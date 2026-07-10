@@ -1,0 +1,61 @@
+{
+  "code": "OK",
+  "message": "成功",
+  "data": {
+    "guestId": null,
+    "pages": 3070,
+    "page": 1,
+    "size": 1,
+    "total": 3070,
+    "took": 0,
+    "url": null,
+    "order": {
+      "field": "",
+      "desc": true
+    },
+    "items": [
+      {
+        "marketplace": "US",
+        "keyword": "child",
+        "keywordCn": "孩子",
+        "keywordJp": "子供",
+        "departments": [
+          {
+            "code": "hpc",
+            "label": "Health, Household & Baby Care"
+          },
+          {
+            "code": "grocery",
+            "label": "Grocery & Gourmet Food"
+          }
+        ],
+        "month": "2025.07",
+        "supplement": "N",
+        "searches": 17702,
+        "purchases": 2436,
+        "purchaseRate": 0.1376,
+        "monopolyClickRate": 0.6205,
+        "products": 364623,
+        "adProducts": 36,
+        "supplyDemandRatio": 0.05,
+        "avgPrice": 17.97,
+        "avgRatings": null,
+        "avgRating": 4.8,
+        "bidMin": 0.91,
+        "bidMax": 1.4,
+        "bid": 1.26,
+        "cvsShareRate": 0.0,
+        "wordCount": 1,
+        "titleDensity": 3,
+        "spr": 56,
+        "relevancy": 100.0,
+        "amazonChoice": false,
+        "searchRank": 94289,
+        "trends": null
+      }
+    ],
+    "terminal": null,
+    "hasNextPage": null,
+    "guestVisited": false
+  }
+}

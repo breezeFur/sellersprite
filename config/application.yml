@@ -1,0 +1,108 @@
+server:
+  port: ${SERVER_PORT:8089}
+  servlet:
+    context-path: /
+
+spring:
+  application:
+    name: sellersprite-service
+  config:
+    import: optional:file:./config/application-local.yml
+  main:
+    banner-mode: console
+  jackson:
+    time-zone: Asia/Shanghai
+    default-property-inclusion: non_null
+  ai:
+    chat:
+      memory:
+        repository:
+          jdbc:
+            initialize-schema: never
+    openai:
+      api-key: ${AI_OPENAI_API_KEY:}
+      base-url: ${AI_OPENAI_BASE_URL:https://yuanbaomao.cyou/v1}
+      chat:
+        completions-path: ${AI_OPENAI_CHAT_COMPLETIONS_PATH:/chat/completions}
+        model: ${AI_CHAT_MODEL:gpt-5.5}
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      pool-name: SellerSpriteHikariPool
+      maximum-pool-size: 10
+      minimum-idle: 2
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+  data:
+    redis:
+      repositories:
+        enabled: false
+
+mybatis-plus:
+  mapper-locations: classpath*:/mapper/**/*.xml
+  type-aliases-package: com.yuanbaomao.sellersprite.db.entity
+  configuration:
+    map-underscore-to-camel-case: true
+    cache-enabled: false
+  global-config:
+    banner: false
+    db-config:
+      logic-delete-field: deleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+
+yuanbaomao:
+  web:
+    openapi:
+      title: SellerSprite 集成服务 API
+      description: SellerSprite 数据接口、系统管理、认证、权限、字典和日志接口
+      version: 0.1.0
+  mybatis:
+    mapper:
+      base-packages:
+        - com.yuanbaomao.sellersprite.db.mapper
+  cache:
+    type: local
+    key-prefix: sellersprite
+    default-ttl: 30m
+  log:
+    max-payload-length: 4000
+
+springdoc:
+  api-docs:
+    enabled: true
+    path: /v3/api-docs
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+    tags-sorter: alpha
+    operations-sorter: method
+
+sellersprite:
+  api:
+    enabled: ${SELLERSPRITE_API_ENABLED:true}
+    base-url: ${SELLERSPRITE_API_BASE_URL:https://api.sellersprite.com}
+    secret-key: ${SELLERSPRITE_API_SECRET_KEY:}
+    connect-timeout: ${SELLERSPRITE_API_CONNECT_TIMEOUT:5s}
+    read-timeout: ${SELLERSPRITE_API_READ_TIMEOUT:30s}
+  ai:
+    chat:
+      enabled: ${AI_CHAT_ENABLED:true}
+      provider: ${AI_CHAT_PROVIDER:openai}
+      model: ${AI_CHAT_MODEL:gpt-5.5}
+      memory-window-size: ${AI_CHAT_MEMORY_WINDOW_SIZE:20}
+  auth:
+    access-token-expire-minutes: ${AUTH_ACCESS_TOKEN_EXPIRE_MINUTES:15}
+    refresh-token-expire-days: 14
+    refresh-cookie-name: sellersprite_refresh_token
+    refresh-cookie-secure: ${AUTH_REFRESH_COOKIE_SECURE:false}
+    public-paths:
+      - /api/auth/login
+      - /api/auth/logout
+      - /actuator/health
+      - /v3/api-docs/**
+      - /swagger-ui.html
+      - /swagger-ui/**
+      - /doc.html
+      - /webjars/**

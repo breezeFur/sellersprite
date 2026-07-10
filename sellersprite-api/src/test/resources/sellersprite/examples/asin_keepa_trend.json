@@ -1,0 +1,167 @@
+{
+  "code": "OK",
+  "message": "成功",
+  "data": {
+    "marketplace": "US",
+    "asin": "B0DYL2DHVV",
+    "dataAsin": "B0DYL2DHVV",
+    "parentAsin": "B0DYL2DHVV",
+    "variationAsins": null,
+    "rootCategory": "283155",
+    "rootCategoryLabel": "Books",
+    "salesRankReference": "283155",
+    "salesRankReferenceHistory": [
+      {
+        "timePoint": 1754767200000,
+        "value": "283155"
+      }
+    ],
+    "nodeIdPath": "283155:1000:48:5043:5045",
+    "nodeLabelPath": "Books:Subjects:Crafts, Hobbies & Home:Pets & Animal Care:Cats",
+    "productStatus": "STANDARD",
+    "availabilityAmazon": "3",
+    "title": "The BrownTrout Portrait Series: The Regal Cat | 2026 12 x 24 Inch (Hanging) Monthly Square Wall Calendar | Plastic-Free | Pet Kitten Feline",
+    "brand": null,
+    "asinUrl": "https://www.amazon.com/dp/B0DYL2DHVV",
+    "brandUrl": null,
+    "salesRankUrl": "https://www.amazon.com/b/?node=283155",
+    "imageUrl": "https://images-na.ssl-images-amazon.com/images/I/71G5e3fedaL._AC_US200_.jpg",
+    "zoomImageUrl": "https://images-na.ssl-images-amazon.com/images/I/71G5e3fedaL._AC_US600_.jpg",
+    "imageUrls": [
+      "https://images-na.ssl-images-amazon.com/images/I/71G5e3fedaL._AC_US200_.jpg",
+      "https://images-na.ssl-images-amazon.com/images/I/41gZkfS-aqL._AC_US200_.jpg",
+      "https://images-na.ssl-images-amazon.com/images/I/41U8rqqd3rL._AC_US200_.jpg",
+      "https://images-na.ssl-images-amazon.com/images/I/31U-+Y9qvOL._AC_US200_.jpg",
+      "https://images-na.ssl-images-amazon.com/images/I/61aDbd0mrzL._AC_US200_.jpg",
+      "https://images-na.ssl-images-amazon.com/images/I/71ZpXgCeF8L._AC_US200_.jpg",
+      "https://images-na.ssl-images-amazon.com/images/I/51Wmp6C8RQL._AC_US200_.jpg",
+      "https://images-na.ssl-images-amazon.com/images/I/61UEytVpLhL._AC_US200_.jpg",
+      "https://images-na.ssl-images-amazon.com/images/I/71vPgiaBjkL._AC_US200_.jpg"
+    ],
+    "dimensions": "12 x 0.1 x 12 inches",
+    "dimensionsSize": [
+      305,
+      3,
+      305
+    ],
+    "weight": "0.56 pounds",
+    "weightGram": 254,
+    "pkgDimensions": "12 x 12 x 0.1 inches",
+    "pkgDimensionsSize": [
+      305,
+      305,
+      3
+    ],
+    "pkgWeight": "0.56 pounds",
+    "pkgWeightGram": 254,
+    "fbaFees": 3.43,
+    "fbaItems": "{\"pickAndPackFeeTax\":0,\"storageFee\":0,\"storageFeeTax\":0,\"pickAndPackFee\":3.43}",
+    "numberOfPages": 28,
+    "numberOfItems": 1,
+    "price": [
+      {
+        "timePoint": 1741427280000,
+        "value": 17.99
+      },
+      {
+        "timePoint": 1741491600000,
+        "value": 17.99
+      },
+      {
+        "timePoint": 1742052000000,
+        "value": 17.99
+      },
+      {
+        "timePoint": 1754767200000,
+        "value": 17.99
+      }
+    ],
+    "dealPrice": [],
+    "buyBox": [],
+    "buyBoxSellerIdHistory": [],
+    "bsr": [
+      {
+        "timePoint": 1741427280000,
+        "value": -1
+      },
+      {
+        "timePoint": 1741491600000,
+        "value": -1
+      },
+      {
+        "timePoint": 1742052000000,
+        "value": -1
+      },
+      {
+        "timePoint": 1754767200000,
+        "value": 256734
+      }
+    ],
+    "subSalesRank": [
+      {
+        "nodeId": "5045",
+        "node": "Cats",
+        "ranks": [
+          {
+            "timePoint": 1741427280000,
+            "value": -1
+          },
+          {
+            "timePoint": 1741491600000,
+            "value": -1
+          },
+          {
+            "timePoint": 1742052000000,
+            "value": -1
+          },
+          {
+            "timePoint": 1754767200000,
+            "value": 189
+          }
+        ]
+      },
+      {
+        "nodeId": "67248",
+        "node": "Cats",
+        "ranks": [
+          {
+            "timePoint": 1741427280000,
+            "value": -1
+          },
+          {
+            "timePoint": 1741491600000,
+            "value": -1
+          },
+          {
+            "timePoint": 1742052000000,
+            "value": -1
+          },
+          {
+            "timePoint": 1754767200000,
+            "value": 34
+          }
+        ]
+      }
+    ],
+    "reviews": [],
+    "rating": [],
+    "sellers": [
+      {
+        "timePoint": 1741427280000,
+        "value": 1
+      },
+      {
+        "timePoint": 1741491600000,
+        "value": 1
+      },
+      {
+        "timePoint": 1742052000000,
+        "value": 1
+      },
+      {
+        "timePoint": 1754767200000,
+        "value": 2
+      }
+    ]
+  }
+}

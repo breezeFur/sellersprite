@@ -1,0 +1,361 @@
+{
+  "code": "OK",
+  "message": "成功",
+  "data": {
+    "asin": {
+      "asin": "B0DXTMS9NF",
+      "asinUrl": "https://www.amazon.com/dp/B0DXTMS9NF?psc=1",
+      "availableDate": 1739894400000,
+      "brand": "GENIMO",
+      "brandUrl": "/stores/GENIMO/page/12D14CF3-B1E6-420E-AC38-482CB1196FE5?is_byline_deeplink=true&deeplink=1F6F837F-A35B-480E-BC90-8ABF05FFA421&redirect_store_id=12D14CF3-B1E6-420E-AC38-482CB1196FE5&lp_asin=B0DXTMS9NF&ref_=ast_bln&store_ref=bl_ast_dp_brandLogo_sto",
+      "bsrId": "home-garden",
+      "bsrLabel": "Home & Kitchen",
+      "bsrRank": 56437,
+      "subcategories": [
+        {
+          "rank": 837,
+          "code": "684541011",
+          "label": "Area Rugs"
+        }
+      ],
+      "createdTime": null,
+      "dimensions": "120\"L x 96\"W",
+      "firstRatingDate": 1752768000000,
+      "imageUrl": "https://m.media-amazon.com/images/I/61AExXWK1NL._AC_US200_.jpg",
+      "lqs": 96,
+      "nodeId": 684541011,
+      "nodeIdPath": "1055398:1063278:21487702011:684541011",
+      "nodeLabelPath": "Home & Kitchen:Home Décor Products:Rugs, Pads & Protectors:Area Rugs",
+      "nodeLabelPathLocale": null,
+      "parent": "B0DXVJ2MKT",
+      "price": 62.99,
+      "primePrice": -1.0,
+      "deliveryPrice": -1.0,
+      "coupon": "",
+      "questions": null,
+      "rating": 4.4,
+      "ratings": 130,
+      "reviews": null,
+      "variantRatings": null,
+      "variantReviews": null,
+      "sellerId": "A99G8HR4ZW1GV",
+      "sellerName": "GENIMO Direct",
+      "fulfillment": "FBA",
+      "sellers": 2,
+      "marketplace": "US",
+      "title": "GENIMO 8x10 Area Rugs for Living Room, Machine Washable Rug Non Slip, Boho Vintage Distressed Chenille Print Carpet, Low Pile Thin Lightweight Rugs for Bedroom, Dining Room, Home, Office, Grey/Brown",
+      "updatedTime": 1757732283000,
+      "variations": 60,
+      "weight": "17.75 Pounds",
+      "zoomImageUrl": "https://m.media-amazon.com/images/I/61AExXWK1NL._AC_US600_.jpg",
+      "skuList": [
+        "Color: Grey & Brown",
+        "Size: 8' x 10' (Rectangular)"
+      ],
+      "variationList": [
+        {
+          "asin": "B0DXV7S864",
+          "attribute": "Color: Orange | Size: 6' x 9' (Rectangular)"
+        },
+        {
+          "asin": "B0DYV9PQRY",
+          "attribute": "Color: Beige/Blue | Size: 2' x 5' (Rectangular)"
+        },
+        {
+          "asin": "B0DYV2V75V",
+          "attribute": "Color: Sage Green | Size: 8' x 10' (Rectangular)"
+        },
+        {
+          "asin": "B0DYV756PB",
+          "attribute": "Color: Brick | Size: 2' x 6' (Rectangular)"
+        },
+        {
+          "asin": "B0DXT7GKZN",
+          "attribute": "Color: Green | Size: 8' x 10' (Rectangular)"
+        },
+        {
+          "asin": "B0DYTQCLBZ",
+          "attribute": "Color: Rose/Blue | Size: 2' x 5' (Rectangular)"
+        },
+        {
+          "asin": "B0DYTY4P2G",
+          "attribute": "Color: Beige/Blue | Size: 8' x 10' (Rectangular)"
+        },
+        {
+          "asin": "B0DYV99B7X",
+          "attribute": "Color: Brick | Size: 2' x 10' (Rectangular)"
+        },
+        {
+          "asin": "B0DYTS1ZHN",
+          "attribute": "Color: Blue/Grey | Size: 2' x 5' (Rectangular)"
+        },
+        {
+          "asin": "B0DXVB4D64",
+          "attribute": "Color: Gray & Cream | Size: 6' x 9' (Rectangular)"
+        },
+        {
+          "asin": "B0DYV1YM3M",
+          "attribute": "Color: Brick | Size: 6' x 9' (Rectangular)"
+        },
+        {
+          "asin": "B0DXTTN9YW",
+          "attribute": "Color: Brown/Beige | Size: 8' x 10' (Rectangular)"
+        },
+        {
+          "asin": "B0DXV1D2PV",
+          "attribute": "Color: Black | Size: 8' x 10' (Rectangular)"
+        },
+        {
+          "asin": "B0DXTMWSFC",
+          "attribute": "Color: Orange | Size: 2' x 5' (Rectangular)"
+        },
+        {
+          "asin": "B0DXV53GM1",
+          "attribute": "Color: Blue/Green | Size: 6' x 9' (Rectangular)"
+        },
+        {
+          "asin": "B0DXTPRXB4",
+          "attribute": "Color: Gray & Cream | Size: 8' x 10' (Rectangular)"
+        },
+        {
+          "asin": "B0DXTY8P6S",
+          "attribute": "Color: Beige | Size: 6' x 9' (Rectangular)"
+        },
+        {
+          "asin": "B0DXV7DJMP",
+          "attribute": "Color: Gray & Cream | Size: 2' x 5' (Rectangular)"
+        },
+        {
+          "asin": "B0DYV5MG3Z",
+          "attribute": "Color: Taupe/Brown | Size: 2' x 10' (Rectangular)"
+        },
+        {
+          "asin": "B0DXV13DT6",
+          "attribute": "Color: Brown/Beige | Size: 2' x 6' (Rectangular)"
+        },
+        {
+          "asin": "B0DXTP42TQ",
+          "attribute": "Color: Beige | Size: 2' x 10' (Rectangular)"
+        },
+        {
+          "asin": "B0DXTYPHH5",
+          "attribute": "Color: Black | Size: 2' x 5' (Rectangular)"
+        },
+        {
+          "asin": "B0DXTXYB8Q",
+          "attribute": "Color: Blue/Green | Size: 2' x 3' (Rectangular)"
+        },
+        {
+          "asin": "B0DXV4RQCH",
+          "attribute": "Color: Taupe | Size: 2' x 5' (Rectangular)"
+        },
+        {
+          "asin": "B0DXTXX6TY",
+          "attribute": "Color: Beige | Size: 2' x 5' (Rectangular)"
+        },
+        {
+          "asin": "B0DYVBD1VS",
+          "attribute": "Color: Grey/Beige | Size: 2' x 5' (Rectangular)"
+        },
+        {
+          "asin": "B0DXTXWFWN",
+          "attribute": "Color: Blue | Size: 2' x 6' (Rectangular)"
+        },
+        {
+          "asin": "B0DXTDGXNY",
+          "attribute": "Color: Brown/Beige | Size: 6' x 9' (Rectangular)"
+        },
+        {
+          "asin": "B0DXTSGM6P",
+          "attribute": "Color: Black | Size: 2' x 10' (Rectangular)"
+        },
+        {
+          "asin": "B0DYVCSZ97",
+          "attribute": "Color: Pink/Blue | Size: 2' x 5' (Rectangular)"
+        },
+        {
+          "asin": "B0DXTP3QLZ",
+          "attribute": "Color: Blue | Size: 8' x 10' (Rectangular)"
+        },
+        {
+          "asin": "B0DXV4S9DY",
+          "attribute": "Color: Black | Size: 6' x 9' (Rectangular)"
+        },
+        {
+          "asin": "B0DYVFLJWZ",
+          "attribute": "Color: Taupe/Brown | Size: 6' x 9' (Rectangular)"
+        },
+        {
+          "asin": "B0DXTMS9NF",
+          "attribute": "Color: Grey & Brown | Size: 8' x 10' (Rectangular)"
+        },
+        {
+          "asin": "B0DXTM5VGT",
+          "attribute": "Color: Brown/Taupe | Size: 8' x 10' (Rectangular)"
+        },
+        {
+          "asin": "B0DYTXY2HB",
+          "attribute": "Color: Sage Green | Size: 2' x 7' (Rectangular)"
+        },
+        {
+          "asin": "B0DXVBGFT7",
+          "attribute": "Color: Taupe | Size: 8' x 10' (Rectangular)"
+        },
+        {
+          "asin": "B0DYV2MMNW",
+          "attribute": "Color: Taupe/Brown | Size: 2' x 6' (Rectangular)"
+        },
+        {
+          "asin": "B0DYV9JKJN",
+          "attribute": "Color: Grey/Beige | Size: 2' x 7' (Rectangular)"
+        },
+        {
+          "asin": "B0DXTTFCRS",
+          "attribute": "Color: Gray & Cream | Size: 2' x 7' (Rectangular)"
+        },
+        {
+          "asin": "B0DYTYQZT3",
+          "attribute": "Color: Grey/Beige | Size: 8' x 10' (Rectangular)"
+        },
+        {
+          "asin": "B0DYV26WJ5",
+          "attribute": "Color: Pink/Blue | Size: 8' x 10' (Rectangular)"
+        },
+        {
+          "asin": "B0DYV4VM98",
+          "attribute": "Color: Sage Green | Size: 6' x 9' (Rectangular)"
+        },
+        {
+          "asin": "B0DXV1GVLT",
+          "attribute": "Color: Grey & Brown | Size: 2' x 5' (Rectangular)"
+        },
+        {
+          "asin": "B0DYVCCTDS",
+          "attribute": "Color: Pink/Blue | Size: 2' x 7' (Rectangular)"
+        },
+        {
+          "asin": "B0DYVB1H2D",
+          "attribute": "Color: Beige/Blue | Size: 2' x 7' (Rectangular)"
+        },
+        {
+          "asin": "B0DYV5P7NS",
+          "attribute": "Color: Beige/Blue | Size: 6' x 9' (Rectangular)"
+        },
+        {
+          "asin": "B0DXTZMVYK",
+          "attribute": "Color: Brown | Size: 6' x 9' (Rectangular)"
+        },
+        {
+          "asin": "B0DYTVBJGS",
+          "attribute": "Color: Blue/Grey | Size: 8' x 10' (Rectangular)"
+        },
+        {
+          "asin": "B0DXTG9G91",
+          "attribute": "Color: Orange | Size: 8' x 10' (Rectangular)"
+        },
+        {
+          "asin": "B0DXTXGHHC",
+          "attribute": "Color: Brown/Taupe | Size: 2' x 3' (Rectangular)"
+        },
+        {
+          "asin": "B0DXVDMWQH",
+          "attribute": "Color: Brown/Taupe | Size: 6' x 9' (Rectangular)"
+        },
+        {
+          "asin": "B0DXTWRB8X",
+          "attribute": "Color: Orange | Size: 2' x 10' (Rectangular)"
+        },
+        {
+          "asin": "B0DYTYNQX7",
+          "attribute": "Color: Pink/Blue | Size: 6' x 9' (Rectangular)"
+        },
+        {
+          "asin": "B0DXVBJNZ8",
+          "attribute": "Color: Green | Size: 2' x 6' (Rectangular)"
+        },
+        {
+          "asin": "B0DXTW4FK1",
+          "attribute": "Color: Brown | Size: 8' x 10' (Rectangular)"
+        },
+        {
+          "asin": "B0DXTFBJPN",
+          "attribute": "Color: Brown | Size: 2' x 7' (Rectangular)"
+        },
+        {
+          "asin": "B0DYVFT8PK",
+          "attribute": "Color: Grey/Beige | Size: 6' x 9' (Rectangular)"
+        },
+        {
+          "asin": "B0DXVDY4XC",
+          "attribute": "Color: Brown | Size: 2' x 5' (Rectangular)"
+        },
+        {
+          "asin": "B0DXTRTCBS",
+          "attribute": "Color: Blue/Green | Size: 8' x 10' (Rectangular)"
+        }
+      ],
+      "features": [
+        "Well-Crafted and High-Quality: Our 8X10 rug is made from high-quality chenille materials, ensuring durability and resistance to wear, fading, stains, and shedding. Featuring a symmetrical central design with intricate plant elements like flowers, leaves, and vines, the large area rug offers rich layers of color and vintage aesthetics for a timeless look. While natural light gives the most accurate color, slight variations may occur due to environmental factors during printing",
+        "Machine Washable and Easy-Care:Washable area rug surfaces are stain-resistant and easy to clean. Beverage stains can be blotted with a rag, and daily dust can be cleaned with a vacuum. For deep cleaning, simply wash the boho rug in the washing machine. Note: For 8x10 washable rug, we recommend using a washer with ≥5.0 cu ft capacity (or a commercial machine) to ensure cleaning",
+        "Nonslip and Pet-Kid Friendly: Our washable rugs feature a high-quality nonslip rubber backing , providing a secure grip to prevent slipping and shifting. The enhanced rubber bottom ensures excellent traction for the kids and pets. It also resists trapping pet fur, keeping vintage rug clean, and odor-free, making it perfect for homes with children and pets",
+        "Slim and Multifunctional Design: Our room rug features a slim, a 3mm low pile design that allows for easy door movement and smooth placement. Its ultra-thin structure offers both style and practicality, whether placed in the bedroom, living room, dining room, kids' room, nursery, playroom, and office",
+        "Wrinkle Removal Guide: 1. Lay indoor rug flat for 3-5 days to let the creases relax naturally. 2. Reverse fold the rug and leave it for a few days to smooth out wrinkles. 3. Place heavy objects on the creases to flatten them. 4.Use a hairdryer or steamer. When ironing both sides of the non slip rug, always place a thin cloth between the iron and the rug, especially on the back side, to prevent damage. Enjoy your boho area rugs"
+      ],
+      "overviews": "{\"Brand\":\"GENIMO\",\"Size\":\"8' x 10' (Rectangular)\",\"Material\":\"Polypropylene\",\"Weave Type\":\"Machine Made\",\"Item Weight\":\"17.75 Pounds\"}",
+      "badge": {
+        "bestSeller": "N",
+        "amazonChoice": "N",
+        "newRelease": "N",
+        "ebc": "Y",
+        "video": "Y"
+      }
+    },
+    "couponTrends": [
+      {
+        "marketplace": "US",
+        "asin": "B0DXTMS9NF",
+        "date": "2025-09-09",
+        "type": "M",
+        "asinPrice": 62.99,
+        "couponPrice": 6.0,
+        "finalPrice": 56.99
+      },
+      {
+        "marketplace": "US",
+        "asin": "B0DXTMS9NF",
+        "date": "2025-09-10",
+        "type": "M",
+        "asinPrice": 62.99,
+        "couponPrice": 6.0,
+        "finalPrice": 56.99
+      },
+      {
+        "marketplace": "US",
+        "asin": "B0DXTMS9NF",
+        "date": "2025-09-11",
+        "type": "M",
+        "asinPrice": 62.99,
+        "couponPrice": 6.0,
+        "finalPrice": 56.99
+      },
+      {
+        "marketplace": "US",
+        "asin": "B0DXTMS9NF",
+        "date": "2025-09-12",
+        "type": "M",
+        "asinPrice": 62.99,
+        "couponPrice": 6.0,
+        "finalPrice": 56.99
+      },
+      {
+        "marketplace": "US",
+        "asin": "B0DXTMS9NF",
+        "date": "2025-09-13",
+        "type": "M",
+        "asinPrice": 62.99,
+        "couponPrice": 6.0,
+        "finalPrice": 56.99
+      }
+    ]
+  }
+}

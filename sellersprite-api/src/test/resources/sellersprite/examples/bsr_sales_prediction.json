@@ -1,0 +1,34 @@
+{
+  "code": "OK",
+  "message": "成功",
+  "data": {
+    "marketplace": "US",
+    "bsr": 2,
+    "categoryLabel": "Handmade Products（手工制作商品）",
+    "estDailySales": 448,
+    "estMonthSales": 13444,
+    "categoryId": "11260432011",
+    "itemList": [
+      {
+        "bsr": 1,
+        "estDailySales": 628,
+        "estMonthSales": 18848
+      },
+      {
+        "bsr": 2,
+        "estDailySales": 448,
+        "estMonthSales": 13444
+      },
+      {
+        "bsr": 3,
+        "estDailySales": 363,
+        "estMonthSales": 10903
+      },
+      {
+        "bsr": 4,
+        "estDailySales": 312,
+        "estMonthSales": 9356
+      }
+    ]
+  }
+}

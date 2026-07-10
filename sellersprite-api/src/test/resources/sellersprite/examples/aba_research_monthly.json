@@ -1,0 +1,83 @@
+{
+  "code": "OK",
+  "message": "成功",
+  "data": {
+    "guestId": null,
+    "pages": 0,
+    "page": 1,
+    "size": 1,
+    "total": 4798,
+    "took": 0,
+    "url": null,
+    "order": {
+      "field": "",
+      "desc": true
+    },
+    "items": [
+      {
+        "marketplace": "US",
+        "date": "202508",
+        "keyword": "screen protector",
+        "keywordCn": "屏幕保护器",
+        "keywordJp": "スクリーンプロテクター",
+        "departments": [
+          "Cell Phones & Accessories"
+        ],
+        "searchRank": 9713,
+        "searchRankCv": -1174,
+        "searchRankCr": -0.1375,
+        "searches": 97649,
+        "purchaseRate": 0.007300000172108412,
+        "purchases": 712,
+        "clicks": 32837,
+        "impressions": 768296,
+        "searchRankGrowthValue": -1174,
+        "searchRankGrowthRate": -0.1375,
+        "cvsShareRate": 0.1115,
+        "clickShareRate": 0.1646,
+        "titleDensityExact": 49,
+        "cprExact": 17,
+        "w1SearchRank": 8539,
+        "w1RankGrowthValue": -1174,
+        "w1RankGrowthRate": -0.1375,
+        "w4SearchRank": 4548,
+        "w4RankGrowthValue": -5165,
+        "w4RankGrowthRate": -1.1357,
+        "w12SearchRank": 12385,
+        "w12RankGrowthValue": 2672,
+        "w12RankGrowthRate": 0.2157,
+        "top3Brands": [
+          "Ailun",
+          "NEW'C",
+          "MAGIC JOHN"
+        ],
+        "bid": 2.98,
+        "bidMax": 3.73,
+        "bidMin": 2.24,
+        "top3AsinDtoList": [
+          {
+            "asin": "B0CCYM3F1V",
+            "imageUrl": "https://m.media-amazon.com/images/I/41nZ7joe65L._AC_SR200,200_.jpg",
+            "clickRate": 0.06559999999999999,
+            "conversionRate": 0.0496
+          },
+          {
+            "asin": "B09CSSP9C1",
+            "imageUrl": "https://m.media-amazon.com/images/I/41YKFO7q5TL._AC_SR200,200_.jpg",
+            "clickRate": 0.058899999999999994,
+            "conversionRate": 0.038900000000000004
+          },
+          {
+            "asin": "B09F2JY5FF",
+            "imageUrl": "https://m.media-amazon.com/images/I/41BTcRUr-ZL._AC_SR200,200_.jpg",
+            "clickRate": 0.0401,
+            "conversionRate": 0.023
+          }
+        ]
+      }
+    ],
+    "terminal": null,
+    "hasNextPage": null,
+    "guestVisited": false
+  }
+}

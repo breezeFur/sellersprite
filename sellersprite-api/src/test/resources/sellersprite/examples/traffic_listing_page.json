@@ -1,0 +1,83 @@
+{
+  "code": "OK",
+  "message": "成功",
+  "data": {
+    "guestId": null,
+    "pages": 0,
+    "page": 0,
+    "size": 1,
+    "total": 916,
+    "took": 0,
+    "url": null,
+    "order": {
+      "field": "createdTime",
+      "desc": true
+    },
+    "items": [
+      {
+        "asin": "B0C2PQ4DKQ",
+        "brand": "Narwey",
+        "brandUrl": "/stores/Narwey/page/FD1DE7D6-334A-4572-9812-2E94A5551047?is_byline_deeplink=true&deeplink=6BD5675E-174E-4D83-8AEC-8E6D8F44651F&redirect_store_id=FD1DE7D6-334A-4572-9812-2E94A5551047&lp_asin=B0C2PQ4DKQ&ref_=ast_bln&store_ref=bl_ast_dp_brandLogo_sto",
+        "imageUrl": "https://images-na.ssl-images-amazon.com/images/I/71-vkU6N+wL._AC_US200_.jpg",
+        "title": "Narwey Makeup Bag Cosmetic Toiletry Bag with Compartments Make Up Bags for Women for Girls",
+        "parent": "B0DRNB9WS7",
+        "nodeLabelPath": "Beauty & Personal Care:Tools & Accessories:Bags & Cases:Cosmetic Bags",
+        "nodeIdPath": "3760911:11062741:11062751:11062771",
+        "nodeId": 11062771,
+        "bsrId": "beauty",
+        "bsr": 1796,
+        "bsrCv": null,
+        "bsrCr": null,
+        "amzUnit": 2000,
+        "amzUnitDate": 1757838157000,
+        "amzSales": null,
+        "units": 13912,
+        "unitsGr": 32.63,
+        "revenue": 118112.875,
+        "price": 8.49,
+        "averagePrice": 9.99,
+        "primePrice": null,
+        "profit": 45.19,
+        "fba": 3.38,
+        "ratings": 11969,
+        "ratingsRate": 0.37,
+        "rating": 4.7,
+        "ratingsCv": 52,
+        "ratingDelta": 0,
+        "availableDate": 1681574400000,
+        "fulfillment": "FBA",
+        "variations": 52,
+        "sellers": 1,
+        "sellerName": "Narwey®",
+        "sellerId": "A1ZPQJWZ8T9WMZ",
+        "sellerNation": "US",
+        "lqs": 100,
+        "weight": "0.29 pounds",
+        "dimension": "8.7 x 3.9 x 5.9 inches",
+        "pkgDimensions": "11.9 x 6.8 x 0.9 inches",
+        "pkgDimensionType": "LS",
+        "pkgWeight": "0.33 pounds",
+        "sku": "Color: YB-Light Checkerboard | Style: Large",
+        "dimensionsType": null,
+        "deliveryPrice": -1.0,
+        "badge": {
+          "bestSeller": null,
+          "amazonChoice": "Amazon's Choice",
+          "newRelease": null,
+          "ebc": "Y",
+          "video": "Y"
+        },
+        "subcategories": [
+          {
+            "code": "11062771",
+            "rank": 3,
+            "label": "Cosmetic Bags"
+          }
+        ]
+      }
+    ],
+    "terminal": null,
+    "hasNextPage": null,
+    "guestVisited": false
+  }
+}

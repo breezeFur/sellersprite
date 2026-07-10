@@ -1,0 +1,103 @@
+{
+  "code": "OK",
+  "message": "成功",
+  "data": {
+    "guestId": null,
+    "pages": 40,
+    "page": 1,
+    "size": 1,
+    "total": 40,
+    "took": 0,
+    "url": null,
+    "order": {
+      "field": "",
+      "desc": true
+    },
+    "items": [
+      {
+        "marketplace": "US",
+        "currency": "USD",
+        "nodeId": 10967801,
+        "nodeLabelName": "Power Strips",
+        "nodeIdPath": "172282:281407:17854127011:10967801",
+        "nodeLabelPath": "Electronics:Accessories & Supplies:Power Strips & Surge Protectors:Power Strips",
+        "nodeLabelLocale": "剥线器",
+        "nodeLabelPathLocale": "电子产品:辅料:剥线器:剥线器",
+        "top10Images": [
+          {
+            "asin": "B09PDLBFKY",
+            "image": "https://images-na.ssl-images-amazon.com/images/I/61NGPmmMAIL._AC_US200_.jpg"
+          },
+          {
+            "asin": "B092J8LPWR",
+            "image": "https://images-na.ssl-images-amazon.com/images/I/61q9hmplGFL._AC_US200_.jpg"
+          },
+          {
+            "asin": "B08R6S1M1K",
+            "image": "https://images-na.ssl-images-amazon.com/images/I/61Hh-YlfJOL._AC_US200_.jpg"
+          },
+          {
+            "asin": "B0DZ254SSR",
+            "image": "https://images-na.ssl-images-amazon.com/images/I/612NrGLfOqL._AC_US200_.jpg"
+          },
+          {
+            "asin": "B09BKHHL5H",
+            "image": "https://images-na.ssl-images-amazon.com/images/I/51hUUjfardL._AC_US200_.jpg"
+          },
+          {
+            "asin": "B09SG2Q23M",
+            "image": "https://images-na.ssl-images-amazon.com/images/I/71FtSiqsK3L._AC_US200_.jpg"
+          },
+          {
+            "asin": "B0DC6GXZSV",
+            "image": "https://images-na.ssl-images-amazon.com/images/I/61MdVuHxxdL._AC_US200_.jpg"
+          },
+          {
+            "asin": "B0BLTYNJCK",
+            "image": "https://images-na.ssl-images-amazon.com/images/I/51eaZfjcoVL._AC_US200_.jpg"
+          },
+          {
+            "asin": "B0BCPC68J6",
+            "image": "https://images-na.ssl-images-amazon.com/images/I/61KkTo7bK4L._AC_US200_.jpg"
+          },
+          {
+            "asin": "B0CKKLDZM8",
+            "image": "https://images-na.ssl-images-amazon.com/images/I/618I9hPCIjL._AC_US200_.jpg"
+          }
+        ],
+        "totalProducts": 2815,
+        "ranking": 1,
+        "topProducts": 100,
+        "brands": 45,
+        "sellers": 45,
+        "totalUnits": 1487414,
+        "totalRevenue": 22973201.92,
+        "avgUnits": 14874,
+        "avgRevenue": 229732.0,
+        "avgPrice": 17.83,
+        "avgRatings": 10756,
+        "avgRating": 4.7,
+        "avgBsr": 447,
+        "baseAvgVolume": 462.27,
+        "avgVolume": 28.21,
+        "baseAvgWeight": 412.99,
+        "avgWeight": 0.9105,
+        "avgProfit": 60.3,
+        "avgSellers": 1.6,
+        "ebcProportion": 91.0,
+        "amazonSelfProportion": 3.0,
+        "fbaProportion": 96.0,
+        "fbmProportion": 0.0,
+        "sellerNation": "CN",
+        "sellerNationLabel": "中国",
+        "sellerProportion": 86.0,
+        "returnRatio": 2.8739,
+        "avgReturnRatio": 2.8656,
+        "searchToPurchaseRatio": 17.91785
+      }
+    ],
+    "terminal": null,
+    "hasNextPage": null,
+    "guestVisited": false
+  }
+}

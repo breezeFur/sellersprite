@@ -1,0 +1,39 @@
+spring:
+  ai:
+    chat:
+      memory:
+        repository:
+          jdbc:
+            initialize-schema: always
+    model:
+      chat: none
+      embedding: none
+      image: none
+      audio:
+        speech: none
+        transcription: none
+      moderation: none
+    openai:
+      api-key:
+      base-url: https://yuanbaomao.cyou/v1
+      chat:
+        model: gpt-5.5
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:sellersprite_service_test;MODE=MySQL;DATABASE_TO_LOWER=TRUE;DB_CLOSE_DELAY=-1
+    username: sa
+    password:
+  data:
+    redis:
+      repositories:
+        enabled: false
+
+mybatis-plus:
+  global-config:
+    banner: false
+
+yuanbaomao:
+  mybatis:
+    mapper:
+      base-packages:
+        - com.yuanbaomao.sellersprite.db.mapper

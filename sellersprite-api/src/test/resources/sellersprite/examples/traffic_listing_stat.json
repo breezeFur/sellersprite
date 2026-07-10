@@ -1,0 +1,63 @@
+{
+  "code": "OK",
+  "message": "成功",
+  "data": {
+    "marketplace": "US",
+    "asin": "B0748J34WZ",
+    "asinList": null,
+    "calcTime": null,
+    "relations": 1037,
+    "freeRelations": 821,
+    "paidRelations": 216,
+    "items": [
+      {
+        "relation": "mib",
+        "count": 0
+      },
+      {
+        "relation": "fbt",
+        "count": 239
+      },
+      {
+        "relation": "csi",
+        "count": 0
+      },
+      {
+        "relation": "cob",
+        "count": 0
+      },
+      {
+        "relation": "mie",
+        "count": 12
+      },
+      {
+        "relation": "bab",
+        "count": 426
+      },
+      {
+        "relation": "vav",
+        "count": 52
+      },
+      {
+        "relation": "avp",
+        "count": 49
+      },
+      {
+        "relation": "bav",
+        "count": 43
+      },
+      {
+        "relation": "bca",
+        "count": 0
+      },
+      {
+        "relation": "sp",
+        "count": 169
+      },
+      {
+        "relation": "fsa",
+        "count": 47
+      }
+    ]
+  }
+}

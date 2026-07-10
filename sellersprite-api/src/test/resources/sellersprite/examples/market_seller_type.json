@@ -1,0 +1,16 @@
+{
+  "code": "OK",
+  "message": "成功",
+  "data": [
+    {
+      "label": "FBA",
+      "asinNum": 10,
+      "asinRatio": 1.0,
+      "units": 4449,
+      "unitsRatio": 1.0,
+      "ratings": 455,
+      "rating": 4.3,
+      "productNum": 10
+    }
+  ]
+}

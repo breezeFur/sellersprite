@@ -1,0 +1,221 @@
+{
+  "code": "OK",
+  "message": "成功",
+  "data": [
+    {
+      "brand": "POCOCO",
+      "ranking": 1,
+      "asins": [
+        "B0B6G28SXP",
+        "B0BZH3T9S9",
+        "B0CHMLN1FS"
+      ],
+      "products": 3,
+      "newProducts": 0,
+      "newUnits": 0,
+      "newRevenue": 0.0,
+      "newUnitsRatio": 0.0,
+      "newRevenueRatio": 0.0,
+      "avgPrice": 41.71,
+      "ratings": 691,
+      "rating": 4.2,
+      "reviews": 29,
+      "totalUnits": 2067,
+      "totalRevenue": 111597.34,
+      "totalUnitsRatio": 0.4449,
+      "totalRevenueRatio": 0.6605
+    },
+    {
+      "brand": "Accecraft",
+      "ranking": 2,
+      "asins": [
+        "B0DQPT7F25"
+      ],
+      "products": 1,
+      "newProducts": 0,
+      "newUnits": 0,
+      "newRevenue": 0.0,
+      "newUnitsRatio": 0.0,
+      "newRevenueRatio": 0.0,
+      "avgPrice": 35.99,
+      "ratings": 105,
+      "rating": 4.7,
+      "reviews": 0,
+      "totalUnits": 599,
+      "totalRevenue": 21558.01,
+      "totalUnitsRatio": 0.1289,
+      "totalRevenueRatio": 0.1276
+    },
+    {
+      "brand": "KUNSLUCK",
+      "ranking": 3,
+      "asins": [
+        "B0C9QMPRY2"
+      ],
+      "products": 1,
+      "newProducts": 0,
+      "newUnits": 0,
+      "newRevenue": 0.0,
+      "newUnitsRatio": 0.0,
+      "newRevenueRatio": 0.0,
+      "avgPrice": 19.99,
+      "ratings": 325,
+      "rating": 4.4,
+      "reviews": 30,
+      "totalUnits": 363,
+      "totalRevenue": 7256.37,
+      "totalUnitsRatio": 0.0781,
+      "totalRevenueRatio": 0.0429
+    },
+    {
+      "brand": "XMANA",
+      "ranking": 4,
+      "asins": [
+        "B0DBRCTQZL",
+        "B0CRTDMYHD"
+      ],
+      "products": 2,
+      "newProducts": 0,
+      "newUnits": 0,
+      "newRevenue": 0.0,
+      "newUnitsRatio": 0.0,
+      "newRevenueRatio": 0.0,
+      "avgPrice": 5.99,
+      "ratings": 607,
+      "rating": 4.5,
+      "reviews": 10,
+      "totalUnits": 289,
+      "totalRevenue": 1731.11,
+      "totalUnitsRatio": 0.0622,
+      "totalRevenueRatio": 0.0102
+    },
+    {
+      "brand": "Brook",
+      "ranking": 5,
+      "asins": [
+        "B06XXKYXLS"
+      ],
+      "products": 1,
+      "newProducts": 0,
+      "newUnits": 0,
+      "newRevenue": 0.0,
+      "newUnitsRatio": 0.0,
+      "newRevenueRatio": 0.0,
+      "avgPrice": 40.0,
+      "ratings": 1279,
+      "rating": 4.0,
+      "reviews": 0,
+      "totalUnits": 282,
+      "totalRevenue": 11280.0,
+      "totalUnitsRatio": 0.0607,
+      "totalRevenueRatio": 0.0668
+    },
+    {
+      "brand": "MIPOW",
+      "ranking": 6,
+      "asins": [
+        "B0D8LKSHCF",
+        "B0D8LK238N"
+      ],
+      "products": 2,
+      "newProducts": 0,
+      "newUnits": 0,
+      "newRevenue": 0.0,
+      "newUnitsRatio": 0.0,
+      "newRevenueRatio": 0.0,
+      "avgPrice": 14.99,
+      "ratings": 82,
+      "rating": 3.9,
+      "reviews": 0,
+      "totalUnits": 274,
+      "totalRevenue": 4107.26,
+      "totalUnitsRatio": 0.059,
+      "totalRevenueRatio": 0.0243
+    },
+    {
+      "brand": "mmcrz",
+      "ranking": 7,
+      "asins": [
+        "B0B2KHYN3Q"
+      ],
+      "products": 1,
+      "newProducts": 0,
+      "newUnits": 0,
+      "newRevenue": 0.0,
+      "newUnitsRatio": 0.0,
+      "newRevenueRatio": 0.0,
+      "avgPrice": 5.39,
+      "ratings": 1307,
+      "rating": 4.3,
+      "reviews": 38,
+      "totalUnits": 239,
+      "totalRevenue": 1288.21,
+      "totalUnitsRatio": 0.0514,
+      "totalRevenueRatio": 0.0076
+    },
+    {
+      "brand": "Dingbaayee",
+      "ranking": 8,
+      "asins": [
+        "B0D448L7Q9"
+      ],
+      "products": 1,
+      "newProducts": 0,
+      "newUnits": 0,
+      "newRevenue": 0.0,
+      "newUnitsRatio": 0.0,
+      "newRevenueRatio": 0.0,
+      "avgPrice": 21.99,
+      "ratings": 144,
+      "rating": 4.3,
+      "reviews": 9,
+      "totalUnits": 185,
+      "totalRevenue": 4068.15,
+      "totalUnitsRatio": 0.0398,
+      "totalRevenueRatio": 0.0241
+    },
+    {
+      "brand": "Generic",
+      "ranking": 9,
+      "asins": [
+        "B0D57J9R1Y",
+        "B0FH56YHCD"
+      ],
+      "products": 2,
+      "newProducts": 1,
+      "newUnits": 128,
+      "newRevenue": 2174.719970703125,
+      "newUnitsRatio": 0.7151,
+      "newRevenueRatio": 0.6808,
+      "avgPrice": 18.49,
+      "ratings": 117,
+      "rating": 3.8,
+      "reviews": 19,
+      "totalUnits": 179,
+      "totalRevenue": 3194.21,
+      "totalUnitsRatio": 0.0385,
+      "totalRevenueRatio": 0.0189
+    },
+    {
+      "brand": "MALKO",
+      "ranking": 10,
+      "asins": [
+        "B08BPKZH45"
+      ],
+      "products": 1,
+      "newProducts": 0,
+      "newUnits": 0,
+      "newRevenue": 0.0,
+      "newUnitsRatio": 0.0,
+      "newRevenueRatio": 0.0,
+      "avgPrice": 16.99,
+      "ratings": 321,
+      "rating": 4.6,
+      "reviews": 0,
+      "totalUnits": 169,
+      "totalRevenue": 2871.31,
+      "totalUnitsRatio": 0.0364,
+      "totalRevenueRatio": 0.017
+    }
+  ]
+}

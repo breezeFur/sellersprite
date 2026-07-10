@@ -1,0 +1,27 @@
+{
+  "code": "OK",
+  "message": "成功",
+  "data": [
+    {
+      "nodeIdPath": "2619525011:3741271:3741281",
+      "nodeLabelPath": "Appliances:Dishwashers:Built-In Dishwashers",
+      "products": 263,
+      "nodeLabelLocale": "嵌入式洗碗机",
+      "nodeLabelPathLocale": "家电:洗碗机:嵌入式洗碗机"
+    },
+    {
+      "nodeIdPath": "2619525011:3741271:19201451011",
+      "nodeLabelPath": "Appliances:Dishwashers:Countertop Dishwashers",
+      "products": 320,
+      "nodeLabelLocale": "洗碗机",
+      "nodeLabelPathLocale": "家电:洗碗机:洗碗机"
+    },
+    {
+      "nodeIdPath": "2619525011:3741271:19201449011",
+      "nodeLabelPath": "Appliances:Dishwashers:Portable Dishwashers",
+      "products": 104,
+      "nodeLabelLocale": "便携式洗碗机",
+      "nodeLabelPathLocale": "家电:洗碗机:便携式洗碗机"
+    }
+  ]
+}

@@ -1,0 +1,83 @@
+{
+  "code": "OK",
+  "message": "成功",
+  "data": {
+    "guestId": null,
+    "pages": 64754,
+    "page": 1,
+    "size": 1,
+    "total": 64754,
+    "took": 17,
+    "url": null,
+    "order": {
+      "field": "",
+      "desc": true
+    },
+    "items": [
+      {
+        "asin": "B0DB5VT4QJ",
+        "brand": "OLANLY",
+        "brandUrl": "https://www.amazon.com/s?k=OLANLY",
+        "imageUrl": "https://images-na.ssl-images-amazon.com/images/I/81ZghGzYgkL._AC_US200_.jpg",
+        "title": "OLANLY Bathroom Rugs 70x46, Extra Soft Absorbent Chenille Bath Rugs, Rubber Backing Quick Dry, Machine Washable Bath Mats for Bathroom Floor, Tub and Shower, Home Decor Accessories, Navy",
+        "parent": "B0DP268C4Y",
+        "nodeLabelPath": "Home & Kitchen:Bath:Bath Rugs",
+        "nodeIdPath": "1055398:1063236:1063242",
+        "nodeId": 1063242,
+        "bsrId": "home-garden",
+        "bsr": 13,
+        "bsrCv": -1,
+        "bsrCr": -8.33,
+        "amzUnit": null,
+        "amzUnitDate": null,
+        "amzSales": null,
+        "units": 158113,
+        "unitsGr": null,
+        "revenue": 16059537.0,
+        "price": 100.89,
+        "averagePrice": 101.57,
+        "primePrice": -1.0,
+        "profit": 71.71,
+        "fba": 13.41,
+        "ratings": 18821,
+        "ratingsRate": 1.38,
+        "rating": 4.4,
+        "ratingsCv": 2179,
+        "ratingDelta": 0,
+        "availableDate": 1721779200000,
+        "fulfillment": "FBA",
+        "variations": 449,
+        "sellers": 1,
+        "sellerName": "OLANLY",
+        "sellerId": "A1MCYUGJD2ILFU",
+        "sellerNation": "CN",
+        "lqs": 96,
+        "weight": "10.41 pounds",
+        "dimension": "46 x 70 x 1 inches",
+        "pkgDimensions": "18.9 x 7.8 x 7.4 inches",
+        "pkgDimensionType": "LB",
+        "pkgWeight": "10.43 pounds",
+        "sku": "Size: 70\" x 46\" | Color: Navy",
+        "dimensionsType": "ELO",
+        "deliveryPrice": -1.0,
+        "badge": {
+          "bestSeller": "#1 Best Seller in Bath Rugs",
+          "amazonChoice": "N",
+          "newRelease": "N",
+          "ebc": "Y",
+          "video": "N"
+        },
+        "subcategories": [
+          {
+            "code": "1063242",
+            "rank": 1,
+            "label": "Bath Rugs"
+          }
+        ]
+      }
+    ],
+    "terminal": null,
+    "hasNextPage": null,
+    "guestVisited": false
+  }
+}

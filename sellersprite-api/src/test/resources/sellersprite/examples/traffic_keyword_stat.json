@@ -1,0 +1,22 @@
+{
+  "code": "OK",
+  "message": "成功",
+  "data": {
+    "marketplace": "US",
+    "asin": "B0DXTMS9NF",
+    "keywords": 60,
+    "ranks": 9,
+    "ads": 52,
+    "badgeCount": {
+      "ns": 9,
+      "ac": null,
+      "er": null,
+      "fs": null,
+      "hr": null,
+      "sb": null,
+      "sv": null,
+      "ad": 52
+    },
+    "calcTime": 1757856276576
+  }
+}

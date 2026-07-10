@@ -1,0 +1,69 @@
+{
+  "code": "OK",
+  "message": "成功",
+  "data": [
+    {
+      "label": "有A+有视频",
+      "products": 14,
+      "productsRatio": 18.18,
+      "units": 3599,
+      "unitsRatio": 68.72
+    },
+    {
+      "label": "新品无A+无视频",
+      "products": 0,
+      "productsRatio": 0.0,
+      "units": 0,
+      "unitsRatio": 0.0
+    },
+    {
+      "label": "有A+无视频",
+      "products": 14,
+      "productsRatio": 18.18,
+      "units": 1117,
+      "unitsRatio": 21.33
+    },
+    {
+      "label": "新品有A+无视频",
+      "products": 0,
+      "productsRatio": 0.0,
+      "units": 0,
+      "unitsRatio": 0.0
+    },
+    {
+      "label": "新品无A+有视频",
+      "products": 0,
+      "productsRatio": 0.0,
+      "units": 0,
+      "unitsRatio": 0.0
+    },
+    {
+      "label": "无A+无视频",
+      "products": 43,
+      "productsRatio": 55.84,
+      "units": 448,
+      "unitsRatio": 8.55
+    },
+    {
+      "label": "新品有A+有视频",
+      "products": 1,
+      "productsRatio": 100.0,
+      "units": 128,
+      "unitsRatio": 100.0
+    },
+    {
+      "label": "无A+有视频",
+      "products": 6,
+      "productsRatio": 7.79,
+      "units": 73,
+      "unitsRatio": 1.39
+    },
+    {
+      "label": "A+",
+      "products": 28,
+      "productsRatio": 36.36,
+      "units": 4716,
+      "unitsRatio": 90.05
+    }
+  ]
+}

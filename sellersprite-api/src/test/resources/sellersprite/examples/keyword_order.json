@@ -1,0 +1,139 @@
+{
+  "code": "OK",
+  "message": "成功",
+  "data": {
+    "guestId": null,
+    "pages": 2,
+    "page": 0,
+    "size": 50,
+    "total": 74,
+    "took": 3593,
+    "url": null,
+    "order": {
+      "field": "searchRank",
+      "desc": false
+    },
+    "items": [
+      {
+        "marketplace": "US",
+        "asin": null,
+        "keyword": "phone holder for desk",
+        "searches": 17804,
+        "keywordCn": "办公桌上的电话支架",
+        "keywordJp": "デスク用フォンホルダー",
+        "searchRank": 14766,
+        "searchRankGv": -2967,
+        "searchRankGr": -0.2515,
+        "monopolyAsinDtos": [
+          {
+            "asin": "B07F8S18D5",
+            "title": "Nulaxy Dual Folding Cell Phone Stand, Fully Adjustable Foldable Desktop Phone Holder Cradle Dock Compatible with Phone 16 15 14 13 12 11 Pro Xs Xs Max Xr X 8, Nintendo Switch, All Phones",
+            "imageUrl": "https://m.media-amazon.com/images/I/31OR4pkm28L._AC_US200_.jpg",
+            "clickRate": 0.1165,
+            "conversionShareRate": 0.1038
+          },
+          {
+            "asin": "B092J6LZPF",
+            "title": "OGMAPLE Cell Phone Stand, Angle Height Adjustable Cell Phone Holder with Silicon Pad for Desk Fully Forldable Mobile Phone Holder Compatible with All Mobile Phones, MT-6, (White)",
+            "imageUrl": "https://m.media-amazon.com/images/I/31bOtLQw2YL._AC_US200_.jpg",
+            "clickRate": 0.0646,
+            "conversionShareRate": 0.0484
+          },
+          {
+            "asin": "B07Z82895W",
+            "title": "LISEN Cell Phone Stand Adjustable Phone Holer for Desk, Computer Office Desk Accessories for iPhone 16 Holder Women Kitchen Essentials Fits All Mobile Phones Switch Kindle iPads Tablet 4-10in",
+            "imageUrl": "https://m.media-amazon.com/images/I/41MvveP1WWL._AC_SR200,200_.jpg",
+            "clickRate": 0.0568,
+            "conversionShareRate": 0.0623
+          }
+        ],
+        "monopolyClickRate": 0.2379,
+        "cvsShareRate": 0.2145,
+        "top3ClickingRate": 0.2379,
+        "top3ConversionRate": 0.2145,
+        "conversionType": "U"
+      },
+      {
+        "marketplace": "US",
+        "asin": null,
+        "keyword": "iphone holder for desk",
+        "searches": 4772,
+        "keywordCn": "桌子上的苹果手机支架",
+        "keywordJp": "机の上にiphoneホルダー",
+        "searchRank": 78787,
+        "searchRankGv": -6964,
+        "searchRankGr": -0.097,
+        "monopolyAsinDtos": [
+          {
+            "asin": "B07F8S18D5",
+            "title": "Nulaxy Dual Folding Cell Phone Stand, Fully Adjustable Foldable Desktop Phone Holder Cradle Dock Compatible with Phone 16 15 14 13 12 11 Pro Xs Xs Max Xr X 8, Nintendo Switch, All Phones",
+            "imageUrl": "https://m.media-amazon.com/images/I/31OR4pkm28L._AC_US200_.jpg",
+            "clickRate": 0.1423,
+            "conversionShareRate": 0.1232
+          },
+          {
+            "asin": "B0744DM3Y3",
+            "title": "Adjustable Cell Phone Stand, OMOTON Aluminum Desktop Cellphone Stand with Anti-Slip Base and Convenient Charging Port, Fits All Smart Phones, Silver",
+            "imageUrl": "https://m.media-amazon.com/images/I/41b6TfhOl7L._AC_SR200,200_.jpg",
+            "clickRate": 0.1149,
+            "conversionShareRate": 0.0915
+          },
+          {
+            "asin": "B07Z82895W",
+            "title": "LISEN Cell Phone Stand Adjustable Phone Holer for Desk, Computer Office Desk Accessories for iPhone 16 Holder Women Kitchen Essentials Fits All Mobile Phones Switch Kindle iPads Tablet 4-10in",
+            "imageUrl": "https://m.media-amazon.com/images/I/41MvveP1WWL._AC_SR200,200_.jpg",
+            "clickRate": 0.0674,
+            "conversionShareRate": 0.0528
+          }
+        ],
+        "monopolyClickRate": 0.3246,
+        "cvsShareRate": 0.2675,
+        "top3ClickingRate": 0.3246,
+        "top3ConversionRate": 0.2675,
+        "conversionType": "U"
+      },
+      {
+        "marketplace": "US",
+        "asin": null,
+        "keyword": "home office accessories for women",
+        "searches": 158,
+        "keywordCn": "女性家庭办公用品",
+        "keywordJp": "女性のためのホームオフィスアクセサリー",
+        "searchRank": 1638861,
+        "searchRankGv": -530386,
+        "searchRankGr": -0.4785,
+        "monopolyAsinDtos": [
+          {
+            "asin": "B07Q128V6W",
+            "title": "ODISTAR Desktop Vacuum Cleaner, Mini Table dust Sweeper Energy Saving,High Endurance up to 90 mins,Cordless&360º Rotatable Design for Keyboard/Home/School/Office(White AA Battery)",
+            "imageUrl": "https://m.media-amazon.com/images/I/31ftQzG80qL._AC_US200_.jpg",
+            "clickRate": 0.0513,
+            "conversionShareRate": 0.0
+          },
+          {
+            "asin": "B07Z82895W",
+            "title": "LISEN Cell Phone Stand Adjustable Phone Holer for Desk, Computer Office Desk Accessories for iPhone 16 Holder Women Kitchen Essentials Fits All Mobile Phones Switch Kindle iPads Tablet 4-10in",
+            "imageUrl": "https://m.media-amazon.com/images/I/41MvveP1WWL._AC_SR200,200_.jpg",
+            "clickRate": 0.0513,
+            "conversionShareRate": 0.0
+          },
+          {
+            "asin": "B085MJGYH4",
+            "title": "Motivational Calendar - Daily Flip Calendar with Inspirational Quotes - Inspirational Desk Decor for Women, Office Decor for Women Desk, Inspirational Gifts for Women, Desk Accessories for Women",
+            "imageUrl": "https://m.media-amazon.com/images/I/519ooHLT18L._AC_US200_.jpg",
+            "clickRate": 0.0513,
+            "conversionShareRate": 0.0
+          }
+        ],
+        "monopolyClickRate": 0.1539,
+        "cvsShareRate": 0.0,
+        "top3ClickingRate": 0.15389999999999998,
+        "top3ConversionRate": 0.0,
+        "conversionType": "I"
+      }
+    ],
+    "terminal": null,
+    "hasNextPage": null,
+    "guestVisited": false
+  }
+}

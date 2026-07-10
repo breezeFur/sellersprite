@@ -1,0 +1,321 @@
+{
+  "code": "OK",
+  "message": "成功",
+  "data": {
+    "asinDetail": {
+      "asin": "B0DBY873G7",
+      "title": "Palo Santo Holder Handmade Ceramics Incense Burner Chimney Dish Smudge Bowl for Palo Santo Sticks Sage Bundles with Brush(Brown) (Aroma Lavender Gray)",
+      "brand": "XINXINGDINGSHENG",
+      "availableDate": 1721836800000,
+      "category": "Home & Kitchen",
+      "categoryId": "1055398",
+      "imageUrl": "https://m.media-amazon.com/images/I/31QCyB5tToL._AC_US600_.jpg",
+      "rating": 4.6,
+      "ratings": 109,
+      "trends": null
+    },
+    "dailyItemList": [
+      {
+        "date": "2025-07-01",
+        "bsr": 137656,
+        "sales": 9,
+        "amount": 126,
+        "price": 14
+      },
+      {
+        "date": "2025-07-02",
+        "bsr": 123175,
+        "sales": 8,
+        "amount": 112,
+        "price": 14
+      },
+      {
+        "date": "2025-07-03",
+        "bsr": 120283,
+        "sales": 8,
+        "amount": 112,
+        "price": 14
+      },
+      {
+        "date": "2025-07-04",
+        "bsr": 114687,
+        "sales": 6,
+        "amount": 83,
+        "price": 14
+      },
+      {
+        "date": "2025-07-05",
+        "bsr": 120777,
+        "sales": 9,
+        "amount": 124,
+        "price": 14
+      },
+      {
+        "date": "2025-07-06",
+        "bsr": 110100,
+        "sales": 8,
+        "amount": 111,
+        "price": 14
+      },
+      {
+        "date": "2025-07-07",
+        "bsr": 133276,
+        "sales": 8,
+        "amount": 111,
+        "price": 14
+      },
+      {
+        "date": "2025-07-08",
+        "bsr": 133770,
+        "sales": 24,
+        "amount": 332,
+        "price": 14
+      },
+      {
+        "date": "2025-07-09",
+        "bsr": 109751,
+        "sales": 13,
+        "amount": 180,
+        "price": 14
+      },
+      {
+        "date": "2025-07-10",
+        "bsr": 135021,
+        "sales": 13,
+        "amount": 180,
+        "price": 14
+      },
+      {
+        "date": "2025-07-11",
+        "bsr": 123387,
+        "sales": 14,
+        "amount": 194,
+        "price": 14
+      },
+      {
+        "date": "2025-07-12",
+        "bsr": 149383,
+        "sales": 6,
+        "amount": 83,
+        "price": 14
+      },
+      {
+        "date": "2025-07-13",
+        "bsr": 148693,
+        "sales": 7,
+        "amount": 97,
+        "price": 14
+      },
+      {
+        "date": "2025-07-14",
+        "bsr": 128831,
+        "sales": 9,
+        "amount": 125,
+        "price": 14
+      },
+      {
+        "date": "2025-07-15",
+        "bsr": 118624,
+        "sales": 8,
+        "amount": 111,
+        "price": 14
+      },
+      {
+        "date": "2025-07-16",
+        "bsr": 131133,
+        "sales": 8,
+        "amount": 111,
+        "price": 14
+      },
+      {
+        "date": "2025-07-17",
+        "bsr": 142485,
+        "sales": 8,
+        "amount": 111,
+        "price": 14
+      },
+      {
+        "date": "2025-07-18",
+        "bsr": 127138,
+        "sales": 8,
+        "amount": 111,
+        "price": 14
+      },
+      {
+        "date": "2025-07-19",
+        "bsr": 140438,
+        "sales": 8,
+        "amount": 111,
+        "price": 14
+      },
+      {
+        "date": "2025-07-20",
+        "bsr": 133537,
+        "sales": 7,
+        "amount": 97,
+        "price": 14
+      },
+      {
+        "date": "2025-07-21",
+        "bsr": 154046,
+        "sales": 7,
+        "amount": 97,
+        "price": 14
+      },
+      {
+        "date": "2025-07-22",
+        "bsr": 157889,
+        "sales": 7,
+        "amount": 97,
+        "price": 14
+      },
+      {
+        "date": "2025-07-23",
+        "bsr": 138867,
+        "sales": 6,
+        "amount": 83,
+        "price": 14
+      },
+      {
+        "date": "2025-07-24",
+        "bsr": 171831,
+        "sales": 5,
+        "amount": 69,
+        "price": 14
+      },
+      {
+        "date": "2025-07-25",
+        "bsr": 190265,
+        "sales": 4,
+        "amount": 55,
+        "price": 14
+      },
+      {
+        "date": "2025-07-26",
+        "bsr": 229817,
+        "sales": 4,
+        "amount": 55,
+        "price": 14
+      },
+      {
+        "date": "2025-07-27",
+        "bsr": 179898,
+        "sales": 4,
+        "amount": 55,
+        "price": 14
+      },
+      {
+        "date": "2025-07-28",
+        "bsr": 183567,
+        "sales": 5,
+        "amount": 69,
+        "price": 14
+      },
+      {
+        "date": "2025-07-29",
+        "bsr": 192506,
+        "sales": 5,
+        "amount": 69,
+        "price": 14
+      },
+      {
+        "date": "2025-07-30",
+        "bsr": 195364,
+        "sales": 5,
+        "amount": 69,
+        "price": 14
+      },
+      {
+        "date": "2025-07-31",
+        "bsr": 193317,
+        "sales": 6,
+        "amount": 83,
+        "price": 14
+      },
+      {
+        "date": "2025-08-01",
+        "bsr": 177302,
+        "sales": 5,
+        "amount": 69,
+        "price": 14
+      },
+      {
+        "date": "2025-08-02",
+        "bsr": 197168,
+        "sales": 5,
+        "amount": 69,
+        "price": 14
+      },
+      {
+        "date": "2025-08-03",
+        "bsr": 197168,
+        "sales": 6,
+        "amount": 83,
+        "price": 14
+      },
+      {
+        "date": "2025-08-04",
+        "bsr": 186121,
+        "sales": 5,
+        "amount": 69,
+        "price": 14
+      },
+      {
+        "date": "2025-08-05",
+        "bsr": 231933,
+        "sales": 4,
+        "amount": 55,
+        "price": 14
+      },
+      {
+        "date": "2025-08-06",
+        "bsr": 226310,
+        "sales": 4,
+        "amount": 55,
+        "price": 14
+      },
+      {
+        "date": "2025-08-07",
+        "bsr": 242646,
+        "sales": 4,
+        "amount": 55,
+        "price": 14
+      },
+      {
+        "date": "2025-08-08",
+        "bsr": 242646,
+        "sales": 4,
+        "amount": 55,
+        "price": 14
+      },
+      {
+        "date": "2025-08-09",
+        "bsr": 242646,
+        "sales": 4,
+        "amount": 55,
+        "price": 14
+      },
+      {
+        "date": "2025-08-10",
+        "bsr": 309885,
+        "sales": 3,
+        "amount": 42,
+        "price": 14
+      }
+    ],
+    "monthItemList": [
+      {
+        "date": "2025-07",
+        "sales": 247,
+        "amount": 3424,
+        "price": 14
+      },
+      {
+        "date": "2025-08",
+        "sales": 44,
+        "amount": 609,
+        "price": 14
+      }
+    ]
+  }
+}

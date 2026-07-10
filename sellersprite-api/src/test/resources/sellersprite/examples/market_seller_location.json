@@ -1,0 +1,143 @@
+{
+  "code": "OK",
+  "message": "成功",
+  "data": [
+    {
+      "label": "中国",
+      "country": "中国",
+      "asins": [
+        "B0CG9LQSHG",
+        "B07ZFHLFRH",
+        "B07LGYFKYN",
+        "B0CB5CF72S",
+        "B00DECS350",
+        "B08NX7DYNT",
+        "B0CCD9R595",
+        "B07M66L7C7",
+        "B0BZH3T9S9",
+        "B0CHMLN1FS",
+        "B0C9QMPRY2",
+        "B0CBS5XLBG",
+        "B0CCJ1YPG6",
+        "B0CG9H4Z1Y",
+        "B0DN66XGD1",
+        "B0DYJZJBV4",
+        "B0DM8RHQS6",
+        "B0CDRLC1B9",
+        "B0D448L7Q9",
+        "B0CGD7R3F9",
+        "B0DQPT7F25",
+        "B0CC9HP84X",
+        "B0CRTDMYHD",
+        "B0D8LK238N",
+        "B0DTKD136N",
+        "B0CCXGSBQ3",
+        "B0CG5GNGGR",
+        "B0CDTXTZ5Q",
+        "B0B6G28SXP",
+        "B0B2KHYN3Q",
+        "B0FH56YHCD",
+        "B0CGLMHC35",
+        "B0CHYQ9F7M",
+        "B0BPY3BYB4",
+        "B0BZP5XRC3",
+        "B0D8LKSHCF",
+        "B0CGDVHJ76",
+        "B07CQDVFQF",
+        "B0DBRCTQZL",
+        "B0CFTQDJZ1",
+        "B083BB18RG",
+        "B0C5CY6P3M",
+        "B0CDPLQ461",
+        "B0CDRL7Q7B"
+      ],
+      "products": 44,
+      "units": 4496,
+      "revenue": 162659.78,
+      "unitsRatio": 0.8585
+    },
+    {
+      "label": "美国",
+      "country": "美国",
+      "asins": [
+        "B00BRABTXO",
+        "B0018RCN5E",
+        "B00271251C",
+        "B00BRABI7Q",
+        "B004BKOBV4",
+        "B0742P76VD",
+        "B07PNCP3K6",
+        "B003081XBE",
+        "B01ETYIZC2",
+        "B08BPKZH45",
+        "B0BX2P43PX",
+        "B0017PNQ7G",
+        "B01ISZ49E6",
+        "B01H482N6E",
+        "B0D7TR7L8P",
+        "B0D57J9R1Y",
+        "B00BRABN8K",
+        "B07PNCLF62",
+        "B08QDWP43V",
+        "B0098B5GN8",
+        "B0C4H7Z8WG",
+        "B00BRABY52",
+        "B00J2QHHYA",
+        "B01J97F05O"
+      ],
+      "products": 24,
+      "units": 362,
+      "revenue": 11658.27,
+      "unitsRatio": 0.0691
+    },
+    {
+      "label": "未知",
+      "country": "未知",
+      "asins": [
+        "B00CERY32S",
+        "B07QVY6QM4",
+        "B0002ZPFU8",
+        "B003P2UMS0",
+        "B071K63M65"
+      ],
+      "products": 5,
+      "units": 39,
+      "revenue": 616.39,
+      "unitsRatio": 0.0074
+    },
+    {
+      "label": "中国香港",
+      "country": "中国香港",
+      "asins": [
+        "B06XXKYXLS",
+        "B07YCGLQFG"
+      ],
+      "products": 2,
+      "units": 285,
+      "revenue": 11333.97,
+      "unitsRatio": 0.0544
+    },
+    {
+      "label": "中国台湾",
+      "country": "中国台湾",
+      "asins": [
+        "B0B58Q99R6"
+      ],
+      "products": 1,
+      "units": 46,
+      "revenue": 4507.54,
+      "unitsRatio": 0.0088
+    },
+    {
+      "label": "加拿大",
+      "country": "加拿大",
+      "asins": [
+        "B0BQ8Z7Z7D"
+      ],
+      "products": 1,
+      "units": 9,
+      "revenue": 234.0,
+      "unitsRatio": 0.0017
+    }
+  ]
+}

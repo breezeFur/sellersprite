@@ -1,0 +1,22 @@
+{
+  "code": "OK",
+  "message": "成功",
+  "data": [
+    {
+      "office": "YT",
+      "officeLabel": "马约特"
+    },
+    {
+      "office": "ZA",
+      "officeLabel": "南非"
+    },
+    {
+      "office": "ZM",
+      "officeLabel": "赞比亚"
+    },
+    {
+      "office": "ZW",
+      "officeLabel": "津巴布韦"
+    }
+  ]
+}

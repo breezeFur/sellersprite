@@ -1,0 +1,73 @@
+{
+  "code": "OK",
+  "message": "成功",
+  "data": {
+    "marketplace": "US",
+    "asin": "B07Z82895W",
+    "total": 1023,
+    "items": [
+      {
+        "keyword": "phone accessory",
+        "keywordCn": "手机配件",
+        "searches": 530,
+        "products": 144065,
+        "purchases": 3,
+        "purchaseRate": 0.007,
+        "bid": 0.77,
+        "bidMax": 0.96,
+        "bidMin": 0.58,
+        "badges": [
+          "naturalSearching",
+          "sponsorVideo"
+        ],
+        "rankPosition": {
+          "page": 3,
+          "pageSize": 17,
+          "index": 4,
+          "position": 52,
+          "updatedTime": 1753349221000
+        },
+        "adPosition": {
+          "page": 3,
+          "pageSize": 20,
+          "index": 20,
+          "position": 73,
+          "updatedTime": 1752120219000
+        },
+        "updatedTime": 1753349221000,
+        "searchesRank": 2443672,
+        "searchesRankTimeFrom": 1752940800000,
+        "searchesRankTimeTo": 1753459200000,
+        "latest1daysAds": 0,
+        "latest7daysAds": 48,
+        "latest30daysAds": 170,
+        "supplyDemandRatio": 0.0,
+        "trafficPercentage": 0.0,
+        "trafficKeywordType": null,
+        "conversionKeywordType": null,
+        "calculatedWeeklySearches": 0.0,
+        "titleDensity": 1,
+        "spr": 1,
+        "monopolyClickRate": 0.2307,
+        "top3ClickingRate": 0.2307,
+        "top3ConversionRate": 0.0,
+        "clicks": 229,
+        "impressions": 13957,
+        "naturalRatio": 0.98009,
+        "adRatio": 0.01991,
+        "topAsins": null,
+        "searchesTrend": null
+      }
+    ],
+    "stats": [
+      {
+        "keywords": "phone",
+        "total": 1
+      },
+      {
+        "keywords": "accessory",
+        "total": 1
+      }
+    ]
+  }
+}

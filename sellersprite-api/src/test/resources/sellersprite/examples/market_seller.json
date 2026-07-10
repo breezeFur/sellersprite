@@ -1,0 +1,220 @@
+{
+  "code": "OK",
+  "message": "成功",
+  "data": [
+    {
+      "sellerName": "POCOCO Direct",
+      "ranking": 1,
+      "asins": [
+        "B0B6G28SXP",
+        "B0BZH3T9S9",
+        "B0CHMLN1FS"
+      ],
+      "products": 3,
+      "newProducts": 0,
+      "newUnits": 0,
+      "newRevenue": 0.0,
+      "newUnitsRatio": 0.0,
+      "newRevenueRatio": 0.0,
+      "avgPrice": 41.71,
+      "ratings": 691,
+      "rating": 4.2,
+      "reviews": 29,
+      "totalUnits": 2067,
+      "totalRevenue": 111597.34,
+      "totalUnitsRatio": 0.4498,
+      "totalRevenueRatio": 0.6645
+    },
+    {
+      "sellerName": "NEX001US",
+      "ranking": 2,
+      "asins": [
+        "B0DQPT7F25"
+      ],
+      "products": 1,
+      "newProducts": 0,
+      "newUnits": 0,
+      "newRevenue": 0.0,
+      "newUnitsRatio": 0.0,
+      "newRevenueRatio": 0.0,
+      "avgPrice": 35.99,
+      "ratings": 105,
+      "rating": 4.7,
+      "reviews": 0,
+      "totalUnits": 599,
+      "totalRevenue": 21558.01,
+      "totalUnitsRatio": 0.1304,
+      "totalRevenueRatio": 0.1284
+    },
+    {
+      "sellerName": "KUNSLUCK",
+      "ranking": 3,
+      "asins": [
+        "B0C9QMPRY2"
+      ],
+      "products": 1,
+      "newProducts": 0,
+      "newUnits": 0,
+      "newRevenue": 0.0,
+      "newUnitsRatio": 0.0,
+      "newRevenueRatio": 0.0,
+      "avgPrice": 19.99,
+      "ratings": 325,
+      "rating": 4.4,
+      "reviews": 30,
+      "totalUnits": 363,
+      "totalRevenue": 7256.37,
+      "totalUnitsRatio": 0.079,
+      "totalRevenueRatio": 0.0432
+    },
+    {
+      "sellerName": "XMANA Direct",
+      "ranking": 4,
+      "asins": [
+        "B0DBRCTQZL",
+        "B0CRTDMYHD"
+      ],
+      "products": 2,
+      "newProducts": 0,
+      "newUnits": 0,
+      "newRevenue": 0.0,
+      "newUnitsRatio": 0.0,
+      "newRevenueRatio": 0.0,
+      "avgPrice": 5.99,
+      "ratings": 607,
+      "rating": 4.5,
+      "reviews": 10,
+      "totalUnits": 289,
+      "totalRevenue": 1731.11,
+      "totalUnitsRatio": 0.0629,
+      "totalRevenueRatio": 0.0103
+    },
+    {
+      "sellerName": "Shop4fun",
+      "ranking": 5,
+      "asins": [
+        "B06XXKYXLS"
+      ],
+      "products": 1,
+      "newProducts": 0,
+      "newUnits": 0,
+      "newRevenue": 0.0,
+      "newUnitsRatio": 0.0,
+      "newRevenueRatio": 0.0,
+      "avgPrice": 40.0,
+      "ratings": 1279,
+      "rating": 4.0,
+      "reviews": 0,
+      "totalUnits": 282,
+      "totalRevenue": 11280.0,
+      "totalUnitsRatio": 0.0614,
+      "totalRevenueRatio": 0.0672
+    },
+    {
+      "sellerName": "MIPOW INC",
+      "ranking": 6,
+      "asins": [
+        "B0D8LKSHCF",
+        "B0D8LK238N"
+      ],
+      "products": 2,
+      "newProducts": 0,
+      "newUnits": 0,
+      "newRevenue": 0.0,
+      "newUnitsRatio": 0.0,
+      "newRevenueRatio": 0.0,
+      "avgPrice": 14.99,
+      "ratings": 82,
+      "rating": 3.9,
+      "reviews": 0,
+      "totalUnits": 274,
+      "totalRevenue": 4107.26,
+      "totalUnitsRatio": 0.0596,
+      "totalRevenueRatio": 0.0245
+    },
+    {
+      "sellerName": "mmcrz",
+      "ranking": 7,
+      "asins": [
+        "B0B2KHYN3Q"
+      ],
+      "products": 1,
+      "newProducts": 0,
+      "newUnits": 0,
+      "newRevenue": 0.0,
+      "newUnitsRatio": 0.0,
+      "newRevenueRatio": 0.0,
+      "avgPrice": 5.39,
+      "ratings": 1307,
+      "rating": 4.3,
+      "reviews": 38,
+      "totalUnits": 239,
+      "totalRevenue": 1288.21,
+      "totalUnitsRatio": 0.052,
+      "totalRevenueRatio": 0.0077
+    },
+    {
+      "sellerName": "Dingbaayee",
+      "ranking": 8,
+      "asins": [
+        "B0D448L7Q9"
+      ],
+      "products": 1,
+      "newProducts": 0,
+      "newUnits": 0,
+      "newRevenue": 0.0,
+      "newUnitsRatio": 0.0,
+      "newRevenueRatio": 0.0,
+      "avgPrice": 21.99,
+      "ratings": 144,
+      "rating": 4.3,
+      "reviews": 9,
+      "totalUnits": 185,
+      "totalRevenue": 4068.15,
+      "totalUnitsRatio": 0.0403,
+      "totalRevenueRatio": 0.0242
+    },
+    {
+      "sellerName": "One Click Shop - Malko",
+      "ranking": 9,
+      "asins": [
+        "B08BPKZH45"
+      ],
+      "products": 1,
+      "newProducts": 0,
+      "newUnits": 0,
+      "newRevenue": 0.0,
+      "newUnitsRatio": 0.0,
+      "newRevenueRatio": 0.0,
+      "avgPrice": 16.99,
+      "ratings": 321,
+      "rating": 4.6,
+      "reviews": 0,
+      "totalUnits": 169,
+      "totalRevenue": 2871.31,
+      "totalUnitsRatio": 0.0368,
+      "totalRevenueRatio": 0.0171
+    },
+    {
+      "sellerName": "CACHIL",
+      "ranking": 10,
+      "asins": [
+        "B0FH56YHCD"
+      ],
+      "products": 1,
+      "newProducts": 1,
+      "newUnits": 128,
+      "newRevenue": 2174.719970703125,
+      "newUnitsRatio": 1.0,
+      "newRevenueRatio": 1.0,
+      "avgPrice": 16.99,
+      "ratings": 15,
+      "rating": 3.7,
+      "reviews": 0,
+      "totalUnits": 128,
+      "totalRevenue": 2174.72,
+      "totalUnitsRatio": 0.0279,
+      "totalRevenueRatio": 0.0129
+    }
+  ]
+}

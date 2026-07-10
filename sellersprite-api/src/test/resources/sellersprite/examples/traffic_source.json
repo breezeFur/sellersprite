@@ -1,0 +1,66 @@
+{
+  "code": "OK",
+  "message": "成功",
+  "data": {
+    "guestId": null,
+    "pages": 0,
+    "page": 1,
+    "size": 1,
+    "total": 9,
+    "took": 0,
+    "url": null,
+    "order": {
+      "field": "",
+      "desc": true
+    },
+    "items": [
+      {
+        "keywords": 1128,
+        "searchKeywords": 1037,
+        "acKeywords": 0,
+        "editorialKeywords": 0,
+        "fourStarsKeywords": 0,
+        "hrKeywords": 13,
+        "adKeywords": 225,
+        "videoKeywords": 9,
+        "brandKeywords": 0,
+        "badgeDetails": {
+          "AD": [
+            "SPONSOR_VIDEO",
+            "HIGHLY_RATED",
+            "ADS"
+          ],
+          "SEARCH": [
+            "NATURAL_SEARCHING"
+          ]
+        },
+        "badgeLabels": [
+          "SEARCH",
+          "AD"
+        ],
+        "asinInfo": {
+          "asin": "B07Z82895W",
+          "asinUrl": "https://www.amazon.com/dp/B07Z82895W?psc=1",
+          "currency": null,
+          "price": 9.99,
+          "rating": 4.5,
+          "reviews": 68849,
+          "sku": "Color: BLACK",
+          "title": "LISEN Cell Phone Stand Adjustable for iPhone Phone Holder for Desk, Office Desk Accessories Computer PC for iPhone Stand Gaming Essentials Fit Otterbox Case Phones Switch Kindle iPad Air Tablet 4-10in",
+          "variations": 9,
+          "category1Id": null,
+          "category1Name": null,
+          "nodeId": 23690036011,
+          "nodeIdPath": "2335752011:2407755011:23690036011",
+          "nodeLabelPath": "Cell Phones & Accessories:Accessories:Stands",
+          "bsrRank": 422,
+          "bsrId": "wireless",
+          "bsrLabel": "Cell Phones & Accessories"
+        }
+      }
+    ],
+    "terminal": null,
+    "hasNextPage": null,
+    "guestVisited": false
+  }
+}

@@ -1,0 +1,51 @@
+{
+  "code": "OK",
+  "message": "成功",
+  "data": [
+    {
+      "marketplace": "US",
+      "asin": "B0DXTMS9NF",
+      "date": "2025-09-09",
+      "type": "M",
+      "asinPrice": 62.99,
+      "couponPrice": 6.0,
+      "finalPrice": 56.99
+    },
+    {
+      "marketplace": "US",
+      "asin": "B0DXTMS9NF",
+      "date": "2025-09-10",
+      "type": "M",
+      "asinPrice": 62.99,
+      "couponPrice": 6.0,
+      "finalPrice": 56.99
+    },
+    {
+      "marketplace": "US",
+      "asin": "B0DXTMS9NF",
+      "date": "2025-09-11",
+      "type": "M",
+      "asinPrice": 62.99,
+      "couponPrice": 6.0,
+      "finalPrice": 56.99
+    },
+    {
+      "marketplace": "US",
+      "asin": "B0DXTMS9NF",
+      "date": "2025-09-12",
+      "type": "M",
+      "asinPrice": 62.99,
+      "couponPrice": 6.0,
+      "finalPrice": 56.99
+    },
+    {
+      "marketplace": "US",
+      "asin": "B0DXTMS9NF",
+      "date": "2025-09-13",
+      "type": "M",
+      "asinPrice": 62.99,
+      "couponPrice": 6.0,
+      "finalPrice": 56.99
+    }
+  ]
+}

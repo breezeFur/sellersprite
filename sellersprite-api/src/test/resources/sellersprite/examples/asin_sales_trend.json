@@ -1,0 +1,191 @@
+{
+  "code": "OK",
+  "message": "成功",
+  "data": {
+    "asin": {
+      "asin": "B0FGJ8SP7R",
+      "asinUrl": "https://www.amazon.com/dp/B0FGJ8SP7R?psc=1",
+      "availableDate": 1751385600000,
+      "brand": "DLHMBOQ",
+      "brandUrl": "/s/ref=bl_dp_s_web_0?ie=UTF8&search-alias=aps&field-keywords=DLHMBOQ",
+      "bsrId": "hi",
+      "bsrLabel": "Tools & Home Improvement",
+      "bsrRank": 6939,
+      "subcategories": [
+        {
+          "rank": 2,
+          "code": "2232357011",
+          "label": "Dishwasher Replacement Hoses"
+        }
+      ],
+      "createdTime": 1751531618000,
+      "dimensions": "8.6\"L x 8.2\"W",
+      "firstRatingDate": 1774713600000,
+      "imageUrl": "https://m.media-amazon.com/images/I/4193rnBah3L._AC_US200_.jpg",
+      "lqs": 100,
+      "nodeId": 2232357011,
+      "nodeIdPath": "2619525011:3741181:3741201:2232357011",
+      "nodeLabelPath": "Appliances:Parts & Accessories:Dishwasher Parts & Accessories:Hoses",
+      "nodeLabelPathLocale": null,
+      "parent": "B0G62RQZVD",
+      "price": 11.99,
+      "primePrice": -1.0,
+      "deliveryPrice": -1.0,
+      "coupon": "",
+      "questions": null,
+      "rating": 4.5,
+      "ratings": 556,
+      "reviews": 0,
+      "variantRatings": null,
+      "variantReviews": 41,
+      "sellerId": "A3CUUY1JMQCJRJ",
+      "sellerName": "DL Boutique",
+      "fulfillment": "FBA",
+      "sellers": 1,
+      "marketplace": "US",
+      "title": "10ft Washing Machine Drain Hose Extension Kit - Universal for Washer, Dishwasher & Dehumidifier, 7-Piece Set with U-Bracket, 4 Clamps & Adapter",
+      "updatedTime": 1780466868000,
+      "variations": 2,
+      "weight": "0.39 Pounds",
+      "zoomImageUrl": "https://m.media-amazon.com/images/I/4193rnBah3L._AC_US600_.jpg",
+      "skuList": [
+        "Size: 10Feet"
+      ],
+      "variationList": [
+        {
+          "asin": "B0FGJ8SP7R",
+          "attribute": "Size: 10Feet"
+        },
+        {
+          "asin": "B0DYDR3F89",
+          "attribute": "Size: 6.5Feet"
+        }
+      ],
+      "features": [
+        "【Universal Fit】 Compatible with most front-load/top-load washers, dishwashers & dehumidifiers (LG/Samsung/Whirlpool, etc.). Four inner diameters of 4/5, 9/10, 1-1/5, and 1-1/2 inches can be cut according to actual size,Confirm your original hose size before purchase!",
+        "【Complete 7-Piece Kit】 Includes: 1x 10ft PP drain hose, 1x U-bracket, 4x adjustable clamps & 1x adapter.",
+        "【Tool-Free Installation】 Flexible hose + quick-connect clamps for easy DIY setup in minutes.",
+        "【Durable & Safe】 Heavy-duty PP material resists kinks, cracks, and chemical corrosion.",
+        "【Extend or Replace】 Solve drainage issues for relocated appliances or tight spaces."
+      ],
+      "overviews": "{\"Brand\":\"DLHMBOQ\",\"Material\":\"high-quality Polypropylene (PP)\",\"Color\":\"Gray\",\"Product Dimensions\":\"8.6\\\"L x 8.2\\\"W\",\"Item Weight\":\"0.39 Pounds\",\"Outside Diameter\":\"1.5 Inches\",\"Item Length\":\"122 Inches\",\"Manufacturer\":\"DLHMBOQ\",\"Set Name\":\"Universal Drain Hose Extension Kit (7-Piece)\",\"Unit Count\":\"1.0 Count\"}",
+      "badge": {
+        "bestSeller": "N",
+        "amazonChoice": "Y",
+        "newRelease": "N",
+        "ebc": "Y",
+        "video": "N"
+      }
+    },
+    "salesTrendPoints": [
+      {
+        "month": "2025-07",
+        "price": 15.99,
+        "averagePrice": 15.99,
+        "parentUnitSales": 0,
+        "childUnitSales": null,
+        "parentSalesRevenue": 0.0,
+        "childSalesRevenue": null
+      },
+      {
+        "month": "2025-08",
+        "price": 10.99,
+        "averagePrice": 12.46,
+        "parentUnitSales": 40,
+        "childUnitSales": null,
+        "parentSalesRevenue": 498.4,
+        "childSalesRevenue": null
+      },
+      {
+        "month": "2025-09",
+        "price": 10.79,
+        "averagePrice": 10.71,
+        "parentUnitSales": 429,
+        "childUnitSales": 400,
+        "parentSalesRevenue": 4594.59,
+        "childSalesRevenue": 4284.0
+      },
+      {
+        "month": "2025-10",
+        "price": 10.99,
+        "averagePrice": 10.99,
+        "parentUnitSales": 455,
+        "childUnitSales": 400,
+        "parentSalesRevenue": 5000.4497,
+        "childSalesRevenue": 4396.0
+      },
+      {
+        "month": "2025-11",
+        "price": 11.29,
+        "averagePrice": 11.22,
+        "parentUnitSales": 494,
+        "childUnitSales": 400,
+        "parentSalesRevenue": 5542.68,
+        "childSalesRevenue": 4488.0
+      },
+      {
+        "month": "2025-12",
+        "price": 11.59,
+        "averagePrice": 11.56,
+        "parentUnitSales": 1727,
+        "childUnitSales": 400,
+        "parentSalesRevenue": 19964.121,
+        "childSalesRevenue": 4624.0
+      },
+      {
+        "month": "2026-01",
+        "price": 11.79,
+        "averagePrice": 11.67,
+        "parentUnitSales": 1692,
+        "childUnitSales": 400,
+        "parentSalesRevenue": 19745.64,
+        "childSalesRevenue": 4668.0
+      },
+      {
+        "month": "2026-02",
+        "price": 11.79,
+        "averagePrice": 11.79,
+        "parentUnitSales": 1136,
+        "childUnitSales": 400,
+        "parentSalesRevenue": 13393.44,
+        "childSalesRevenue": 4716.0
+      },
+      {
+        "month": "2026-03",
+        "price": 11.79,
+        "averagePrice": 11.79,
+        "parentUnitSales": 1710,
+        "childUnitSales": 500,
+        "parentSalesRevenue": 20160.9,
+        "childSalesRevenue": 5895.0
+      },
+      {
+        "month": "2026-04",
+        "price": 11.99,
+        "averagePrice": 12.14,
+        "parentUnitSales": 1850,
+        "childUnitSales": 600,
+        "parentSalesRevenue": 22459.0,
+        "childSalesRevenue": 7284.0
+      },
+      {
+        "month": "2026-05",
+        "price": 11.99,
+        "averagePrice": 11.99,
+        "parentUnitSales": 1671,
+        "childUnitSales": null,
+        "parentSalesRevenue": 20035.29,
+        "childSalesRevenue": null
+      },
+      {
+        "month": "2026-06",
+        "price": 11.99,
+        "averagePrice": 11.99,
+        "parentUnitSales": 1560,
+        "childUnitSales": null,
+        "parentSalesRevenue": 18704.4,
+        "childSalesRevenue": null
+      }
+    ]
+  }
+}

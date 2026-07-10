@@ -1,0 +1,230 @@
+{
+  "code": "OK",
+  "message": "成功",
+  "data": [
+    {
+      "label": "2012",
+      "year": "2012",
+      "asins": [
+        "B0018RCN5E",
+        "B0002ZPFU8"
+      ],
+      "products": 2,
+      "units": 5,
+      "revenue": 48.33,
+      "unitsRatio": 0.001
+    },
+    {
+      "label": "2013",
+      "year": "2013",
+      "asins": [
+        "B0098B5GN8"
+      ],
+      "products": 1,
+      "units": 8,
+      "revenue": 47.92,
+      "unitsRatio": 0.0015
+    },
+    {
+      "label": "2014",
+      "year": "2014",
+      "asins": [
+        "B003081XBE"
+      ],
+      "products": 1,
+      "units": 0,
+      "revenue": 0.0,
+      "unitsRatio": 0.0
+    },
+    {
+      "label": "2015",
+      "year": "2015",
+      "asins": [],
+      "products": 0,
+      "units": 0,
+      "revenue": 0.0,
+      "unitsRatio": 0.0
+    },
+    {
+      "label": "2016",
+      "year": "2016",
+      "asins": [
+        "B00CERY32S",
+        "B01H482N6E",
+        "B00271251C"
+      ],
+      "products": 3,
+      "units": 25,
+      "revenue": 938.92,
+      "unitsRatio": 0.0048
+    },
+    {
+      "label": "2017",
+      "year": "2017",
+      "asins": [
+        "B01ISZ49E6",
+        "B06XXKYXLS",
+        "B004BKOBV4",
+        "B0742P76VD",
+        "B01ETYIZC2",
+        "B071K63M65",
+        "B0017PNQ7G"
+      ],
+      "products": 7,
+      "units": 286,
+      "revenue": 11339.8,
+      "unitsRatio": 0.0546
+    },
+    {
+      "label": "2018",
+      "year": "2018",
+      "asins": [
+        "B07M66L7C7",
+        "B00BRABN8K",
+        "B07CQDVFQF",
+        "B00BRABI7Q",
+        "B00J2QHHYA",
+        "B01J97F05O"
+      ],
+      "products": 6,
+      "units": 3,
+      "revenue": 239.94,
+      "unitsRatio": 0.0006
+    },
+    {
+      "label": "2019",
+      "year": "2019",
+      "asins": [
+        "B00BRABTXO",
+        "B07LGYFKYN",
+        "B00DECS350",
+        "B07QVY6QM4",
+        "B07PNCLF62",
+        "B00BRABY52",
+        "B07PNCP3K6"
+      ],
+      "products": 7,
+      "units": 70,
+      "revenue": 1836.61,
+      "unitsRatio": 0.0134
+    },
+    {
+      "label": "2020",
+      "year": "2020",
+      "asins": [
+        "B07ZFHLFRH",
+        "B08NX7DYNT",
+        "B08QDWP43V",
+        "B083BB18RG",
+        "B07YCGLQFG",
+        "B08BPKZH45",
+        "B003P2UMS0"
+      ],
+      "products": 7,
+      "units": 201,
+      "revenue": 3467.29,
+      "unitsRatio": 0.0384
+    },
+    {
+      "label": "2021",
+      "year": "2021",
+      "asins": [],
+      "products": 0,
+      "units": 0,
+      "revenue": 0.0,
+      "unitsRatio": 0.0
+    },
+    {
+      "label": "2022",
+      "year": "2022",
+      "asins": [
+        "B0B6G28SXP",
+        "B0B58Q99R6",
+        "B0B2KHYN3Q"
+      ],
+      "products": 3,
+      "units": 2352,
+      "revenue": 117393.09,
+      "unitsRatio": 0.4491
+    },
+    {
+      "label": "2023",
+      "year": "2023",
+      "asins": [
+        "B0CG9LQSHG",
+        "B0CB5CF72S",
+        "B0CCD9R595",
+        "B0BQ8Z7Z7D",
+        "B0BZH3T9S9",
+        "B0CHMLN1FS",
+        "B0C9QMPRY2",
+        "B0CBS5XLBG",
+        "B0CCJ1YPG6",
+        "B0CG9H4Z1Y",
+        "B0C4H7Z8WG",
+        "B0CDRLC1B9",
+        "B0CGD7R3F9",
+        "B0CC9HP84X",
+        "B0CCXGSBQ3",
+        "B0CG5GNGGR",
+        "B0CDTXTZ5Q",
+        "B0CGLMHC35",
+        "B0CHYQ9F7M",
+        "B0BPY3BYB4",
+        "B0BX2P43PX",
+        "B0BZP5XRC3",
+        "B0CGDVHJ76",
+        "B0CFTQDJZ1",
+        "B0C5CY6P3M",
+        "B0CDPLQ461",
+        "B0CDRL7Q7B"
+      ],
+      "products": 27,
+      "units": 670,
+      "revenue": 16262.24,
+      "unitsRatio": 0.1279
+    },
+    {
+      "label": "2024",
+      "year": "2024",
+      "asins": [
+        "B0D8LKSHCF",
+        "B0D8LK238N",
+        "B0D7TR7L8P",
+        "B0D57J9R1Y",
+        "B0DM8RHQS6",
+        "B0DBRCTQZL",
+        "B0D448L7Q9",
+        "B0CRTDMYHD"
+      ],
+      "products": 8,
+      "units": 799,
+      "revenue": 10926.01,
+      "unitsRatio": 0.1526
+    },
+    {
+      "label": "2025",
+      "year": "2025",
+      "asins": [
+        "B0DTKD136N",
+        "B0DN66XGD1",
+        "B0DYJZJBV4",
+        "B0DQPT7F25",
+        "B0FH56YHCD"
+      ],
+      "products": 5,
+      "units": 818,
+      "revenue": 28509.8,
+      "unitsRatio": 0.1562
+    },
+    {
+      "label": "2026",
+      "year": "2026",
+      "asins": [],
+      "products": 0,
+      "units": 0,
+      "revenue": 0.0,
+      "unitsRatio": 0.0
+    }
+  ]
+}

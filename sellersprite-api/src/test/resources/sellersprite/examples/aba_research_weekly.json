@@ -1,0 +1,83 @@
+{
+  "code": "OK",
+  "message": "成功",
+  "data": {
+    "guestId": null,
+    "pages": 0,
+    "page": 1,
+    "size": 1,
+    "total": 4835,
+    "took": 0,
+    "url": null,
+    "order": {
+      "field": "",
+      "desc": true
+    },
+    "items": [
+      {
+        "marketplace": "US",
+        "date": "20250802",
+        "keyword": "screen protector",
+        "keywordCn": "屏幕保护器",
+        "keywordJp": "スクリーンプロテクター",
+        "departments": [
+          "Cell Phones & Accessories"
+        ],
+        "searchRank": 9038,
+        "searchRankCv": -738,
+        "searchRankCr": -0.0889,
+        "searches": 22012,
+        "purchaseRate": 0.04699999839067459,
+        "purchases": 1035,
+        "clicks": 3403,
+        "impressions": 451341,
+        "searchRankGrowthValue": -738,
+        "searchRankGrowthRate": -0.0889,
+        "cvsShareRate": 0.0842,
+        "clickShareRate": 0.1489,
+        "titleDensityExact": 50,
+        "cprExact": 64,
+        "w1SearchRank": 8300,
+        "w1RankGrowthValue": -738,
+        "w1RankGrowthRate": -0.0889,
+        "w4SearchRank": 7989,
+        "w4RankGrowthValue": -1049,
+        "w4RankGrowthRate": -0.1313,
+        "w12SearchRank": 8738,
+        "w12RankGrowthValue": -300,
+        "w12RankGrowthRate": -0.0343,
+        "top3Brands": [
+          "Ailun",
+          "MAGIC JOHN",
+          "JETech"
+        ],
+        "bid": 3.36,
+        "bidMax": 4.2,
+        "bidMin": 2.52,
+        "top3AsinDtoList": [
+          {
+            "asin": "B09CSSP9C1",
+            "imageUrl": "https://m.media-amazon.com/images/I/41YKFO7q5TL._AC_SR200,200_.jpg",
+            "clickRate": 0.0679,
+            "conversionRate": 0.0335
+          },
+          {
+            "asin": "B0B769X1VJ",
+            "imageUrl": "https://m.media-amazon.com/images/I/41jCDstPVaL._AC_SR200,200_.jpg",
+            "clickRate": 0.0407,
+            "conversionRate": 0.0281
+          },
+          {
+            "asin": "B09F2JY5FF",
+            "imageUrl": "https://m.media-amazon.com/images/I/41BTcRUr-ZL._AC_SR200,200_.jpg",
+            "clickRate": 0.0403,
+            "conversionRate": 0.0226
+          }
+        ]
+      }
+    ],
+    "terminal": null,
+    "hasNextPage": null,
+    "guestVisited": false
+  }
+}

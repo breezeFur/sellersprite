@@ -1,0 +1,171 @@
+{
+  "code": "OK",
+  "message": "成功",
+  "data": {
+    "guestId": null,
+    "pages": 1239,
+    "page": 1,
+    "size": 1,
+    "total": 1239,
+    "took": 15,
+    "url": null,
+    "order": {
+      "field": "",
+      "desc": true
+    },
+    "items": [
+      {
+        "marketplace": "US",
+        "keywords": "child",
+        "searches": 17702,
+        "purchases": 2436,
+        "growth": -19.83153,
+        "purchaseRate": 0.1376,
+        "products": 364623,
+        "supplyDemandRatio": 0.05,
+        "searchDepartments": [
+          {
+            "code": "hpc",
+            "label": "Health, Household & Baby Care",
+            "total": 2725,
+            "ratio": 0.15393741
+          },
+          {
+            "code": "grocery",
+            "label": "Grocery & Gourmet Food",
+            "total": 1361,
+            "ratio": 0.07688397
+          }
+        ],
+        "month": "2025.07",
+        "supplement": "N",
+        "searchMonthlyCv": -12649,
+        "searchMonthlyCr": -41.68,
+        "searchNearlyCv": -4379,
+        "searchNearlyCr": -19.83,
+        "currency": "$",
+        "avgPrice": 17.97,
+        "avgRatings": 25985,
+        "avgRating": 4.8,
+        "relationAsinList": [
+          {
+            "asin": "B06XSCPJZK",
+            "imageUrl": "https://m.media-amazon.com/images/I/41dfAc5LCkL._AC_US200_.jpg",
+            "price": 26.59,
+            "ratings": 6816,
+            "rating": 4.4
+          },
+          {
+            "asin": "B08N7XY3YX",
+            "imageUrl": "https://m.media-amazon.com/images/I/51I4il4gDiL._SX200_SY200_CR,0,0,200,200_.jpg",
+            "price": 3.88,
+            "ratings": 1891,
+            "rating": 4.3
+          },
+          {
+            "asin": "B0DBK72RNM",
+            "imageUrl": null,
+            "price": null,
+            "ratings": null,
+            "rating": null
+          },
+          {
+            "asin": "031075013X",
+            "imageUrl": "https://m.media-amazon.com/images/I/51W5p0Xa+bL._SX200_SY200_CR,0,0,200,200_.jpg",
+            "price": 0.0,
+            "ratings": 26942,
+            "rating": 4.9
+          },
+          {
+            "asin": "1589255518",
+            "imageUrl": "https://m.media-amazon.com/images/I/51X8S5lCw0L._SX200_SY200_CR,0,0,200,200_.jpg",
+            "price": 799.0,
+            "ratings": 78366,
+            "rating": 4.9
+          },
+          {
+            "asin": "1558585362",
+            "imageUrl": "https://m.media-amazon.com/images/I/61PSea9xxtL._SX200_SY200_CR,0,0,200,200_.jpg",
+            "price": 5.16,
+            "ratings": 7356,
+            "rating": 4.8
+          },
+          {
+            "asin": "B0D47TX6KL",
+            "imageUrl": null,
+            "price": null,
+            "ratings": null,
+            "rating": null
+          },
+          {
+            "asin": "0060245867",
+            "imageUrl": "https://m.media-amazon.com/images/I/51TyTVf8ALL._SX200_SY200_CR,0,0,200,200_.jpg",
+            "price": 0.0,
+            "ratings": 14669,
+            "rating": 4.8
+          },
+          {
+            "asin": "0399226907",
+            "imageUrl": "https://m.media-amazon.com/images/I/41oCAss2B8L._SX200_SY200_CR,0,0,200,200_.jpg",
+            "price": 599.0,
+            "ratings": 77242,
+            "rating": 4.9
+          },
+          {
+            "asin": "B000I9VO6C",
+            "imageUrl": null,
+            "price": null,
+            "ratings": null,
+            "rating": null
+          }
+        ],
+        "bidMin": 0.91,
+        "bidMax": 1.4,
+        "bid": 1.26,
+        "araAsinList": [
+          {
+            "asin": "B07HQ2JS3L",
+            "title": null,
+            "imageUrl": null,
+            "clickRate": 0.28,
+            "conversionShareRate": 0.0
+          },
+          {
+            "asin": "B00CR9RR12",
+            "title": null,
+            "imageUrl": null,
+            "clickRate": 0.1878,
+            "conversionShareRate": 0.0
+          },
+          {
+            "asin": "B00D5DO41K",
+            "title": null,
+            "imageUrl": null,
+            "clickRate": 0.1527,
+            "conversionShareRate": 0.0
+          }
+        ],
+        "araClickRate": 0.6205,
+        "araShareRate": 0.0,
+        "goodsValue": 0.0701,
+        "marketPeriod": "S9,S10",
+        "brand": null,
+        "hasBrandWord": false,
+        "keywordCn": "孩子",
+        "brands": [
+          "Majosta",
+          "Delacorte Press"
+        ],
+        "categories": [
+          "Digital_Video_Download",
+          "Books",
+          "Digital_Ebook_Purchase"
+        ],
+        "titleDensityExact": 3
+      }
+    ],
+    "terminal": null,
+    "hasNextPage": null,
+    "guestVisited": false
+  }
+}

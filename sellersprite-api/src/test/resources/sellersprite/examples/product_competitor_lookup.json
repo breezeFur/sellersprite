@@ -1,0 +1,93 @@
+{
+  "code": "OK",
+  "message": "成功",
+  "data": {
+    "guestId": null,
+    "pages": 8644,
+    "page": 1,
+    "size": 1,
+    "total": 8644,
+    "took": 754,
+    "url": null,
+    "order": {
+      "field": "",
+      "desc": true
+    },
+    "items": [
+      {
+        "asin": "B0DGVP84B5",
+        "brand": "Apple",
+        "brandUrl": "https://www.amazon.com/s?k=Apple",
+        "imageUrl": "https://images-na.ssl-images-amazon.com/images/I/61886B78v4L._AC_US200_.jpg",
+        "title": "Apple Watch Series 10 [GPS + Cellular 46mm] with Natural Titanium Case with Stone Grey Sport Band - S/M. Fitness Tracker, ECG App, Always-On Retina Display, Water Resistant with AppleCare+ (2 Years)",
+        "parent": "B0FH2CCLPX",
+        "nodeLabelPath": null,
+        "nodeIdPath": null,
+        "nodeId": null,
+        "bsrId": null,
+        "bsr": 4,
+        "bsrCv": -3,
+        "bsrCr": -300.0,
+        "amzUnit": null,
+        "amzUnitDate": null,
+        "amzSales": null,
+        "units": 167539,
+        "unitsGr": null,
+        "revenue": 123276872.0,
+        "price": 728.99,
+        "averagePrice": 735.81,
+        "primePrice": -1.0,
+        "profit": 98.52,
+        "fba": 10.75,
+        "ratings": 8707,
+        "ratingsRate": 0.66,
+        "rating": 4.7,
+        "ratingsCv": 1103,
+        "ratingDelta": 0,
+        "availableDate": 1726012800000,
+        "fulfillment": "AMZ",
+        "variations": 84,
+        "sellers": 1,
+        "sellerName": "Amazon",
+        "sellerId": null,
+        "sellerNation": "US",
+        "lqs": null,
+        "weight": "4.8 ounces",
+        "dimension": "24 x 7.7 x 3 inches",
+        "pkgDimensions": null,
+        "pkgDimensionType": null,
+        "pkgWeight": null,
+        "sku": "Color: Natural Titanium Case with Stone Grey Sport Band | Size: 46mm case + Small/Medium band | Style: GPS + Cellular | Configuration: With AppleCare+ (2 Years)",
+        "dimensionsType": "LB",
+        "deliveryPrice": -1.0,
+        "badge": {
+          "bestSeller": "#1 Best Seller in Smartwatches",
+          "amazonChoice": "N",
+          "newRelease": "N",
+          "ebc": "Y",
+          "video": "Y"
+        },
+        "subcategories": [
+          {
+            "code": "14130292011",
+            "rank": 1,
+            "label": "Smartwatches"
+          },
+          {
+            "code": "7939901011",
+            "rank": 1,
+            "label": "Smartwatches"
+          },
+          {
+            "code": "172282",
+            "rank": 14,
+            "label": "Back to results"
+          }
+        ]
+      }
+    ],
+    "terminal": null,
+    "hasNextPage": null,
+    "guestVisited": false
+  }
+}
