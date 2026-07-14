@@ -1,0 +1,205 @@
+export interface ApiEndpointRef {
+  httpMethod: string
+  pathPattern: string
+}
+
+export interface MenuApiBinding {
+  functionCode: string
+  apis: readonly ApiEndpointRef[]
+}
+
+const sessionApi = { httpMethod: 'GET', pathPattern: '/api/auth/session' } as const
+
+export const sellerSpriteWorkbenchApis = [
+  { httpMethod: 'GET', pathPattern: '/api/sellersprite/account/visits' },
+  { httpMethod: 'POST', pathPattern: '/api/sellersprite/products/competitors' },
+  { httpMethod: 'POST', pathPattern: '/api/sellersprite/products/research' },
+  { httpMethod: 'GET', pathPattern: '/api/sellersprite/products/nodes' },
+  { httpMethod: 'GET', pathPattern: '/api/sellersprite/asins/detail' },
+  { httpMethod: 'GET', pathPattern: '/api/sellersprite/asins/coupon-trend' },
+  { httpMethod: 'GET', pathPattern: '/api/sellersprite/asins/with-coupon-trend' },
+  { httpMethod: 'GET', pathPattern: '/api/sellersprite/asins/sales-trend' },
+  { httpMethod: 'GET', pathPattern: '/api/sellersprite/asins/sales-prediction' },
+  { httpMethod: 'GET', pathPattern: '/api/sellersprite/asins/bsr-sales-prediction' },
+  { httpMethod: 'GET', pathPattern: '/api/sellersprite/asins/keepa' },
+  { httpMethod: 'POST', pathPattern: '/api/sellersprite/keywords/research' },
+  { httpMethod: 'POST', pathPattern: '/api/sellersprite/keywords/research/trends' },
+  { httpMethod: 'POST', pathPattern: '/api/sellersprite/keywords/mine' },
+  { httpMethod: 'POST', pathPattern: '/api/sellersprite/keywords/traffic/extend' },
+  { httpMethod: 'POST', pathPattern: '/api/sellersprite/keywords/aba/weekly' },
+  { httpMethod: 'POST', pathPattern: '/api/sellersprite/keywords/aba/monthly' },
+  { httpMethod: 'POST', pathPattern: '/api/sellersprite/keywords/aba/trends' },
+  { httpMethod: 'GET', pathPattern: '/api/sellersprite/keywords/google-trends' },
+  { httpMethod: 'POST', pathPattern: '/api/sellersprite/keywords/order/reverse' },
+  { httpMethod: 'POST', pathPattern: '/api/sellersprite/traffic/keywords/reverse' },
+  { httpMethod: 'POST', pathPattern: '/api/sellersprite/traffic/related' },
+  { httpMethod: 'GET', pathPattern: '/api/sellersprite/traffic/keywords/stats' },
+  { httpMethod: 'GET', pathPattern: '/api/sellersprite/traffic/listings/stats' },
+  { httpMethod: 'POST', pathPattern: '/api/sellersprite/traffic/sources' },
+  { httpMethod: 'POST', pathPattern: '/api/sellersprite/markets/research' },
+  { httpMethod: 'POST', pathPattern: '/api/sellersprite/markets/statistics' },
+  { httpMethod: 'POST', pathPattern: '/api/sellersprite/markets/goods' },
+  { httpMethod: 'POST', pathPattern: '/api/sellersprite/markets/brands' },
+  { httpMethod: 'POST', pathPattern: '/api/sellersprite/markets/sellers/locations' },
+  { httpMethod: 'POST', pathPattern: '/api/sellersprite/markets/sellers' },
+  { httpMethod: 'POST', pathPattern: '/api/sellersprite/markets/sellers/types' },
+  { httpMethod: 'POST', pathPattern: '/api/sellersprite/markets/demand-trend' },
+  { httpMethod: 'POST', pathPattern: '/api/sellersprite/markets/shelf-times' },
+  { httpMethod: 'POST', pathPattern: '/api/sellersprite/markets/shelf-trends' },
+  { httpMethod: 'POST', pathPattern: '/api/sellersprite/markets/ratings' },
+  { httpMethod: 'POST', pathPattern: '/api/sellersprite/markets/rating' },
+  { httpMethod: 'POST', pathPattern: '/api/sellersprite/markets/prices' },
+  { httpMethod: 'POST', pathPattern: '/api/sellersprite/markets/ebc' },
+  { httpMethod: 'POST', pathPattern: '/api/sellersprite/reviews/search' },
+  { httpMethod: 'GET', pathPattern: '/api/sellersprite/trademarks/range' },
+  { httpMethod: 'GET', pathPattern: '/api/sellersprite/trademarks/detail' },
+  { httpMethod: 'POST', pathPattern: '/api/sellersprite/trademarks/search' },
+  { httpMethod: 'POST', pathPattern: '/api/sellersprite/trademarks/stats' },
+  { httpMethod: 'POST', pathPattern: '/api/sellersprite/tools/ocr' },
+] as const satisfies readonly ApiEndpointRef[]
+
+export const menuApiBindings = [
+  {
+    functionCode: 'dashboard',
+    apis: [
+      sessionApi,
+      { httpMethod: 'GET', pathPattern: '/api/dashboard/overview' },
+    ],
+  },
+  {
+    functionCode: 'ai.chat',
+    apis: [
+      sessionApi,
+      { httpMethod: 'GET', pathPattern: '/api/ai/conversations' },
+      { httpMethod: 'GET', pathPattern: '/api/ai/conversations/{conversationId}' },
+      { httpMethod: 'PUT', pathPattern: '/api/ai/conversations/{conversationId}' },
+      { httpMethod: 'PUT', pathPattern: '/api/ai/conversations/{conversationId}/settings' },
+      { httpMethod: 'DELETE', pathPattern: '/api/ai/conversations/{conversationId}' },
+      { httpMethod: 'POST', pathPattern: '/api/ai/chat/stream' },
+      { httpMethod: 'POST', pathPattern: '/api/ai/conversations/{conversationId}/messages/{messageId}/retry' },
+    ],
+  },
+  {
+    functionCode: 'sellersprite.workbench',
+    apis: [sessionApi, ...sellerSpriteWorkbenchApis],
+  },
+  {
+    functionCode: 'research.market-report',
+    apis: [
+      sessionApi,
+      { httpMethod: 'POST', pathPattern: '/api/market-research/jobs' },
+      { httpMethod: 'GET', pathPattern: '/api/market-research/jobs/{jobId}' },
+      { httpMethod: 'GET', pathPattern: '/api/market-research/jobs/{jobId}/download' },
+    ],
+  },
+  {
+    functionCode: 'system.user',
+    apis: [
+      sessionApi,
+      { httpMethod: 'GET', pathPattern: '/api/users' },
+      { httpMethod: 'GET', pathPattern: '/api/users/{userId}' },
+      { httpMethod: 'POST', pathPattern: '/api/users' },
+      { httpMethod: 'PUT', pathPattern: '/api/users/{userId}' },
+      { httpMethod: 'PUT', pathPattern: '/api/users/{userId}/status' },
+      { httpMethod: 'PUT', pathPattern: '/api/users/{userId}/roles' },
+      { httpMethod: 'PUT', pathPattern: '/api/users/{userId}/password' },
+      { httpMethod: 'DELETE', pathPattern: '/api/users/{userId}' },
+      { httpMethod: 'GET', pathPattern: '/api/roles/enabled' },
+      { httpMethod: 'GET', pathPattern: '/api/depts/tree' },
+    ],
+  },
+  {
+    functionCode: 'system.dept',
+    apis: [
+      sessionApi,
+      { httpMethod: 'GET', pathPattern: '/api/depts/tree' },
+      { httpMethod: 'GET', pathPattern: '/api/depts/{deptId}' },
+      { httpMethod: 'POST', pathPattern: '/api/depts' },
+      { httpMethod: 'PUT', pathPattern: '/api/depts/{deptId}' },
+      { httpMethod: 'PUT', pathPattern: '/api/depts/{deptId}/status' },
+      { httpMethod: 'DELETE', pathPattern: '/api/depts/{deptId}' },
+    ],
+  },
+  {
+    functionCode: 'system.role',
+    apis: [
+      sessionApi,
+      { httpMethod: 'GET', pathPattern: '/api/roles' },
+      { httpMethod: 'GET', pathPattern: '/api/roles/{roleId}' },
+      { httpMethod: 'POST', pathPattern: '/api/roles' },
+      { httpMethod: 'PUT', pathPattern: '/api/roles/{roleId}' },
+      { httpMethod: 'PUT', pathPattern: '/api/roles/{roleId}/status' },
+      { httpMethod: 'DELETE', pathPattern: '/api/roles/{roleId}' },
+      { httpMethod: 'GET', pathPattern: '/api/roles/{roleId}/permissions' },
+      { httpMethod: 'PUT', pathPattern: '/api/roles/{roleId}/permissions' },
+      { httpMethod: 'GET', pathPattern: '/api/permissions/functions/tree' },
+      { httpMethod: 'GET', pathPattern: '/api/permissions/apis' },
+    ],
+  },
+  {
+    functionCode: 'system.dict',
+    apis: [
+      sessionApi,
+      { httpMethod: 'GET', pathPattern: '/api/system/dicts/types' },
+      { httpMethod: 'POST', pathPattern: '/api/system/dicts/types' },
+      { httpMethod: 'PUT', pathPattern: '/api/system/dicts/types/{dictTypeId}' },
+      { httpMethod: 'PUT', pathPattern: '/api/system/dicts/types/{dictTypeId}/status' },
+      { httpMethod: 'DELETE', pathPattern: '/api/system/dicts/types/{dictTypeId}' },
+      { httpMethod: 'GET', pathPattern: '/api/system/dicts/types/{dictTypeId}/items' },
+      { httpMethod: 'POST', pathPattern: '/api/system/dicts/items' },
+      { httpMethod: 'PUT', pathPattern: '/api/system/dicts/items/{dictItemId}' },
+      { httpMethod: 'PUT', pathPattern: '/api/system/dicts/items/{dictItemId}/status' },
+      { httpMethod: 'DELETE', pathPattern: '/api/system/dicts/items/{dictItemId}' },
+    ],
+  },
+  {
+    functionCode: 'system.function',
+    apis: [
+      sessionApi,
+      { httpMethod: 'GET', pathPattern: '/api/permissions/functions/tree' },
+      { httpMethod: 'POST', pathPattern: '/api/permissions/functions' },
+      { httpMethod: 'PUT', pathPattern: '/api/permissions/functions/{functionId}' },
+      { httpMethod: 'PUT', pathPattern: '/api/permissions/functions/{functionId}/status' },
+      { httpMethod: 'DELETE', pathPattern: '/api/permissions/functions/{functionId}' },
+      { httpMethod: 'GET', pathPattern: '/api/permissions/functions/{functionId}/apis' },
+      { httpMethod: 'PUT', pathPattern: '/api/permissions/functions/{functionId}/apis' },
+      { httpMethod: 'GET', pathPattern: '/api/permissions/apis' },
+    ],
+  },
+  {
+    functionCode: 'system.api',
+    apis: [
+      sessionApi,
+      { httpMethod: 'GET', pathPattern: '/api/permissions/apis' },
+      { httpMethod: 'POST', pathPattern: '/api/permissions/apis' },
+      { httpMethod: 'PUT', pathPattern: '/api/permissions/apis/{apiId}' },
+      { httpMethod: 'PUT', pathPattern: '/api/permissions/apis/{apiId}/status' },
+      { httpMethod: 'DELETE', pathPattern: '/api/permissions/apis/{apiId}' },
+      { httpMethod: 'POST', pathPattern: '/api/permissions/apis/catalog/sync' },
+      { httpMethod: 'PUT', pathPattern: '/api/permissions/functions/api-bindings/sync' },
+    ],
+  },
+  {
+    functionCode: 'ops.cache',
+    apis: [
+      sessionApi,
+      { httpMethod: 'GET', pathPattern: '/api/cache/keys' },
+      { httpMethod: 'GET', pathPattern: '/api/cache/value' },
+      { httpMethod: 'GET', pathPattern: '/api/cache/exists' },
+      { httpMethod: 'DELETE', pathPattern: '/api/cache/key' },
+      { httpMethod: 'DELETE', pathPattern: '/api/cache' },
+    ],
+  },
+  {
+    functionCode: 'ops.logs',
+    apis: [
+      sessionApi,
+      { httpMethod: 'GET', pathPattern: '/api/logs/login' },
+      { httpMethod: 'GET', pathPattern: '/api/logs/login/{loginLogId}' },
+      { httpMethod: 'GET', pathPattern: '/api/logs/operation' },
+      { httpMethod: 'GET', pathPattern: '/api/logs/operation/{operationLogId}' },
+      { httpMethod: 'GET', pathPattern: '/api/logs/ai-prompts' },
+      { httpMethod: 'GET', pathPattern: '/api/logs/ai-prompts/{promptRecordId}' },
+    ],
+  },
+] as const satisfies readonly MenuApiBinding[]

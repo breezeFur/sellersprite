@@ -1,8 +1,12 @@
 // Generated from SellerSprite official documentation on 2026-07-10.
 package com.yuanbaomao.sellersprite.api.trademark.model.vo;
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import lombok.Data;
 import tools.jackson.databind.JsonNode;
 
@@ -211,6 +215,20 @@ public class TrademarkDetailVo {
     @Schema(description = "全球商标库-详情响应参数：文字商标说明")
     private WordMarkSpecificationVo wordMarkSpecification;
 
+    /** 官方响应中未建模字段的原始值。 */
+    @Schema(description = "官方响应未建模字段", hidden = true)
+    private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
+
+    @JsonAnySetter
+    public void putAdditionalProperty(String name, JsonNode value) {
+        additionalProperties.put(name, value);
+    }
+
+    @JsonAnyGetter
+    public Map<String, JsonNode> getAdditionalProperties() {
+        return additionalProperties;
+    }
+
     @Data
     @Schema(description = "全球商标库-详情响应参数：logo")
     public static class LogosVo {
@@ -222,6 +240,20 @@ public class TrademarkDetailVo {
         /** 全球商标库-详情响应参数：logo url */
         @Schema(description = "全球商标库-详情响应参数：logo url")
         private String logoUrl;
+
+        /** 官方响应中未建模字段的原始值。 */
+        @Schema(description = "官方响应未建模字段", hidden = true)
+        private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
+
+        @JsonAnySetter
+        public void putAdditionalProperty(String name, JsonNode value) {
+            additionalProperties.put(name, value);
+        }
+
+        @JsonAnyGetter
+        public Map<String, JsonNode> getAdditionalProperties() {
+            return additionalProperties;
+        }
 
     }
 
@@ -236,6 +268,20 @@ public class TrademarkDetailVo {
         /** 全球商标库-详情响应参数：分类 */
         @Schema(description = "全球商标库-详情响应参数：分类")
         private String kind;
+
+        /** 官方响应中未建模字段的原始值。 */
+        @Schema(description = "官方响应未建模字段", hidden = true)
+        private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
+
+        @JsonAnySetter
+        public void putAdditionalProperty(String name, JsonNode value) {
+            additionalProperties.put(name, value);
+        }
+
+        @JsonAnyGetter
+        public Map<String, JsonNode> getAdditionalProperties() {
+            return additionalProperties;
+        }
 
     }
 
@@ -263,6 +309,20 @@ public class TrademarkDetailVo {
         @Schema(description = "全球商标库-详情响应参数：国家")
         private String country;
 
+        /** 官方响应中未建模字段的原始值。 */
+        @Schema(description = "官方响应未建模字段", hidden = true)
+        private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
+
+        @JsonAnySetter
+        public void putAdditionalProperty(String name, JsonNode value) {
+            additionalProperties.put(name, value);
+        }
+
+        @JsonAnyGetter
+        public Map<String, JsonNode> getAdditionalProperties() {
+            return additionalProperties;
+        }
+
     }
 
     @Data
@@ -281,6 +341,20 @@ public class TrademarkDetailVo {
         @Schema(description = "全球商标库-详情响应参数：详情")
         private String classification;
 
+        /** 官方响应中未建模字段的原始值。 */
+        @Schema(description = "官方响应未建模字段", hidden = true)
+        private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
+
+        @JsonAnySetter
+        public void putAdditionalProperty(String name, JsonNode value) {
+            additionalProperties.put(name, value);
+        }
+
+        @JsonAnyGetter
+        public Map<String, JsonNode> getAdditionalProperties() {
+            return additionalProperties;
+        }
+
     }
 
     @Data
@@ -295,6 +369,20 @@ public class TrademarkDetailVo {
         @Schema(description = "全球商标库-详情响应参数：语言；en")
         private String languageCode;
 
+        /** 官方响应中未建模字段的原始值。 */
+        @Schema(description = "官方响应未建模字段", hidden = true)
+        private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
+
+        @JsonAnySetter
+        public void putAdditionalProperty(String name, JsonNode value) {
+            additionalProperties.put(name, value);
+        }
+
+        @JsonAnyGetter
+        public Map<String, JsonNode> getAdditionalProperties() {
+            return additionalProperties;
+        }
+
     }
 
     @Data
@@ -308,6 +396,20 @@ public class TrademarkDetailVo {
         /** 全球商标库-详情响应参数：语言；en */
         @Schema(description = "全球商标库-详情响应参数：语言；en")
         private String languageCode;
+
+        /** 官方响应中未建模字段的原始值。 */
+        @Schema(description = "官方响应未建模字段", hidden = true)
+        private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
+
+        @JsonAnySetter
+        public void putAdditionalProperty(String name, JsonNode value) {
+            additionalProperties.put(name, value);
+        }
+
+        @JsonAnyGetter
+        public Map<String, JsonNode> getAdditionalProperties() {
+            return additionalProperties;
+        }
 
     }
 
@@ -326,6 +428,20 @@ public class TrademarkDetailVo {
         /** 全球商标库-详情响应参数：详情 */
         @Schema(description = "全球商标库-详情响应参数：详情")
         private String classification;
+
+        /** 官方响应中未建模字段的原始值。 */
+        @Schema(description = "官方响应未建模字段", hidden = true)
+        private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
+
+        @JsonAnySetter
+        public void putAdditionalProperty(String name, JsonNode value) {
+            additionalProperties.put(name, value);
+        }
+
+        @JsonAnyGetter
+        public Map<String, JsonNode> getAdditionalProperties() {
+            return additionalProperties;
+        }
 
     }
 
@@ -353,6 +469,20 @@ public class TrademarkDetailVo {
         @Schema(description = "全球商标库-详情响应参数：说明")
         private String message;
 
+        /** 官方响应中未建模字段的原始值。 */
+        @Schema(description = "官方响应未建模字段", hidden = true)
+        private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
+
+        @JsonAnySetter
+        public void putAdditionalProperty(String name, JsonNode value) {
+            additionalProperties.put(name, value);
+        }
+
+        @JsonAnyGetter
+        public Map<String, JsonNode> getAdditionalProperties() {
+            return additionalProperties;
+        }
+
     }
 
     @Data
@@ -370,6 +500,20 @@ public class TrademarkDetailVo {
         /** 全球商标库-详情响应参数：内容 */
         @Schema(description = "全球商标库-详情响应参数：内容")
         private String section;
+
+        /** 官方响应中未建模字段的原始值。 */
+        @Schema(description = "官方响应未建模字段", hidden = true)
+        private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
+
+        @JsonAnySetter
+        public void putAdditionalProperty(String name, JsonNode value) {
+            additionalProperties.put(name, value);
+        }
+
+        @JsonAnyGetter
+        public Map<String, JsonNode> getAdditionalProperties() {
+            return additionalProperties;
+        }
 
     }
 
@@ -397,6 +541,20 @@ public class TrademarkDetailVo {
         @Schema(description = "全球商标库-详情响应参数：说明")
         private String message;
 
+        /** 官方响应中未建模字段的原始值。 */
+        @Schema(description = "官方响应未建模字段", hidden = true)
+        private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
+
+        @JsonAnySetter
+        public void putAdditionalProperty(String name, JsonNode value) {
+            additionalProperties.put(name, value);
+        }
+
+        @JsonAnyGetter
+        public Map<String, JsonNode> getAdditionalProperties() {
+            return additionalProperties;
+        }
+
     }
 
     @Data
@@ -415,6 +573,20 @@ public class TrademarkDetailVo {
         @Schema(description = "全球商标库-详情响应参数：注册信息")
         private ReferenceRegistrationVo registration;
 
+        /** 官方响应中未建模字段的原始值。 */
+        @Schema(description = "官方响应未建模字段", hidden = true)
+        private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
+
+        @JsonAnySetter
+        public void putAdditionalProperty(String name, JsonNode value) {
+            additionalProperties.put(name, value);
+        }
+
+        @JsonAnyGetter
+        public Map<String, JsonNode> getAdditionalProperties() {
+            return additionalProperties;
+        }
+
     }
 
     @Data
@@ -429,6 +601,20 @@ public class TrademarkDetailVo {
         @Schema(description = "全球商标库-详情响应参数：编号")
         private String number;
 
+        /** 官方响应中未建模字段的原始值。 */
+        @Schema(description = "官方响应未建模字段", hidden = true)
+        private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
+
+        @JsonAnySetter
+        public void putAdditionalProperty(String name, JsonNode value) {
+            additionalProperties.put(name, value);
+        }
+
+        @JsonAnyGetter
+        public Map<String, JsonNode> getAdditionalProperties() {
+            return additionalProperties;
+        }
+
     }
 
     @Data
@@ -442,6 +628,20 @@ public class TrademarkDetailVo {
         /** 全球商标库-详情响应参数：编号 */
         @Schema(description = "全球商标库-详情响应参数：编号")
         private String number;
+
+        /** 官方响应中未建模字段的原始值。 */
+        @Schema(description = "官方响应未建模字段", hidden = true)
+        private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
+
+        @JsonAnySetter
+        public void putAdditionalProperty(String name, JsonNode value) {
+            additionalProperties.put(name, value);
+        }
+
+        @JsonAnyGetter
+        public Map<String, JsonNode> getAdditionalProperties() {
+            return additionalProperties;
+        }
 
     }
 
@@ -465,6 +665,20 @@ public class TrademarkDetailVo {
         @Schema(description = "全球商标库-详情响应参数：markSignificantVerbalElement")
         private WordMarkSpecificationMarkSignificantVerbalElementVo markSignificantVerbalElement;
 
+        /** 官方响应中未建模字段的原始值。 */
+        @Schema(description = "官方响应未建模字段", hidden = true)
+        private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
+
+        @JsonAnySetter
+        public void putAdditionalProperty(String name, JsonNode value) {
+            additionalProperties.put(name, value);
+        }
+
+        @JsonAnyGetter
+        public Map<String, JsonNode> getAdditionalProperties() {
+            return additionalProperties;
+        }
+
     }
 
     @Data
@@ -478,6 +692,20 @@ public class TrademarkDetailVo {
         /** 全球商标库-详情响应参数：语言类型 */
         @Schema(description = "全球商标库-详情响应参数：语言类型")
         private String languageCode;
+
+        /** 官方响应中未建模字段的原始值。 */
+        @Schema(description = "官方响应未建模字段", hidden = true)
+        private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
+
+        @JsonAnySetter
+        public void putAdditionalProperty(String name, JsonNode value) {
+            additionalProperties.put(name, value);
+        }
+
+        @JsonAnyGetter
+        public Map<String, JsonNode> getAdditionalProperties() {
+            return additionalProperties;
+        }
 
     }
 
@@ -493,6 +721,20 @@ public class TrademarkDetailVo {
         @Schema(description = "全球商标库-详情响应参数：语言类型")
         private String languageCode;
 
+        /** 官方响应中未建模字段的原始值。 */
+        @Schema(description = "官方响应未建模字段", hidden = true)
+        private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
+
+        @JsonAnySetter
+        public void putAdditionalProperty(String name, JsonNode value) {
+            additionalProperties.put(name, value);
+        }
+
+        @JsonAnyGetter
+        public Map<String, JsonNode> getAdditionalProperties() {
+            return additionalProperties;
+        }
+
     }
 
     @Data
@@ -506,6 +748,20 @@ public class TrademarkDetailVo {
         /** 全球商标库-详情响应参数：语言类型；en */
         @Schema(description = "全球商标库-详情响应参数：语言类型；en")
         private String languageCode;
+
+        /** 官方响应中未建模字段的原始值。 */
+        @Schema(description = "官方响应未建模字段", hidden = true)
+        private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
+
+        @JsonAnySetter
+        public void putAdditionalProperty(String name, JsonNode value) {
+            additionalProperties.put(name, value);
+        }
+
+        @JsonAnyGetter
+        public Map<String, JsonNode> getAdditionalProperties() {
+            return additionalProperties;
+        }
 
     }
 

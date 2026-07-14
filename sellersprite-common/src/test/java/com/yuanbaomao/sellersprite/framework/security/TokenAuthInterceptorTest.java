@@ -37,6 +37,9 @@ class TokenAuthInterceptorTest {
     @Mock
     private UserDao userDao;
 
+    @Mock
+    private ApiResourceMatcher apiResourceMatcher;
+
     @AfterEach
     void tearDown() {
         RequestContextHolder.clear();
@@ -44,7 +47,8 @@ class TokenAuthInterceptorTest {
 
     @Test
     void shouldRejectProtectedRequestWithoutBearerToken() {
-        TokenAuthInterceptor interceptor = new TokenAuthInterceptor(new TokenHasher(), userTokenDao, userDao);
+        TokenAuthInterceptor interceptor = new TokenAuthInterceptor(new TokenHasher(), userTokenDao, userDao,
+                apiResourceMatcher);
 
         assertThatThrownBy(() -> interceptor.preHandle(new MockHttpServletRequest("GET", "/api/users"),
                 new MockHttpServletResponse(), new Object()))
@@ -66,7 +70,8 @@ class TokenAuthInterceptorTest {
         user.setStatus(1);
         when(userTokenDao.findValidByAccessTokenHash(accessTokenHash)).thenReturn(Optional.of(userToken));
         when(userDao.getById(USER_ID)).thenReturn(user);
-        TokenAuthInterceptor interceptor = new TokenAuthInterceptor(tokenHasher, userTokenDao, userDao);
+        TokenAuthInterceptor interceptor = new TokenAuthInterceptor(tokenHasher, userTokenDao, userDao,
+                apiResourceMatcher);
         MockHttpServletRequest request = new MockHttpServletRequest("GET", "/api/users");
         request.addHeader(HttpHeaderConstants.AUTHORIZATION, "Bearer " + ACCESS_TOKEN);
 
@@ -91,7 +96,8 @@ class TokenAuthInterceptorTest {
         user.setStatus(0);
         when(userTokenDao.findValidByAccessTokenHash(accessTokenHash)).thenReturn(Optional.of(userToken));
         when(userDao.getById(USER_ID)).thenReturn(user);
-        TokenAuthInterceptor interceptor = new TokenAuthInterceptor(tokenHasher, userTokenDao, userDao);
+        TokenAuthInterceptor interceptor = new TokenAuthInterceptor(tokenHasher, userTokenDao, userDao,
+                apiResourceMatcher);
         MockHttpServletRequest request = new MockHttpServletRequest("GET", "/api/users");
         request.addHeader(HttpHeaderConstants.AUTHORIZATION, "Bearer " + ACCESS_TOKEN);
 
@@ -104,12 +110,26 @@ class TokenAuthInterceptorTest {
 
     @Test
     void shouldSkipPublicApiPath() throws Exception {
-        TokenAuthInterceptor interceptor = new TokenAuthInterceptor(new TokenHasher(), userTokenDao, userDao);
+        TokenAuthInterceptor interceptor = new TokenAuthInterceptor(new TokenHasher(), userTokenDao, userDao,
+                apiResourceMatcher);
+        MockHttpServletRequest request = new MockHttpServletRequest("POST", "/api/auth/login");
+        when(apiResourceMatcher.isStaticPublic(request)).thenReturn(true);
 
-        boolean result = interceptor.preHandle(new MockHttpServletRequest("POST", "/api/auth/login"),
-                new MockHttpServletResponse(), new Object());
+        boolean result = interceptor.preHandle(request, new MockHttpServletResponse(), new Object());
 
         assertThat(result).isTrue();
+        verify(userTokenDao, never()).findValidByAccessTokenHash(org.mockito.ArgumentMatchers.anyString());
+    }
+
+    @Test
+    void shouldRequireAuthenticationForRegisteredPublicApiPath() {
+        TokenAuthInterceptor interceptor = new TokenAuthInterceptor(new TokenHasher(), userTokenDao, userDao,
+                apiResourceMatcher);
+        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/api/public/ping");
+
+        assertThatThrownBy(() -> interceptor.preHandle(request, new MockHttpServletResponse(), new Object()))
+                .isInstanceOf(BizException.class)
+                .hasMessage(ResultCode.UNAUTHORIZED.getMessage());
         verify(userTokenDao, never()).findValidByAccessTokenHash(org.mockito.ArgumentMatchers.anyString());
     }
 }

@@ -1,0 +1,158 @@
+{
+  "version": "market-research-v1",
+  "quota": [
+    {
+      "datasetCode": "quota.visits",
+      "operation": "ACCOUNT_VISITS",
+      "recordCount": 1,
+      "payload": {
+        "details": {
+          "status": "mock-available",
+          "modules": {
+            "productResearch": {"remaining": 9999, "unit": "request"},
+            "keywordResearch": {"remaining": 9999, "unit": "request"},
+            "reviewList": {"remaining": 9999, "unit": "request"}
+          }
+        }
+      }
+    }
+  ],
+  "marketAndProducts": [
+    {
+      "datasetCode": "market.overview",
+      "operation": "MARKET_RESEARCH",
+      "recordCount": 1,
+      "payload": {
+        "marketplace": "US",
+        "keyword": "facial cleansing device",
+        "currency": "USD",
+        "metrics": {
+          "productCount": 128,
+          "averagePrice": 49.9,
+          "monthlyUnits": 18420,
+          "monthlyRevenue": 918558
+        }
+      }
+    },
+    {
+      "datasetCode": "products",
+      "operation": "PRODUCT_RESEARCH",
+      "recordCount": 1,
+      "payload": {
+        "guestId": null,
+        "pages": 64754,
+        "page": 1,
+        "size": 1,
+        "total": 64754,
+        "took": 17,
+        "url": null,
+        "order": {
+          "field": "",
+          "desc": true
+        },
+        "items": [
+          {
+            "asin": "B0DB5VT4QJ",
+            "brand": "OLANLY",
+            "brandUrl": "https://www.amazon.com/s?k=OLANLY",
+            "imageUrl": "https://images-na.ssl-images-amazon.com/images/I/81ZghGzYgkL._AC_US200_.jpg",
+            "title": "OLANLY Bathroom Rugs 70x46, Extra Soft Absorbent Chenille Bath Rugs, Rubber Backing Quick Dry, Machine Washable Bath Mats for Bathroom Floor, Tub and Shower, Home Decor Accessories, Navy",
+            "parent": "B0DP268C4Y",
+            "nodeLabelPath": "Home & Kitchen:Bath:Bath Rugs",
+            "nodeIdPath": "1055398:1063236:1063242",
+            "nodeId": 1063242,
+            "bsrId": "home-garden",
+            "bsr": 13,
+            "bsrCv": -1,
+            "bsrCr": -8.33,
+            "amzUnit": null,
+            "amzUnitDate": null,
+            "amzSales": null,
+            "units": 158113,
+            "unitsGr": null,
+            "revenue": 16059537.0,
+            "price": 100.89,
+            "averagePrice": 101.57,
+            "primePrice": -1.0,
+            "profit": 71.71,
+            "fba": 13.41,
+            "ratings": 18821,
+            "ratingsRate": 1.38,
+            "rating": 4.4,
+            "ratingsCv": 2179,
+            "ratingDelta": 0,
+            "availableDate": 1721779200000,
+            "fulfillment": "FBA",
+            "variations": 449,
+            "sellers": 1,
+            "sellerName": "OLANLY",
+            "sellerId": "A1MCYUGJD2ILFU",
+            "sellerNation": "CN",
+            "lqs": 96,
+            "weight": "10.41 pounds",
+            "dimension": "46 x 70 x 1 inches",
+            "pkgDimensions": "18.9 x 7.8 x 7.4 inches",
+            "pkgDimensionType": "LB",
+            "pkgWeight": "10.43 pounds",
+            "sku": "Size: 70\" x 46\" | Color: Navy",
+            "dimensionsType": "ELO",
+            "deliveryPrice": -1.0,
+            "badge": {
+              "bestSeller": "#1 Best Seller in Bath Rugs",
+              "amazonChoice": "N",
+              "newRelease": "N",
+              "ebc": "Y",
+              "video": "N"
+            },
+            "subcategories": [
+              {
+                "code": "1063242",
+                "rank": 1,
+                "label": "Bath Rugs"
+              }
+            ]
+          }
+        ],
+        "terminal": null,
+        "hasNextPage": null,
+        "guestVisited": false
+      }
+    }
+  ],
+  "keywords": [
+    {
+      "datasetCode": "keywords",
+      "operation": "KEYWORD_RESEARCH",
+      "recordCount": 4,
+      "payload": {
+        "page": 1,
+        "size": 15,
+        "total": 4,
+        "items": [
+          {"keyword": "facial cleansing device", "monthlySearches": 18500, "products": 128},
+          {"keyword": "face cleansing brush", "monthlySearches": 12100, "products": 214},
+          {"keyword": "microcurrent facial device", "monthlySearches": 9800, "products": 96},
+          {"keyword": "facial massager", "monthlySearches": 7700, "products": 173}
+        ]
+      }
+    }
+  ],
+  "reviews": [
+    {
+      "datasetCode": "reviews.fixture",
+      "operation": "REVIEW_LIST",
+      "recordCount": 4,
+      "payload": {
+        "page": 1,
+        "size": 10,
+        "total": 4,
+        "items": [
+          {"asin": "B0MOCK0001", "rating": 5, "verified": true, "title": "Easy to use", "content": "Simple controls and gentle cleaning."},
+          {"asin": "B0MOCK0001", "rating": 3, "verified": true, "title": "Battery could improve", "content": "Useful device but charging takes time."},
+          {"asin": "B0MOCK0002", "rating": 4, "verified": false, "title": "Good routine addition", "content": "Fits into a daily skin care routine."},
+          {"asin": "B0MOCK0003", "rating": 2, "verified": false, "title": "Too much vibration", "content": "The strongest setting is uncomfortable."}
+        ]
+      }
+    }
+  ]
+}

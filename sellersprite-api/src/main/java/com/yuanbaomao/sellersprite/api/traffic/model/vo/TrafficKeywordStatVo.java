@@ -1,8 +1,13 @@
 // Generated from SellerSprite official documentation on 2026-07-10.
 package com.yuanbaomao.sellersprite.api.traffic.model.vo;
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import lombok.Data;
+import tools.jackson.databind.JsonNode;
 
 /**
  * 流量词统计响应模型。
@@ -41,6 +46,20 @@ public class TrafficKeywordStatVo {
     @Schema(description = "流量词统计响应参数：流量词类型统计")
     private BadgeCountVo badgeCount;
 
+    /** 官方响应中未建模字段的原始值。 */
+    @Schema(description = "官方响应未建模字段", hidden = true)
+    private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
+
+    @JsonAnySetter
+    public void putAdditionalProperty(String name, JsonNode value) {
+        additionalProperties.put(name, value);
+    }
+
+    @JsonAnyGetter
+    public Map<String, JsonNode> getAdditionalProperties() {
+        return additionalProperties;
+    }
+
     @Data
     @Schema(description = "流量词统计响应参数：流量词类型统计")
     public static class BadgeCountVo {
@@ -76,6 +95,20 @@ public class TrafficKeywordStatVo {
         /** 流量词统计响应参数：SP广告词数量；764 */
         @Schema(description = "流量词统计响应参数：SP广告词数量；764")
         private Integer ad;
+
+        /** 官方响应中未建模字段的原始值。 */
+        @Schema(description = "官方响应未建模字段", hidden = true)
+        private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
+
+        @JsonAnySetter
+        public void putAdditionalProperty(String name, JsonNode value) {
+            additionalProperties.put(name, value);
+        }
+
+        @JsonAnyGetter
+        public Map<String, JsonNode> getAdditionalProperties() {
+            return additionalProperties;
+        }
 
     }
 

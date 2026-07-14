@@ -1,13 +1,18 @@
 // Generated from SellerSprite official documentation on 2026-07-10.
 package com.yuanbaomao.sellersprite.api.asin.model.vo;
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.yuanbaomao.sellersprite.api.common.model.vo.NumericTrendPointVo;
 import com.yuanbaomao.sellersprite.api.common.model.vo.StringTrendPointVo;
 import com.yuanbaomao.sellersprite.api.common.model.vo.SubRankTrendVo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.math.BigDecimal;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import lombok.Data;
+import tools.jackson.databind.JsonNode;
 
 /**
  * 商品趋势详情(keepa)响应模型。
@@ -185,5 +190,19 @@ public class KeepaTrendVo {
     /** 商品趋势详情(keepa)响应参数：卖家数趋势数据；见 PairNumberDto 趋势数字数据结构 */
     @Schema(description = "商品趋势详情(keepa)响应参数：卖家数趋势数据；见 PairNumberDto 趋势数字数据结构")
     private List<NumericTrendPointVo> sellers;
+
+    /** 官方响应中未建模字段的原始值。 */
+    @Schema(description = "官方响应未建模字段", hidden = true)
+    private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
+
+    @JsonAnySetter
+    public void putAdditionalProperty(String name, JsonNode value) {
+        additionalProperties.put(name, value);
+    }
+
+    @JsonAnyGetter
+    public Map<String, JsonNode> getAdditionalProperties() {
+        return additionalProperties;
+    }
 
 }

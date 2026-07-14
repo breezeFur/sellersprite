@@ -13,4 +13,7 @@ public class AiConversationDetailVo {
 
     @Schema(description = "按顺序排列的完整前端可见消息")
     private List<AiConversationMessageVo> messages;
+
+    @Schema(description = "会话设置")
+    private AiConversationSettingsVo settings;
 }

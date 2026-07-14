@@ -9,25 +9,30 @@ import lombok.Data;
 @Schema(description = "创建字典值请求")
 public class DictItemCreateRequest {
 
-    @NotBlank(message = "字典类型ID不能为空")
-    @Schema(description = "字典类型ID")
-    private String dictTypeId;
+    @NotBlank(message = "字典类型不能为空")
+    @Schema(description = "字典类型")
+    private String dictType;
 
     @NotBlank(message = "字典标签不能为空")
     @Size(max = 128, message = "字典标签不能超过128个字符")
     @Schema(description = "字典标签")
-    private String itemLabel;
+    private String dictLabel;
+
+    @NotBlank(message = "字典名称不能为空")
+    @Size(max = 128, message = "字典名称不能超过128个字符")
+    @Schema(description = "前端展示名称")
+    private String dictName;
 
     @NotBlank(message = "字典值不能为空")
     @Size(max = 128, message = "字典值不能超过128个字符")
     @Schema(description = "字典值")
-    private String itemValue;
+    private String dictValue;
 
     @Schema(description = "展示颜色")
     private String color;
 
     @Schema(description = "是否默认项：1是 0否")
-    private Integer defaultItem;
+    private Integer defaultFlag;
 
     @Schema(description = "排序值")
     private Integer sortOrder;

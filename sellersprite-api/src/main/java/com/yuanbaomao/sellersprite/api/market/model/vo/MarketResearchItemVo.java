@@ -1,10 +1,15 @@
 // Generated from SellerSprite official documentation on 2026-07-10.
 package com.yuanbaomao.sellersprite.api.market.model.vo;
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.math.BigDecimal;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import lombok.Data;
+import tools.jackson.databind.JsonNode;
 
 /**
  * 选市场列表明细响应模型。
@@ -423,6 +428,20 @@ public class MarketResearchItemVo {
     @Schema(description = "选市场列表明细响应参数：最近12个月新品月均销售额")
     private BigDecimal l12NewAvgRevenue;
 
+    /** 官方响应中未建模字段的原始值。 */
+    @Schema(description = "官方响应未建模字段", hidden = true)
+    private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
+
+    @JsonAnySetter
+    public void putAdditionalProperty(String name, JsonNode value) {
+        additionalProperties.put(name, value);
+    }
+
+    @JsonAnyGetter
+    public Map<String, JsonNode> getAdditionalProperties() {
+        return additionalProperties;
+    }
+
     @Data
     @Schema(description = "选市场列表明细响应参数：前10商品的图片")
     public static class Top10ImagesVo {
@@ -434,6 +453,20 @@ public class MarketResearchItemVo {
         /** 选市场列表明细响应参数：asin图片链接；https://images-na.ssl-images-amazon.com/images/I/51+5VVLcXSL._AC_US200_.jpg */
         @Schema(description = "选市场列表明细响应参数：asin图片链接；https://images-na.ssl-images-amazon.com/images/I/51+5VVLcXSL._AC_US200_.jpg")
         private String image;
+
+        /** 官方响应中未建模字段的原始值。 */
+        @Schema(description = "官方响应未建模字段", hidden = true)
+        private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
+
+        @JsonAnySetter
+        public void putAdditionalProperty(String name, JsonNode value) {
+            additionalProperties.put(name, value);
+        }
+
+        @JsonAnyGetter
+        public Map<String, JsonNode> getAdditionalProperties() {
+            return additionalProperties;
+        }
 
     }
 

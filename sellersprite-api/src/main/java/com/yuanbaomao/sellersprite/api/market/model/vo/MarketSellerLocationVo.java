@@ -1,10 +1,15 @@
 // Generated from SellerSprite official documentation on 2026-07-10.
 package com.yuanbaomao.sellersprite.api.market.model.vo;
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.math.BigDecimal;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import lombok.Data;
+import tools.jackson.databind.JsonNode;
 
 /**
  * 选市场-卖家所属地分布响应模型。
@@ -46,5 +51,19 @@ public class MarketSellerLocationVo {
     /** 选市场-卖家所属地分布响应参数：销售额占比；0.7794 */
     @Schema(description = "选市场-卖家所属地分布响应参数：销售额占比；0.7794")
     private BigDecimal revenueRatio;
+
+    /** 官方响应中未建模字段的原始值。 */
+    @Schema(description = "官方响应未建模字段", hidden = true)
+    private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
+
+    @JsonAnySetter
+    public void putAdditionalProperty(String name, JsonNode value) {
+        additionalProperties.put(name, value);
+    }
+
+    @JsonAnyGetter
+    public Map<String, JsonNode> getAdditionalProperties() {
+        return additionalProperties;
+    }
 
 }

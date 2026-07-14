@@ -4,8 +4,10 @@ import com.yuanbaomao.base.result.PageResult;
 import com.yuanbaomao.base.result.Result;
 import com.yuanbaomao.sellersprite.ai.conversation.model.dto.AiConversationPageRequest;
 import com.yuanbaomao.sellersprite.ai.conversation.model.dto.AiConversationRenameRequest;
+import com.yuanbaomao.sellersprite.ai.conversation.model.dto.AiConversationSettingsRequest;
 import com.yuanbaomao.sellersprite.ai.conversation.model.vo.AiConversationDetailVo;
 import com.yuanbaomao.sellersprite.ai.conversation.model.vo.AiConversationVo;
+import com.yuanbaomao.sellersprite.ai.conversation.model.vo.AiConversationSettingsVo;
 import com.yuanbaomao.sellersprite.ai.conversation.service.AiConversationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -44,6 +46,14 @@ public class AiConversationController {
     public Result<AiConversationVo> rename(@PathVariable String conversationId,
                                            @Valid @RequestBody AiConversationRenameRequest request) {
         return Result.success(conversationService.rename(conversationId, request));
+    }
+
+    @Operation(summary = "更新会话设置", description = "当前只支持更新系统提示词，提供方与模型只读")
+    @PutMapping("/{conversationId}/settings")
+    public Result<AiConversationSettingsVo> updateSettings(
+            @PathVariable String conversationId,
+            @Valid @RequestBody AiConversationSettingsRequest request) {
+        return Result.success(conversationService.updateSettings(conversationId, request));
     }
 
     @Operation(summary = "删除会话")

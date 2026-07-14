@@ -50,6 +50,18 @@ public class AiConversationMessage extends BaseCreateTime {
     @Schema(description = "消息扩展元数据JSON")
     private String metadata;
 
+    @TableField("message_status")
+    @Schema(description = "消息状态：STREAMING COMPLETED CANCELLED FAILED")
+    private String messageStatus;
+
+    @TableField("error_code")
+    @Schema(description = "稳定错误码")
+    private String errorCode;
+
+    @TableField("error_message")
+    @Schema(description = "安全错误摘要")
+    private String errorMessage;
+
     @TableLogic
     @TableField("deleted")
     @Schema(description = "逻辑删除：0正常 1删除")

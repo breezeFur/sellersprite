@@ -28,6 +28,15 @@ public class AiConversationMessageVo {
     @Schema(description = "消息扩展元数据JSON")
     private String metadata;
 
+    @Schema(description = "消息状态：STREAMING COMPLETED CANCELLED FAILED")
+    private String messageStatus;
+
+    @Schema(description = "稳定错误码")
+    private String errorCode;
+
+    @Schema(description = "安全错误摘要")
+    private String errorMessage;
+
     @Schema(description = "创建时间，Unix毫秒")
     private Long createdAt;
 }

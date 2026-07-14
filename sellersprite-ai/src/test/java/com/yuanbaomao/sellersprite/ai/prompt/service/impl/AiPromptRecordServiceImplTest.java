@@ -52,6 +52,21 @@ class AiPromptRecordServiceImplTest {
     }
 
     @Test
+    void shouldPersistMaskedAndTruncatedPromptSummary() {
+        String prompt = " password=secret " + "请分析".repeat(800);
+
+        promptRecordService.recordRequest(PROMPT_RECORD_ID, List.of(new UserMessage(prompt)));
+
+        ArgumentCaptor<AiPromptRecord> captor = ArgumentCaptor.forClass(AiPromptRecord.class);
+        verify(promptRecordDao).updateById(captor.capture());
+        AiPromptRecord record = captor.getValue();
+        assertThat(record.getRequestMessages()).doesNotContain("secret").contains("[REDACTED]");
+        assertThat(record.getPromptSummary()).contains("password=[REDACTED]").doesNotContain("secret");
+        assertThat(record.getPromptSummary()).hasSize(2048);
+        assertThat(record.getPromptTruncated()).isEqualTo(1);
+    }
+
+    @Test
     void shouldMarkFailedCallWithErrorDetails() {
         promptRecordService.recordFailure(PROMPT_RECORD_ID, new IllegalStateException("模型调用失败"), 25L);
 
@@ -62,5 +77,47 @@ class AiPromptRecordServiceImplTest {
         assertThat(record.getErrorType()).isEqualTo(IllegalStateException.class.getName());
         assertThat(record.getErrorMessage()).isEqualTo("模型调用失败");
         assertThat(record.getCostMs()).isEqualTo(25L);
+    }
+
+    @Test
+    void shouldKeepPartialResponseWhenStreamFails() {
+        promptRecordService.recordStreamFailure(
+                PROMPT_RECORD_ID, "已输出部分内容", new IllegalStateException("流式失败"), 30L);
+
+        ArgumentCaptor<AiPromptRecord> captor = ArgumentCaptor.forClass(AiPromptRecord.class);
+        verify(promptRecordDao).updateById(captor.capture());
+        AiPromptRecord record = captor.getValue();
+        assertThat(record.getStatus()).isEqualTo(AiPromptStatus.FAILED.name());
+        assertThat(record.getResponseContent()).isEqualTo("已输出部分内容");
+        assertThat(record.getErrorType()).isEqualTo(IllegalStateException.class.getName());
+        assertThat(record.getErrorMessage()).isEqualTo("流式失败");
+        assertThat(record.getCostMs()).isEqualTo(30L);
+    }
+
+    @Test
+    void shouldMarkCancelledCallAndKeepPartialResponse() {
+        promptRecordService.recordCancelled(PROMPT_RECORD_ID, "已输出部分内容", 35L);
+
+        ArgumentCaptor<AiPromptRecord> captor = ArgumentCaptor.forClass(AiPromptRecord.class);
+        verify(promptRecordDao).updateById(captor.capture());
+        AiPromptRecord record = captor.getValue();
+        assertThat(record.getStatus()).isEqualTo(AiPromptStatus.CANCELLED.name());
+        assertThat(record.getResponseContent()).isEqualTo("已输出部分内容");
+        assertThat(record.getFinishReason()).isEqualTo("cancelled");
+        assertThat(record.getErrorType()).isEmpty();
+        assertThat(record.getErrorMessage()).isEmpty();
+        assertThat(record.getCostMs()).isEqualTo(35L);
+    }
+
+    @Test
+    void shouldMaskStreamFailurePayloadBeforePersistence() {
+        promptRecordService.recordStreamFailure(PROMPT_RECORD_ID, " token=secret ",
+                new IllegalStateException(" api_key=secret "), 40L);
+
+        ArgumentCaptor<AiPromptRecord> captor = ArgumentCaptor.forClass(AiPromptRecord.class);
+        verify(promptRecordDao).updateById(captor.capture());
+        AiPromptRecord record = captor.getValue();
+        assertThat(record.getResponseContent()).contains("[REDACTED]").doesNotContain("secret");
+        assertThat(record.getErrorMessage()).contains("[REDACTED]").doesNotContain("secret");
     }
 }

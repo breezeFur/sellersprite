@@ -1,6 +1,7 @@
 package com.yuanbaomao.sellersprite.db.dao.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.yuanbaomao.sellersprite.db.dao.SysApiDao;
 import com.yuanbaomao.sellersprite.db.entity.SysApi;
 import com.yuanbaomao.sellersprite.db.mapper.SysApiMapper;
@@ -22,7 +23,41 @@ public class SysApiDaoImpl extends ServiceImpl<SysApiMapper, SysApi> implements 
     }
 
     @Override
+    public List<SysApi> listEnabledByHttpMethod(String httpMethod) {
+        return lambdaQuery()
+                .eq(SysApi::getHttpMethod, httpMethod)
+                .eq(SysApi::getStatus, ENABLED_STATUS)
+                .list();
+    }
+
+    @Override
     public boolean existsByApiCode(String apiCode) {
         return lambdaQuery().eq(SysApi::getApiCode, apiCode).exists();
+    }
+
+    @Override
+    public boolean existsByApiCodeExcludingId(String apiCode, String apiId) {
+        return lambdaQuery().eq(SysApi::getApiCode, apiCode)
+                .ne(apiId != null, SysApi::getSysApiId, apiId).exists();
+    }
+
+    @Override
+    public boolean existsByHttpMethodAndPathPattern(String httpMethod, String pathPattern, String apiId) {
+        return lambdaQuery().eq(SysApi::getHttpMethod, httpMethod).eq(SysApi::getPathPattern, pathPattern)
+                .ne(apiId != null, SysApi::getSysApiId, apiId).exists();
+    }
+
+    @Override
+    public Page<SysApi> pageApis(String keyword, String apiType, String httpMethod, String moduleName,
+            Integer status, long current, long size) {
+        return lambdaQuery()
+                .and(keyword != null && !keyword.isBlank(), query -> query.like(SysApi::getApiCode, keyword)
+                        .or().like(SysApi::getApiName, keyword))
+                .eq(apiType != null && !apiType.isBlank(), SysApi::getApiType, apiType)
+                .eq(httpMethod != null && !httpMethod.isBlank(), SysApi::getHttpMethod, httpMethod)
+                .eq(moduleName != null && !moduleName.isBlank(), SysApi::getModuleName, moduleName)
+                .eq(status != null, SysApi::getStatus, status)
+                .orderByAsc(SysApi::getModuleName).orderByAsc(SysApi::getApiCode)
+                .page(Page.of(current, size));
     }
 }

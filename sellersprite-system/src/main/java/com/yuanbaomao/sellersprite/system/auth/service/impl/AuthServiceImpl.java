@@ -1,26 +1,27 @@
 package com.yuanbaomao.sellersprite.system.auth.service.impl;
 
+import com.yuanbaomao.base.context.RequestContextHolder;
+import com.yuanbaomao.base.exception.BizException;
+import com.yuanbaomao.base.id.IdGenerator;
 import com.yuanbaomao.sellersprite.common.result.ResultCode;
-import com.yuanbaomao.sellersprite.db.dao.LoginLogDao;
 import com.yuanbaomao.sellersprite.db.dao.UserDao;
 import com.yuanbaomao.sellersprite.db.dao.UserTokenDao;
 import com.yuanbaomao.sellersprite.db.entity.LoginLog;
 import com.yuanbaomao.sellersprite.db.entity.User;
 import com.yuanbaomao.sellersprite.db.entity.UserToken;
-import com.yuanbaomao.base.context.RequestContextHolder;
-import com.yuanbaomao.base.exception.BizException;
-import com.yuanbaomao.base.id.IdGenerator;
 import com.yuanbaomao.sellersprite.framework.security.TokenHasher;
-import com.yuanbaomao.sellersprite.system.auth.config.AuthProperties;
-import com.yuanbaomao.sellersprite.system.constants.SystemBusinessConstants;
-import com.yuanbaomao.sellersprite.system.convert.SystemConverter;
+import com.yuanbaomao.sellersprite.system.auth.constants.AuthConstants;
 import com.yuanbaomao.sellersprite.system.auth.enums.LoginType;
 import com.yuanbaomao.sellersprite.system.auth.enums.TokenStatus;
 import com.yuanbaomao.sellersprite.system.auth.model.dto.AuthLoginRequest;
 import com.yuanbaomao.sellersprite.system.auth.model.vo.AuthLoginVo;
 import com.yuanbaomao.sellersprite.system.auth.model.vo.AuthSessionVo;
 import com.yuanbaomao.sellersprite.system.auth.service.AuthService;
-import java.time.Duration;
+import com.yuanbaomao.sellersprite.system.constants.SystemBusinessConstants;
+import com.yuanbaomao.sellersprite.system.convert.SystemConverter;
+import com.yuanbaomao.sellersprite.system.ops.login.service.LoginLogRecorder;
+import com.yuanbaomao.sellersprite.system.permission.model.vo.UserPermissionContextVo;
+import com.yuanbaomao.sellersprite.system.permission.service.PermissionContextService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -32,26 +33,35 @@ public class AuthServiceImpl implements AuthService {
 
     private final UserDao userDao;
     private final UserTokenDao userTokenDao;
-    private final LoginLogDao loginLogDao;
+    private final LoginLogRecorder loginLogRecorder;
     private final PasswordEncoder passwordEncoder;
     private final IdGenerator idGenerator;
-    private final AuthProperties authProperties;
     private final TokenHasher tokenHasher;
+    private final PermissionContextService permissionContextService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public AuthLoginVo login(AuthLoginRequest request, String loginIp, String userAgent) {
         User user = userDao.findByUsername(request.getUsername()).orElse(null);
-        if (user == null || !Integer.valueOf(SystemBusinessConstants.STATUS_ENABLED).equals(user.getStatus())
-                || !passwordEncoder.matches(request.getPassword(), user.getPasswordHash())) {
+        if (user == null) {
+            saveLoginLog(user, request.getUsername(), false, ResultCode.UNAUTHORIZED.getCode(),
+                    SystemBusinessConstants.PASSWORD_LOGIN_FAILURE, loginIp, userAgent, request);
+            throw new BizException(ResultCode.UNAUTHORIZED, SystemBusinessConstants.PASSWORD_LOGIN_FAILURE);
+        }
+        if (!Integer.valueOf(SystemBusinessConstants.STATUS_ENABLED).equals(user.getStatus())) {
+            saveLoginLog(user, request.getUsername(), false, ResultCode.UNAUTHORIZED.getCode(),
+                    SystemBusinessConstants.ACCOUNT_DISABLED_REASON, loginIp, userAgent, request);
+            throw new BizException(ResultCode.UNAUTHORIZED, SystemBusinessConstants.PASSWORD_LOGIN_FAILURE);
+        }
+        if (!passwordEncoder.matches(request.getPassword(), user.getPasswordHash())) {
             saveLoginLog(user, request.getUsername(), false, ResultCode.UNAUTHORIZED.getCode(),
                     SystemBusinessConstants.PASSWORD_LOGIN_FAILURE, loginIp, userAgent, request);
             throw new BizException(ResultCode.UNAUTHORIZED, SystemBusinessConstants.PASSWORD_LOGIN_FAILURE);
         }
 
         long now = System.currentTimeMillis();
-        long expiresAt = now + Duration.ofMinutes(authProperties.getAccessTokenExpireMinutes()).toMillis();
-        long refreshExpiresAt = now + Duration.ofDays(authProperties.getRefreshTokenExpireDays()).toMillis();
+        long expiresAt = now + AuthConstants.ACCESS_TOKEN_TTL.toMillis();
+        long refreshExpiresAt = now + AuthConstants.REFRESH_TOKEN_TTL.toMillis();
         String accessToken = idGenerator.nextId().replace("-", "") + idGenerator.nextId().replace("-", "");
         String refreshToken = idGenerator.nextId().replace("-", "") + idGenerator.nextId().replace("-", "");
 
@@ -83,80 +93,90 @@ public class AuthServiceImpl implements AuthService {
         vo.setTokenType(SystemBusinessConstants.TOKEN_TYPE_BEARER);
         vo.setExpiresAt(expiresAt);
         vo.setUser(SystemConverter.toUserDetailVo(user));
+        applyPermissionContext(vo, user);
         return vo;
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public AuthLoginVo refresh(String refreshToken, String loginIp, String userAgent) {
-        if (refreshToken == null || refreshToken.isBlank()) {
-            throw new BizException(ResultCode.SESSION_EXPIRED);
-        }
-        UserToken previousToken = userTokenDao.findByRefreshTokenHash(tokenHasher.sha256(refreshToken))
-                .orElseThrow(() -> new BizException(ResultCode.SESSION_EXPIRED));
-        long now = System.currentTimeMillis();
-        if (!TokenStatus.VALID.getCode().equals(previousToken.getStatus()) || previousToken.getRevokedAt() != null) {
-            if (previousToken.getReplacedByTokenId() != null && !previousToken.getReplacedByTokenId().isBlank()) {
+        UserToken previousToken = null;
+        User user = null;
+        try {
+            if (refreshToken == null || refreshToken.isBlank()) {
+                throw new BizException(ResultCode.SESSION_EXPIRED);
+            }
+            previousToken = userTokenDao.findByRefreshTokenHash(tokenHasher.sha256(refreshToken))
+                    .orElseThrow(() -> new BizException(ResultCode.SESSION_EXPIRED));
+            long now = System.currentTimeMillis();
+            if (!TokenStatus.VALID.getCode().equals(previousToken.getStatus())
+                    || previousToken.getRevokedAt() != null) {
+                if (previousToken.getReplacedByTokenId() != null && !previousToken.getReplacedByTokenId().isBlank()) {
+                    userTokenDao.revokeFamily(previousToken.getSessionFamilyId(), now,
+                            SystemBusinessConstants.TOKEN_REVOKE_REASON_REUSED);
+                    throw new BizException(ResultCode.REFRESH_TOKEN_REUSED);
+                }
+                throw new BizException(ResultCode.SESSION_EXPIRED);
+            }
+            if (previousToken.getRefreshExpiresAt() == null || previousToken.getRefreshExpiresAt() <= now) {
+                revokeToken(previousToken, now, SystemBusinessConstants.TOKEN_REVOKE_REASON_EXPIRED);
+                throw new BizException(ResultCode.SESSION_EXPIRED);
+            }
+
+            user = userDao.getById(previousToken.getUserId());
+            if (user == null || !Integer.valueOf(SystemBusinessConstants.STATUS_ENABLED).equals(user.getStatus())) {
+                userTokenDao.revokeFamily(previousToken.getSessionFamilyId(), now,
+                        SystemBusinessConstants.TOKEN_REVOKE_REASON_EXPIRED);
+                throw new BizException(ResultCode.UNAUTHORIZED);
+            }
+
+            long expiresAt = now + AuthConstants.ACCESS_TOKEN_TTL.toMillis();
+            long refreshExpiresAt = now + AuthConstants.REFRESH_TOKEN_TTL.toMillis();
+            String accessToken = newOpaqueToken();
+            String newRefreshToken = newOpaqueToken();
+            UserToken newToken = new UserToken();
+            newToken.setUserTokenId(idGenerator.nextId());
+            newToken.setUserId(user.getUserId());
+            newToken.setAccessTokenHash(tokenHasher.sha256(accessToken));
+            newToken.setRefreshTokenHash(tokenHasher.sha256(newRefreshToken));
+            newToken.setSessionFamilyId(previousToken.getSessionFamilyId());
+            newToken.setTokenType(SystemBusinessConstants.TOKEN_TYPE_BEARER);
+            newToken.setDeviceId(previousToken.getDeviceId());
+            newToken.setDeviceName(defaultString(previousToken.getDeviceName()));
+            newToken.setClientType(defaultIfBlank(previousToken.getClientType(),
+                    SystemBusinessConstants.DEFAULT_CLIENT_TYPE));
+            newToken.setLoginIp(defaultString(loginIp));
+            newToken.setUserAgent(defaultString(userAgent));
+            newToken.setIssuedAt(now);
+            newToken.setExpiresAt(expiresAt);
+            newToken.setRefreshExpiresAt(refreshExpiresAt);
+            newToken.setStatus(TokenStatus.VALID.getCode());
+            previousToken.setLastUsedAt(now);
+            previousToken.setReplacedByTokenId(newToken.getUserTokenId());
+            previousToken.setStatus(TokenStatus.INVALID.getCode());
+            previousToken.setRevokedAt(now);
+            previousToken.setRevokeReason(SystemBusinessConstants.TOKEN_REVOKE_REASON_ROTATED);
+            boolean rotated = userTokenDao.rotateRefreshToken(previousToken.getUserTokenId(), newToken.getUserTokenId(),
+                    now, SystemBusinessConstants.TOKEN_REVOKE_REASON_ROTATED);
+            if (!rotated) {
                 userTokenDao.revokeFamily(previousToken.getSessionFamilyId(), now,
                         SystemBusinessConstants.TOKEN_REVOKE_REASON_REUSED);
                 throw new BizException(ResultCode.REFRESH_TOKEN_REUSED);
             }
-            throw new BizException(ResultCode.SESSION_EXPIRED);
-        }
-        if (previousToken.getRefreshExpiresAt() == null || previousToken.getRefreshExpiresAt() <= now) {
-            revokeToken(previousToken, now, SystemBusinessConstants.TOKEN_REVOKE_REASON_EXPIRED);
-            throw new BizException(ResultCode.SESSION_EXPIRED);
-        }
+            userTokenDao.save(newToken);
 
-        User user = userDao.getById(previousToken.getUserId());
-        if (user == null || !Integer.valueOf(SystemBusinessConstants.STATUS_ENABLED).equals(user.getStatus())) {
-            userTokenDao.revokeFamily(previousToken.getSessionFamilyId(), now,
-                    SystemBusinessConstants.TOKEN_REVOKE_REASON_EXPIRED);
-            throw new BizException(ResultCode.UNAUTHORIZED);
+            AuthLoginVo vo = new AuthLoginVo();
+            vo.setAccessToken(accessToken);
+            vo.setRefreshToken(newRefreshToken);
+            vo.setTokenType(SystemBusinessConstants.TOKEN_TYPE_BEARER);
+            vo.setExpiresAt(expiresAt);
+            vo.setUser(SystemConverter.toUserDetailVo(user));
+            applyPermissionContext(vo, user);
+            return vo;
+        } catch (BizException exception) {
+            saveRefreshFailureLog(previousToken, user, exception, loginIp, userAgent);
+            throw exception;
         }
-
-        long expiresAt = now + Duration.ofMinutes(authProperties.getAccessTokenExpireMinutes()).toMillis();
-        long refreshExpiresAt = now + Duration.ofDays(authProperties.getRefreshTokenExpireDays()).toMillis();
-        String accessToken = newOpaqueToken();
-        String newRefreshToken = newOpaqueToken();
-        UserToken newToken = new UserToken();
-        newToken.setUserTokenId(idGenerator.nextId());
-        newToken.setUserId(user.getUserId());
-        newToken.setAccessTokenHash(tokenHasher.sha256(accessToken));
-        newToken.setRefreshTokenHash(tokenHasher.sha256(newRefreshToken));
-        newToken.setSessionFamilyId(previousToken.getSessionFamilyId());
-        newToken.setTokenType(SystemBusinessConstants.TOKEN_TYPE_BEARER);
-        newToken.setDeviceId(previousToken.getDeviceId());
-        newToken.setDeviceName(defaultString(previousToken.getDeviceName()));
-        newToken.setClientType(defaultIfBlank(previousToken.getClientType(),
-                SystemBusinessConstants.DEFAULT_CLIENT_TYPE));
-        newToken.setLoginIp(defaultString(loginIp));
-        newToken.setUserAgent(defaultString(userAgent));
-        newToken.setIssuedAt(now);
-        newToken.setExpiresAt(expiresAt);
-        newToken.setRefreshExpiresAt(refreshExpiresAt);
-        newToken.setStatus(TokenStatus.VALID.getCode());
-        previousToken.setLastUsedAt(now);
-        previousToken.setReplacedByTokenId(newToken.getUserTokenId());
-        previousToken.setStatus(TokenStatus.INVALID.getCode());
-        previousToken.setRevokedAt(now);
-        previousToken.setRevokeReason(SystemBusinessConstants.TOKEN_REVOKE_REASON_ROTATED);
-        boolean rotated = userTokenDao.rotateRefreshToken(previousToken.getUserTokenId(), newToken.getUserTokenId(),
-                now, SystemBusinessConstants.TOKEN_REVOKE_REASON_ROTATED);
-        if (!rotated) {
-            userTokenDao.revokeFamily(previousToken.getSessionFamilyId(), now,
-                    SystemBusinessConstants.TOKEN_REVOKE_REASON_REUSED);
-            throw new BizException(ResultCode.REFRESH_TOKEN_REUSED);
-        }
-        userTokenDao.save(newToken);
-
-        AuthLoginVo vo = new AuthLoginVo();
-        vo.setAccessToken(accessToken);
-        vo.setRefreshToken(newRefreshToken);
-        vo.setTokenType(SystemBusinessConstants.TOKEN_TYPE_BEARER);
-        vo.setExpiresAt(expiresAt);
-        vo.setUser(SystemConverter.toUserDetailVo(user));
-        return vo;
     }
 
     @Override
@@ -183,7 +203,19 @@ public class AuthServiceImpl implements AuthService {
         AuthSessionVo session = new AuthSessionVo();
         session.setUser(SystemConverter.toUserDetailVo(user));
         session.setPermissionVersion(user.getPermissionVersion() == null ? 0L : user.getPermissionVersion());
+        UserPermissionContextVo permissionContext = permissionContextService.getByUserId(userId);
+        session.setRoles(permissionContext.getRoles());
+        session.setMenuTree(permissionContext.getMenuTree());
+        session.setPermissionCodes(permissionContext.getPermissionCodes());
         return session;
+    }
+
+    private void applyPermissionContext(AuthLoginVo login, User user) {
+        UserPermissionContextVo permissionContext = permissionContextService.getByUserId(user.getUserId());
+        login.setRoles(permissionContext.getRoles());
+        login.setMenuTree(permissionContext.getMenuTree());
+        login.setPermissionCodes(permissionContext.getPermissionCodes());
+        login.setPermissionVersion(user.getPermissionVersion() == null ? 0L : user.getPermissionVersion());
     }
 
     private void revokeToken(UserToken token, long revokedAt, String reason) {
@@ -212,7 +244,27 @@ public class AuthServiceImpl implements AuthService {
         loginLog.setDeviceName(defaultString(request.getDeviceName()));
         loginLog.setClientType(defaultIfBlank(request.getClientType(), SystemBusinessConstants.DEFAULT_CLIENT_TYPE));
         loginLog.setTrackId(RequestContextHolder.currentTrackId());
-        loginLogDao.save(loginLog);
+        loginLogRecorder.record(loginLog);
+    }
+
+    private void saveRefreshFailureLog(UserToken token, User user, BizException exception,
+                                       String loginIp, String userAgent) {
+        LoginLog loginLog = new LoginLog();
+        loginLog.setUserId(user == null ? token == null ? null : token.getUserId() : user.getUserId());
+        loginLog.setUsername(user == null ? "" : defaultString(user.getUsername()));
+        loginLog.setLoginType(LoginType.REFRESH.getCode());
+        loginLog.setSuccess(SystemBusinessConstants.NO);
+        loginLog.setErrorCode(exception.getCode());
+        loginLog.setFailureReason(defaultString(exception.getMessage()));
+        loginLog.setLoginIp(defaultString(loginIp));
+        loginLog.setLoginLocation("");
+        loginLog.setUserAgent(defaultString(userAgent));
+        loginLog.setDeviceName(token == null ? "" : defaultString(token.getDeviceName()));
+        loginLog.setClientType(token == null
+                ? SystemBusinessConstants.DEFAULT_CLIENT_TYPE
+                : defaultIfBlank(token.getClientType(), SystemBusinessConstants.DEFAULT_CLIENT_TYPE));
+        loginLog.setTrackId(RequestContextHolder.currentTrackId());
+        loginLogRecorder.record(loginLog);
     }
 
     private String defaultIfBlank(String value, String defaultValue) {

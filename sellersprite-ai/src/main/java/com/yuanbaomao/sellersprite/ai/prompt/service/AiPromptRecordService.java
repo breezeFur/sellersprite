@@ -13,4 +13,8 @@ public interface AiPromptRecordService {
     void recordSuccess(String promptRecordId, ChatResponse chatResponse, long costMs);
 
     void recordFailure(String promptRecordId, Throwable throwable, long costMs);
+
+    void recordStreamFailure(String promptRecordId, String partialContent, Throwable throwable, long costMs);
+
+    void recordCancelled(String promptRecordId, String partialContent, long costMs);
 }

@@ -1,8 +1,13 @@
 // Generated from SellerSprite official documentation on 2026-07-10.
 package com.yuanbaomao.sellersprite.api.trademark.model.vo;
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import lombok.Data;
+import tools.jackson.databind.JsonNode;
 
 /**
  * 全球商标库-数据范围响应模型。
@@ -20,5 +25,19 @@ public class TrademarkRangeVo {
     /** 全球商标库-数据范围响应参数：中文名称；安道尔 */
     @Schema(description = "全球商标库-数据范围响应参数：中文名称；安道尔")
     private String officeLabel;
+
+    /** 官方响应中未建模字段的原始值。 */
+    @Schema(description = "官方响应未建模字段", hidden = true)
+    private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
+
+    @JsonAnySetter
+    public void putAdditionalProperty(String name, JsonNode value) {
+        additionalProperties.put(name, value);
+    }
+
+    @JsonAnyGetter
+    public Map<String, JsonNode> getAdditionalProperties() {
+        return additionalProperties;
+    }
 
 }

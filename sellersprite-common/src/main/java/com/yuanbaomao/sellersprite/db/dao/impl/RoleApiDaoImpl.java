@@ -19,4 +19,18 @@ public class RoleApiDaoImpl extends ServiceImpl<RoleApiMapper, RoleApi> implemen
         }
         return lambdaQuery().in(RoleApi::getRoleId, roleIds).list();
     }
+
+    @Override
+    public boolean existsByApiId(String apiId) {
+        return lambdaQuery().eq(RoleApi::getSysApiId, apiId).exists();
+    }
+
+    @Override
+    public void replaceByRoleId(String roleId, Collection<RoleApi> roleApis) {
+        baseMapper.deletePhysicallyByRoleId(roleId);
+        if (roleApis == null || roleApis.isEmpty()) {
+            return;
+        }
+        saveBatch(roleApis);
+    }
 }

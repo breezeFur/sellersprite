@@ -8,4 +8,8 @@ import java.util.List;
 public interface RoleApiDao extends IService<RoleApi> {
 
     List<RoleApi> listByRoleIds(Collection<String> roleIds);
+
+    boolean existsByApiId(String apiId);
+
+    void replaceByRoleId(String roleId, Collection<RoleApi> roleApis);
 }

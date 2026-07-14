@@ -22,9 +22,6 @@ import reactor.core.publisher.Flux;
 @RequiredArgsConstructor
 public class MyLoggerAdvisor implements BaseAdvisor {
 
-    private static final int MAX_MESSAGE_SUMMARY_LENGTH = 500;
-    private static final int MAX_TOOL_RESULT_PREVIEW_LENGTH = 160;
-
     private final AiPromptRecordService promptRecordService;
 
     @Override
@@ -53,7 +50,7 @@ public class MyLoggerAdvisor implements BaseAdvisor {
         }
         String text = extractText(response);
         if (text != null) {
-            log.info("<<<<<< [模型回复结束] 完整回复 <<<<<<\n{}", text);
+            log.info("<<<<<< [模型回复结束] responseChars={}", text.length());
         }
         logToolCalls(response);
         logReasoning(response);
@@ -72,13 +69,13 @@ public class MyLoggerAdvisor implements BaseAdvisor {
                     String delta = extractText(response);
                     if (delta != null) {
                         fullText.append(delta);
-                        log.debug("[TOKEN] {}", delta);
+                        log.debug("[TOKEN] chars={}", delta.length());
                     }
                     logToolCalls(response);
                     logReasoning(response);
                 })
                 .doOnComplete(() -> {
-                    log.info("[FINAL] {}", fullText);
+                    log.info("[FINAL] responseChars={}", fullText.length());
                     if (!promptRecordId.isBlank()) {
                         ChatResponse mergedResponse = mergeStreamResponse(fullText.toString(), lastResponse.get());
                         promptRecordService.recordSuccess(promptRecordId, mergedResponse, elapsed(processed.context()));
@@ -116,8 +113,15 @@ public class MyLoggerAdvisor implements BaseAdvisor {
         }
         AssistantMessage output = response.chatResponse().getResult().getOutput();
         if (output.hasToolCalls()) {
-            output.getToolCalls().forEach(tool -> log.info("[TOOL-DELTA] {} -> {}", tool.name(), tool.arguments()));
+            output.getToolCalls().forEach(tool -> log.info("[TOOL-DELTA] name={}, {}",
+                    tool.name(), summarizeToolArguments(tool.arguments())));
         }
+    }
+
+    static String summarizeToolArguments(String arguments) {
+        int argumentChars = arguments == null ? 0 : arguments.length();
+        // 工具参数可能包含选品关键词等业务数据，日志只保留长度和固定脱敏标记。
+        return "argumentChars=" + argumentChars + ", arguments=<redacted>";
     }
 
     private void logReasoning(ChatClientResponse response) {
@@ -126,7 +130,7 @@ public class MyLoggerAdvisor implements BaseAdvisor {
         }
         var metadata = response.chatResponse().getMetadata();
         if (metadata.containsKey("reasoning")) {
-            log.info("[REASONING] {}", String.valueOf(metadata.get("reasoning")));
+            log.info("[REASONING] reasoningChars={}", String.valueOf(metadata.get("reasoning")).length());
         }
     }
 
@@ -139,37 +143,33 @@ public class MyLoggerAdvisor implements BaseAdvisor {
         return response.chatResponse().getResult().getOutput().getText();
     }
 
-    private String summarizeMessage(Message message) {
+    static String summarizeMessage(Message message) {
         if (message instanceof ToolResponseMessage toolResponseMessage) {
             return summarizeToolResponseMessage(toolResponseMessage);
         }
-        return limit(message.getText(), MAX_MESSAGE_SUMMARY_LENGTH);
+        return "messageChars=" + characterCount(message.getText());
     }
 
-    private String summarizeToolResponseMessage(ToolResponseMessage toolResponseMessage) {
+    private static String summarizeToolResponseMessage(ToolResponseMessage toolResponseMessage) {
         List<ToolResponseMessage.ToolResponse> responses = toolResponseMessage.getResponses();
         if (responses == null || responses.isEmpty()) {
             return "toolResponses=0";
         }
         return "toolResponses=" + responses.size() + " "
-                + responses.stream().map(this::summarizeToolResponse).toList();
+                + responses.stream().map(MyLoggerAdvisor::summarizeToolResponse).toList();
     }
 
-    private String summarizeToolResponse(ToolResponseMessage.ToolResponse response) {
+    private static String summarizeToolResponse(ToolResponseMessage.ToolResponse response) {
         String responseData = response.responseData() == null ? "" : response.responseData();
         return "{toolCallId=" + response.id()
                 + ", toolName=" + response.name()
                 + ", resultChars=" + responseData.length()
-                + ", preview=" + limit(responseData, MAX_TOOL_RESULT_PREVIEW_LENGTH)
+                + ", result=<redacted>"
                 + "}";
     }
 
-    private String limit(String content, int maxLength) {
-        if (content == null || content.isBlank()) {
-            return "";
-        }
-        String normalized = content.replaceAll("\\s+", " ").trim();
-        return normalized.length() <= maxLength ? normalized : normalized.substring(0, maxLength) + "...";
+    private static int characterCount(String content) {
+        return content == null ? 0 : content.length();
     }
 
     private long elapsed(Map<String, Object> context) {

@@ -1,5 +1,6 @@
 package com.yuanbaomao.sellersprite.ai.advisor;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
@@ -13,6 +14,7 @@ import org.springframework.ai.chat.client.ChatClientResponse;
 import org.springframework.ai.chat.client.advisor.api.AdvisorChain;
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.SystemMessage;
+import org.springframework.ai.chat.messages.ToolResponseMessage;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.model.Generation;
@@ -52,5 +54,34 @@ class MyLoggerAdvisorTest {
         advisor.after(response, org.mockito.Mockito.mock(AdvisorChain.class));
 
         verify(promptRecordService).recordSuccess(eq(PROMPT_RECORD_ID), eq(chatResponse), anyLong());
+    }
+
+    @Test
+    void shouldRedactToolArgumentsFromLogSummary() {
+        String arguments = "{\"secretKey\":\"sensitive-value\",\"asin\":\"B08GHW4TBS\"}";
+
+        String summary = MyLoggerAdvisor.summarizeToolArguments(arguments);
+
+        assertThat(summary)
+                .isEqualTo("argumentChars=" + arguments.length() + ", arguments=<redacted>")
+                .doesNotContain("sensitive-value", "B08GHW4TBS");
+    }
+
+    @Test
+    void shouldSummarizeMessagesWithoutBusinessContent() {
+        String userContent = "查询敏感关键词和 ASIN B08GHW4TBS";
+        String toolResult = "{\"secretKey\":\"sensitive-value\",\"asin\":\"B08GHW4TBS\"}";
+        ToolResponseMessage toolMessage = ToolResponseMessage.builder()
+                .responses(List.of(new ToolResponseMessage.ToolResponse(
+                        "tool-call-id", "sellersprite_get_asin_detail", toolResult)))
+                .build();
+
+        assertThat(MyLoggerAdvisor.summarizeMessage(new UserMessage(userContent)))
+                .isEqualTo("messageChars=" + userContent.length())
+                .doesNotContain(userContent, "B08GHW4TBS");
+        assertThat(MyLoggerAdvisor.summarizeMessage(toolMessage))
+                .contains("toolName=sellersprite_get_asin_detail", "resultChars=" + toolResult.length(),
+                        "result=<redacted>")
+                .doesNotContain("sensitive-value", "B08GHW4TBS");
     }
 }

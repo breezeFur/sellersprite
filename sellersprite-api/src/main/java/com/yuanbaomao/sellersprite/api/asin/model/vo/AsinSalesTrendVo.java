@@ -1,13 +1,18 @@
 // Generated from SellerSprite official documentation on 2026-07-10.
 package com.yuanbaomao.sellersprite.api.asin.model.vo;
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.yuanbaomao.sellersprite.api.common.model.vo.BadgeVo;
 import com.yuanbaomao.sellersprite.api.common.model.vo.SubcategoryVo;
 import com.yuanbaomao.sellersprite.api.common.model.vo.VariationVo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.math.BigDecimal;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import lombok.Data;
+import tools.jackson.databind.JsonNode;
 
 /**
  * ASIN 销量趋势响应模型。
@@ -25,6 +30,20 @@ public class AsinSalesTrendVo {
     /** ASIN 销量趋势响应参数：ASIN sales Trend */
     @Schema(description = "ASIN 销量趋势响应参数：ASIN sales Trend")
     private List<SalesTrendPointsVo> salesTrendPoints;
+
+    /** 官方响应中未建模字段的原始值。 */
+    @Schema(description = "官方响应未建模字段", hidden = true)
+    private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
+
+    @JsonAnySetter
+    public void putAdditionalProperty(String name, JsonNode value) {
+        additionalProperties.put(name, value);
+    }
+
+    @JsonAnyGetter
+    public Map<String, JsonNode> getAdditionalProperties() {
+        return additionalProperties;
+    }
 
     @Data
     @Schema(description = "ASIN 销量趋势响应参数：Asin Object")
@@ -206,6 +225,20 @@ public class AsinSalesTrendVo {
         @Schema(description = "ASIN 销量趋势响应参数：优惠卷；[save $20]")
         private String coupon;
 
+        /** 官方响应中未建模字段的原始值。 */
+        @Schema(description = "官方响应未建模字段", hidden = true)
+        private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
+
+        @JsonAnySetter
+        public void putAdditionalProperty(String name, JsonNode value) {
+            additionalProperties.put(name, value);
+        }
+
+        @JsonAnyGetter
+        public Map<String, JsonNode> getAdditionalProperties() {
+            return additionalProperties;
+        }
+
     }
 
     @Data
@@ -239,6 +272,20 @@ public class AsinSalesTrendVo {
         /** ASIN 销量趋势响应参数：子体销售额度 */
         @Schema(description = "ASIN 销量趋势响应参数：子体销售额度")
         private BigDecimal childSalesRevenue;
+
+        /** 官方响应中未建模字段的原始值。 */
+        @Schema(description = "官方响应未建模字段", hidden = true)
+        private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
+
+        @JsonAnySetter
+        public void putAdditionalProperty(String name, JsonNode value) {
+            additionalProperties.put(name, value);
+        }
+
+        @JsonAnyGetter
+        public Map<String, JsonNode> getAdditionalProperties() {
+            return additionalProperties;
+        }
 
     }
 

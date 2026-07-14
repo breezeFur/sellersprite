@@ -19,7 +19,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import com.yuanbaomao.sellersprite.common.result.ResultCode;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -28,13 +27,24 @@ import lombok.extern.slf4j.Slf4j;
  * <p>业务域只能通过本类访问外部服务，不能自行拼装密钥、请求 ID 或错误降级。</p>
  */
 @Slf4j
-@RequiredArgsConstructor
 public class SellerSpriteClient {
 
     private static final String SUCCESS_CODE = "OK";
 
     private final RestClient restClient;
     private final SellerSpriteAuthStrategy authStrategy;
+    private final SellerSpriteDictionaryResolver dictionaryResolver;
+
+    public SellerSpriteClient(RestClient restClient, SellerSpriteAuthStrategy authStrategy) {
+        this(restClient, authStrategy, null);
+    }
+
+    public SellerSpriteClient(RestClient restClient, SellerSpriteAuthStrategy authStrategy,
+            SellerSpriteDictionaryResolver dictionaryResolver) {
+        this.restClient = restClient;
+        this.authStrategy = authStrategy;
+        this.dictionaryResolver = dictionaryResolver;
+    }
 
     /**
      * 调用不含路径变量和查询参数的 GET 接口。
@@ -91,7 +101,7 @@ public class SellerSpriteClient {
         return execute(HttpMethod.POST, path, requestId, () -> restClient.post()
                 .uri(path)
                 .headers(headers -> requestId.set(authStrategy.apply(headers)))
-                .body(request)
+                .body(dictionaryResolver == null ? request : dictionaryResolver.resolveRequest(request))
                 .retrieve()
                 .body(responseType));
     }

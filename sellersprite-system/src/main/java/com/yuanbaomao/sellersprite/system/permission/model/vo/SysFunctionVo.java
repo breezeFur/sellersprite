@@ -1,6 +1,8 @@
 package com.yuanbaomao.sellersprite.system.permission.model.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.Data;
 
 @Data
@@ -25,9 +27,23 @@ public class SysFunctionVo {
     @Schema(description = "路由路径")
     private String routePath;
 
+    private String componentPath;
+
+    private String icon;
+
+    private Integer visible;
+
+    private Integer cacheable;
+
+    private String externalLink;
+
     @Schema(description = "权限标识")
     private String permissionCode;
 
     @Schema(description = "排序值")
     private Integer sortOrder;
+
+    private Integer status;
+
+    private List<SysFunctionVo> children = new ArrayList<>();
 }

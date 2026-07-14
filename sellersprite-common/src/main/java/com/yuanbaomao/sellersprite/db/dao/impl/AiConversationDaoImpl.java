@@ -37,4 +37,10 @@ public class AiConversationDaoImpl extends ServiceImpl<AiConversationMapper, AiC
                 .eq(AiConversation::getConversationId, conversationId)
                 .eq(AiConversation::getUserId, userId));
     }
+
+    @Override
+    public long countByCreatedAtRange(long startTime, long endTime) {
+        return lambdaQuery().ge(AiConversation::getCreatedAt, startTime)
+                .lt(AiConversation::getCreatedAt, endTime).count();
+    }
 }

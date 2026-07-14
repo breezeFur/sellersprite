@@ -6,6 +6,7 @@ import lombok.Getter;
 public enum LoginType {
 
     PASSWORD("PASSWORD", "密码登录"),
+    REFRESH("REFRESH", "刷新会话"),
     TOKEN("TOKEN", "令牌登录");
 
     private final String code;

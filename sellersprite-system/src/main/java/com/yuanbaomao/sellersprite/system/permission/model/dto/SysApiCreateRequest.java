@@ -39,4 +39,7 @@ public class SysApiCreateRequest {
 
     @Schema(description = "操作名称")
     private String operationName;
+
+    @Schema(description = "备注")
+    private String remark;
 }

@@ -21,7 +21,29 @@ public class SysFunctionDaoImpl extends ServiceImpl<SysFunctionMapper, SysFuncti
     }
 
     @Override
+    public List<SysFunction> listAll() {
+        return lambdaQuery().orderByAsc(SysFunction::getSortOrder).orderByAsc(SysFunction::getSysFunctionId).list();
+    }
+
+    @Override
     public boolean existsByFunctionCode(String functionCode) {
         return lambdaQuery().eq(SysFunction::getFunctionCode, functionCode).exists();
+    }
+
+    @Override
+    public boolean existsByFunctionCodeExcludingId(String functionCode, String functionId) {
+        return lambdaQuery().eq(SysFunction::getFunctionCode, functionCode)
+                .ne(functionId != null, SysFunction::getSysFunctionId, functionId).exists();
+    }
+
+    @Override
+    public boolean existsByPermissionCodeExcludingId(String permissionCode, String functionId) {
+        return lambdaQuery().eq(SysFunction::getPermissionCode, permissionCode)
+                .ne(functionId != null, SysFunction::getSysFunctionId, functionId).exists();
+    }
+
+    @Override
+    public boolean existsByParentId(String parentId) {
+        return lambdaQuery().eq(SysFunction::getParentId, parentId).exists();
     }
 }

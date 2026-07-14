@@ -1,8 +1,12 @@
 // Generated from SellerSprite official documentation on 2026-07-10.
 package com.yuanbaomao.sellersprite.api.trademark.model.vo;
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import lombok.Data;
 import tools.jackson.databind.JsonNode;
 
@@ -103,6 +107,20 @@ public class TrademarkListItemVo {
     @Schema(description = "全球商标库-列表明细响应参数：类型；TRADEMARK")
     private String type;
 
+    /** 官方响应中未建模字段的原始值。 */
+    @Schema(description = "官方响应未建模字段", hidden = true)
+    private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
+
+    @JsonAnySetter
+    public void putAdditionalProperty(String name, JsonNode value) {
+        additionalProperties.put(name, value);
+    }
+
+    @JsonAnyGetter
+    public Map<String, JsonNode> getAdditionalProperties() {
+        return additionalProperties;
+    }
+
     @Data
     @Schema(description = "全球商标库-列表明细响应参数：申请人详情；格式同office")
     public static class ApplicantsVo {
@@ -131,6 +149,20 @@ public class TrademarkListItemVo {
         @Schema(description = "全球商标库-列表明细响应参数：完整名称")
         private List<ApplicantsFullNameVo> fullName;
 
+        /** 官方响应中未建模字段的原始值。 */
+        @Schema(description = "官方响应未建模字段", hidden = true)
+        private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
+
+        @JsonAnySetter
+        public void putAdditionalProperty(String name, JsonNode value) {
+            additionalProperties.put(name, value);
+        }
+
+        @JsonAnyGetter
+        public Map<String, JsonNode> getAdditionalProperties() {
+            return additionalProperties;
+        }
+
     }
 
     @Data
@@ -149,6 +181,20 @@ public class TrademarkListItemVo {
         @Schema(description = "全球商标库-列表明细响应参数：图片URL；https://o.sellersprite.com/w/brands/ustm/US502022097612203/ee45f.jpg")
         private String imageUrl;
 
+        /** 官方响应中未建模字段的原始值。 */
+        @Schema(description = "官方响应未建模字段", hidden = true)
+        private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
+
+        @JsonAnySetter
+        public void putAdditionalProperty(String name, JsonNode value) {
+            additionalProperties.put(name, value);
+        }
+
+        @JsonAnyGetter
+        public Map<String, JsonNode> getAdditionalProperties() {
+            return additionalProperties;
+        }
+
     }
 
     @Data
@@ -163,6 +209,20 @@ public class TrademarkListItemVo {
         @Schema(description = "全球商标库-列表明细响应参数：语言；en")
         private String languageCode;
 
+        /** 官方响应中未建模字段的原始值。 */
+        @Schema(description = "官方响应未建模字段", hidden = true)
+        private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
+
+        @JsonAnySetter
+        public void putAdditionalProperty(String name, JsonNode value) {
+            additionalProperties.put(name, value);
+        }
+
+        @JsonAnyGetter
+        public Map<String, JsonNode> getAdditionalProperties() {
+            return additionalProperties;
+        }
+
     }
 
     @Data
@@ -176,6 +236,20 @@ public class TrademarkListItemVo {
         /** 全球商标库-列表明细响应参数：logo url */
         @Schema(description = "全球商标库-列表明细响应参数：logo url")
         private String logoUrl;
+
+        /** 官方响应中未建模字段的原始值。 */
+        @Schema(description = "官方响应未建模字段", hidden = true)
+        private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
+
+        @JsonAnySetter
+        public void putAdditionalProperty(String name, JsonNode value) {
+            additionalProperties.put(name, value);
+        }
+
+        @JsonAnyGetter
+        public Map<String, JsonNode> getAdditionalProperties() {
+            return additionalProperties;
+        }
 
     }
 

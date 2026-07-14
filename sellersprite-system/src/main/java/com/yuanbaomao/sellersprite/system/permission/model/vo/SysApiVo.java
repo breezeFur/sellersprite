@@ -27,4 +27,10 @@ public class SysApiVo {
 
     @Schema(description = "权限标识")
     private String permissionCode;
+
+    private String moduleName;
+
+    private String operationName;
+
+    private Integer status;
 }

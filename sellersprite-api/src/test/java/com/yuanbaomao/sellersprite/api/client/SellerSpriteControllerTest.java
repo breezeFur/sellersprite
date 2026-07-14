@@ -1,5 +1,6 @@
 package com.yuanbaomao.sellersprite.api.client;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -11,7 +12,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.springframework.http.MediaType;
+import org.springframework.format.support.DefaultFormattingConversionService;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
@@ -28,6 +31,7 @@ import com.yuanbaomao.sellersprite.api.market.model.dto.MarketStatisticsRequest;
 import com.yuanbaomao.sellersprite.api.market.service.MarketService;
 import com.yuanbaomao.sellersprite.api.product.controller.ProductController;
 import com.yuanbaomao.sellersprite.api.product.model.dto.CompetitorLookupRequest;
+import com.yuanbaomao.sellersprite.api.product.model.dto.ProductResearchRequest;
 import com.yuanbaomao.sellersprite.api.product.service.ProductService;
 import com.yuanbaomao.sellersprite.api.review.controller.ReviewController;
 import com.yuanbaomao.sellersprite.api.review.model.dto.ReviewListRequest;
@@ -60,7 +64,7 @@ class SellerSpriteControllerTest {
 
         mvc(new ProductController(service)).perform(post("/api/sellersprite/products/competitors")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"marketplace\":\"US\"}"))
+                        .content("{\"marketplace\":\"MARKET_US\"}"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value("00000"));
 
@@ -68,11 +72,40 @@ class SellerSpriteControllerTest {
     }
 
     @Test
+    void shouldBindProductResearchDictionaryLabelsBeforeClientResolution() throws Exception {
+        ProductService service = mock(ProductService.class);
+
+        mvc(new ProductController(service)).perform(post("/api/sellersprite/products/research")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "marketplace": "MARKET_US",
+                                  "availableMonth": "LISTING_DATE_3",
+                                  "dimensionType": "PRODUCT_SIZE_US_ST_SS,PRODUCT_SIZE_US_LS",
+                                  "order": {
+                                    "field": "PRODUCT_SORT_FIELD_TOTAL_UNITS",
+                                    "desc": true
+                                  }
+                                }
+                                """))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value("00000"));
+
+        ArgumentCaptor<ProductResearchRequest> requestCaptor = ArgumentCaptor.forClass(ProductResearchRequest.class);
+        verify(service).researchProducts(requestCaptor.capture());
+        ProductResearchRequest request = requestCaptor.getValue();
+        assertThat(request.getAvailableMonth()).isEqualTo("LISTING_DATE_3");
+        assertThat(request.getDimensionType()).isEqualTo("PRODUCT_SIZE_US_ST_SS,PRODUCT_SIZE_US_LS");
+        assertThat(request.getOrder().getField()).isEqualTo("PRODUCT_SORT_FIELD_TOTAL_UNITS");
+        assertThat(request.getOrder().getDesc()).isTrue();
+    }
+
+    @Test
     void shouldRouteAsinQueryRequest() throws Exception {
         AsinService service = mock(AsinService.class);
 
         mvc(new AsinController(service)).perform(get("/api/sellersprite/asins/detail")
-                        .queryParam("marketplace", "US")
+                        .queryParam("marketplace", "MARKET_US")
                         .queryParam("asin", "B0TESTASIN"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value("00000"));
@@ -170,6 +203,10 @@ class SellerSpriteControllerTest {
     }
 
     private MockMvc mvc(Object controller) {
-        return MockMvcBuilders.standaloneSetup(controller).build();
+        DefaultFormattingConversionService conversionService = new DefaultFormattingConversionService();
+        new SellerSpriteApiConfig().addFormatters(conversionService);
+        return MockMvcBuilders.standaloneSetup(controller)
+                .setConversionService(conversionService)
+                .build();
     }
 }

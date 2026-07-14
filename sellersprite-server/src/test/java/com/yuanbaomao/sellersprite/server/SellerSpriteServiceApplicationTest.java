@@ -58,10 +58,19 @@ class SellerSpriteServiceApplicationTest {
                 "/api/roles",
                 "/api/depts",
                 "/api/dicts/types",
+                "/api/system/dicts/types",
                 "/api/permissions/functions",
                 "/api/ai/chat",
                 "/api/ai/conversations",
-                "/api/ai/conversations/{conversationId}");
+                "/api/ai/conversations/{conversationId}",
+                "/api/market-research/jobs",
+                "/api/market-research/jobs/{jobId}",
+                "/api/market-research/jobs/{jobId}/download",
+                "/api/cache/keys",
+                "/api/cache/value",
+                "/api/cache/exists",
+                "/api/cache/key",
+                "/api/cache");
         assertThat(registeredPaths.stream()
                 .filter(path -> path.startsWith("/api/sellersprite/")))
                 .hasSize(45)
@@ -97,6 +106,16 @@ class SellerSpriteServiceApplicationTest {
     @Test
     void sellerSpriteRoutesShouldRequireAccessToken() throws Exception {
         var result = mockMvc.perform(get("/api/sellersprite/account/visits")).andReturn();
+
+        assertThat(result.getResolvedException())
+                .isInstanceOf(com.yuanbaomao.base.exception.BizException.class)
+                .extracting("code")
+                .isEqualTo("A401");
+    }
+
+    @Test
+    void marketResearchRoutesShouldRequireAccessToken() throws Exception {
+        var result = mockMvc.perform(get("/api/market-research/jobs/test-job")).andReturn();
 
         assertThat(result.getResolvedException())
                 .isInstanceOf(com.yuanbaomao.base.exception.BizException.class)

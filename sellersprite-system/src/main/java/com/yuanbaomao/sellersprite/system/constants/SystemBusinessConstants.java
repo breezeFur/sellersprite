@@ -10,6 +10,7 @@ public final class SystemBusinessConstants {
     public static final String DEFAULT_CLIENT_TYPE = "WEB";
     public static final String TOKEN_TYPE_BEARER = "BEARER";
     public static final String PASSWORD_LOGIN_FAILURE = "用户名或密码错误";
+    public static final String ACCOUNT_DISABLED_REASON = "账号已停用";
     public static final String TOKEN_REVOKE_REASON_ROTATED = "ROTATED";
     public static final String TOKEN_REVOKE_REASON_REUSED = "REUSED";
     public static final String TOKEN_REVOKE_REASON_EXPIRED = "EXPIRED";

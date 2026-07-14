@@ -1,10 +1,10 @@
 package com.yuanbaomao.sellersprite.system.auth.controller;
 
 import com.yuanbaomao.base.result.Result;
+import com.yuanbaomao.sellersprite.system.auth.constants.AuthConstants;
 import com.yuanbaomao.sellersprite.system.auth.model.dto.AuthLoginRequest;
 import com.yuanbaomao.sellersprite.system.auth.model.vo.AuthLoginVo;
 import com.yuanbaomao.sellersprite.system.auth.model.vo.AuthSessionVo;
-import com.yuanbaomao.sellersprite.system.auth.config.AuthProperties;
 import com.yuanbaomao.sellersprite.system.auth.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -13,7 +13,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.Cookie;
 import jakarta.validation.Valid;
 import java.time.Duration;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,12 +24,16 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "认证接口")
 @RestController
-@RequiredArgsConstructor
 @RequestMapping("/api/auth")
 public class AuthController {
 
     private final AuthService authService;
-    private final AuthProperties authProperties;
+    private final String refreshCookieName;
+
+    public AuthController(AuthService authService, @Value("${spring.application.name}") String applicationName) {
+        this.authService = authService;
+        this.refreshCookieName = applicationName + AuthConstants.REFRESH_COOKIE_NAME_SUFFIX;
+    }
 
     @Operation(summary = "用户登录")
     @PostMapping("/login")
@@ -37,8 +41,8 @@ public class AuthController {
             HttpServletResponse servletResponse) {
         AuthLoginVo loginVo = authService.login(request, servletRequest.getRemoteAddr(),
                 servletRequest.getHeader("User-Agent"));
-        writeRefreshCookie(servletResponse, loginVo.getRefreshToken(),
-                Duration.ofDays(authProperties.getRefreshTokenExpireDays()));
+        writeRefreshCookie(servletRequest, servletResponse, loginVo.getRefreshToken(),
+                AuthConstants.REFRESH_TOKEN_TTL);
         return Result.success(loginVo);
     }
 
@@ -47,8 +51,8 @@ public class AuthController {
     public Result<AuthLoginVo> refresh(HttpServletRequest servletRequest, HttpServletResponse servletResponse) {
         AuthLoginVo loginVo = authService.refresh(resolveRefreshToken(servletRequest), servletRequest.getRemoteAddr(),
                 servletRequest.getHeader("User-Agent"));
-        writeRefreshCookie(servletResponse, loginVo.getRefreshToken(),
-                Duration.ofDays(authProperties.getRefreshTokenExpireDays()));
+        writeRefreshCookie(servletRequest, servletResponse, loginVo.getRefreshToken(),
+                AuthConstants.REFRESH_TOKEN_TTL);
         return Result.success(loginVo);
     }
 
@@ -56,7 +60,7 @@ public class AuthController {
     @PostMapping("/logout")
     public Result<Void> logout(HttpServletRequest servletRequest, HttpServletResponse servletResponse) {
         authService.logout(resolveRefreshToken(servletRequest));
-        writeRefreshCookie(servletResponse, "", Duration.ZERO);
+        writeRefreshCookie(servletRequest, servletResponse, "", Duration.ZERO);
         return Result.success();
     }
 
@@ -72,19 +76,20 @@ public class AuthController {
             return null;
         }
         for (Cookie cookie : cookies) {
-            if (authProperties.getRefreshCookieName().equals(cookie.getName())) {
+            if (refreshCookieName.equals(cookie.getName())) {
                 return cookie.getValue();
             }
         }
         return null;
     }
 
-    private void writeRefreshCookie(HttpServletResponse response, String value, Duration maxAge) {
-        ResponseCookie refreshCookie = ResponseCookie.from(authProperties.getRefreshCookieName(), value)
+    private void writeRefreshCookie(HttpServletRequest request, HttpServletResponse response, String value,
+                                    Duration maxAge) {
+        ResponseCookie refreshCookie = ResponseCookie.from(refreshCookieName, value)
                 .httpOnly(true)
-                .secure(authProperties.isRefreshCookieSecure())
-                .sameSite("Lax")
-                .path("/api/auth")
+                .secure(request.isSecure())
+                .sameSite(AuthConstants.REFRESH_COOKIE_SAME_SITE)
+                .path(AuthConstants.REFRESH_COOKIE_PATH)
                 .maxAge(maxAge)
                 .build();
         response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());

@@ -1,5 +1,6 @@
 package com.yuanbaomao.sellersprite.api.common.enums;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 import lombok.Getter;
@@ -31,4 +32,21 @@ public enum SellerSpriteMarketplace {
 
     /** 市场默认 ISO 4217 货币编码。 */
     private final String currency;
+
+    /**
+     * 前后端使用 MARKET_XX 稳定标签，SellerSprite 远端仍接收 XX 市场编码。
+     */
+    @JsonCreator
+    public static SellerSpriteMarketplace fromTransportValue(String value) {
+        if (value == null || value.isBlank()) {
+            return null;
+        }
+        String code = value.startsWith("MARKET_") ? value.substring("MARKET_".length()) : value;
+        for (SellerSpriteMarketplace marketplace : values()) {
+            if (marketplace.code.equalsIgnoreCase(code)) {
+                return marketplace;
+            }
+        }
+        throw new IllegalArgumentException("不支持的市场标签: " + value);
+    }
 }

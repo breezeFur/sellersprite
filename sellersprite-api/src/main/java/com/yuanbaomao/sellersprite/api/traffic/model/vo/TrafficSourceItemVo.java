@@ -1,9 +1,13 @@
 // Generated from SellerSprite official documentation on 2026-07-10.
 package com.yuanbaomao.sellersprite.api.traffic.model.vo;
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.math.BigDecimal;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import lombok.Data;
 import tools.jackson.databind.JsonNode;
 
@@ -64,6 +68,20 @@ public class TrafficSourceItemVo {
     @Schema(description = "查流量来源(关键词流向)明细响应参数：Asin相关信息")
     private AsinInfoVo asinInfo;
 
+    /** 官方响应中未建模字段的原始值。 */
+    @Schema(description = "官方响应未建模字段", hidden = true)
+    private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
+
+    @JsonAnySetter
+    public void putAdditionalProperty(String name, JsonNode value) {
+        additionalProperties.put(name, value);
+    }
+
+    @JsonAnyGetter
+    public Map<String, JsonNode> getAdditionalProperties() {
+        return additionalProperties;
+    }
+
     @Data
     @Schema(description = "查流量来源(关键词流向)明细响应参数：Asin相关信息")
     public static class AsinInfoVo {
@@ -119,6 +137,20 @@ public class TrafficSourceItemVo {
         /** 查流量来源(关键词流向)明细响应参数：大类排名(BSR)；175204 */
         @Schema(description = "查流量来源(关键词流向)明细响应参数：大类排名(BSR)；175204")
         private Long bsrRank;
+
+        /** 官方响应中未建模字段的原始值。 */
+        @Schema(description = "官方响应未建模字段", hidden = true)
+        private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
+
+        @JsonAnySetter
+        public void putAdditionalProperty(String name, JsonNode value) {
+            additionalProperties.put(name, value);
+        }
+
+        @JsonAnyGetter
+        public Map<String, JsonNode> getAdditionalProperties() {
+            return additionalProperties;
+        }
 
     }
 

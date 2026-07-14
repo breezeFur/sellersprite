@@ -5,6 +5,7 @@ import com.yuanbaomao.sellersprite.ai.prompt.enums.AiPromptStatus;
 import com.yuanbaomao.sellersprite.ai.prompt.service.AiPromptRecordService;
 import com.yuanbaomao.sellersprite.db.dao.AiPromptRecordDao;
 import com.yuanbaomao.sellersprite.db.entity.AiPromptRecord;
+import com.yuanbaomao.sellersprite.framework.security.SensitiveDataMasker;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -28,8 +29,12 @@ import tools.jackson.databind.ObjectMapper;
 public class AiPromptRecordServiceImpl implements AiPromptRecordService {
 
     private static final int MAX_ERROR_MESSAGE_LENGTH = 4000;
+    private static final int MAX_PROMPT_SUMMARY_LENGTH = 2048;
+    private static final int YES = 1;
+    private static final int NO = 0;
     private static final String EMPTY_JSON_ARRAY = "[]";
     private static final String EMPTY_STRING = "";
+    private static final String CANCELLED_FINISH_REASON = "cancelled";
 
     private final AiPromptRecordDao promptRecordDao;
     private final ObjectMapper objectMapper;
@@ -43,6 +48,8 @@ public class AiPromptRecordServiceImpl implements AiPromptRecordService {
         record.setProvider(provider);
         record.setModel(model);
         record.setRequestMessages(EMPTY_JSON_ARRAY);
+        record.setPromptSummary(EMPTY_STRING);
+        record.setPromptTruncated(NO);
         record.setResponseContent(EMPTY_STRING);
         record.setStatus(AiPromptStatus.PROCESSING.name());
         record.setErrorType(EMPTY_STRING);
@@ -57,9 +64,14 @@ public class AiPromptRecordServiceImpl implements AiPromptRecordService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void recordRequest(String promptRecordId, List<Message> messages) {
+        String requestMessages = SensitiveDataMasker.mask(writeJson(toMessagePayloads(messages)));
+        SensitiveDataMasker.MaskedText summary = SensitiveDataMasker.maskAndTruncate(
+                requestMessages, MAX_PROMPT_SUMMARY_LENGTH);
         AiPromptRecord record = new AiPromptRecord();
         record.setPromptRecordId(promptRecordId);
-        record.setRequestMessages(writeJson(toMessagePayloads(messages)));
+        record.setRequestMessages(requestMessages);
+        record.setPromptSummary(summary.content());
+        record.setPromptTruncated(summary.truncated() ? YES : NO);
         promptRecordDao.updateById(record);
     }
 
@@ -81,19 +93,49 @@ public class AiPromptRecordServiceImpl implements AiPromptRecordService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void recordFailure(String promptRecordId, Throwable throwable, long costMs) {
+        recordFailure(promptRecordId, null, throwable, costMs);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void recordStreamFailure(String promptRecordId, String partialContent,
+                                    Throwable throwable, long costMs) {
+        recordFailure(promptRecordId, partialContent, throwable, costMs);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void recordCancelled(String promptRecordId, String partialContent, long costMs) {
+        AiPromptRecord record = new AiPromptRecord();
+        record.setPromptRecordId(promptRecordId);
+        record.setStatus(AiPromptStatus.CANCELLED.name());
+        record.setResponseContent(SensitiveDataMasker.mask(partialContent));
+        record.setFinishReason(CANCELLED_FINISH_REASON);
+        record.setCostMs(Math.max(costMs, 0L));
+        record.setErrorType(EMPTY_STRING);
+        record.setErrorMessage(EMPTY_STRING);
+        promptRecordDao.updateById(record);
+    }
+
+    private void recordFailure(String promptRecordId, String partialContent,
+                               Throwable throwable, long costMs) {
         AiPromptRecord record = new AiPromptRecord();
         record.setPromptRecordId(promptRecordId);
         record.setStatus(AiPromptStatus.FAILED.name());
+        if (partialContent != null) {
+            record.setResponseContent(SensitiveDataMasker.mask(partialContent));
+        }
         record.setCostMs(Math.max(costMs, 0L));
         record.setErrorType(throwable == null ? EMPTY_STRING : throwable.getClass().getName());
-        record.setErrorMessage(throwable == null ? EMPTY_STRING : limit(throwable.getMessage(), MAX_ERROR_MESSAGE_LENGTH));
+        record.setErrorMessage(throwable == null ? EMPTY_STRING
+                : SensitiveDataMasker.mask(limit(throwable.getMessage(), MAX_ERROR_MESSAGE_LENGTH)));
         promptRecordDao.updateById(record);
     }
 
     private void applyResponse(AiPromptRecord record, ChatResponse chatResponse) {
         Generation generation = chatResponse.getResult();
         if (generation != null && generation.getOutput() != null) {
-            record.setResponseContent(defaultString(generation.getOutput().getText()));
+            record.setResponseContent(SensitiveDataMasker.mask(generation.getOutput().getText()));
         }
         ChatGenerationMetadata generationMetadata = generation == null ? null : generation.getMetadata();
         if (generationMetadata != null) {
@@ -108,7 +150,7 @@ public class AiPromptRecordServiceImpl implements AiPromptRecordService {
                 record.setTotalTokens(usage.getTotalTokens());
             }
         }
-        record.setResponseMetadata(writeJson(toResponseMetadata(chatResponse)));
+        record.setResponseMetadata(SensitiveDataMasker.mask(writeJson(toResponseMetadata(chatResponse))));
     }
 
     private List<Map<String, Object>> toMessagePayloads(List<Message> messages) {

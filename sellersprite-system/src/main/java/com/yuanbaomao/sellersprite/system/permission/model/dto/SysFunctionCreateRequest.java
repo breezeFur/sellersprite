@@ -38,4 +38,19 @@ public class SysFunctionCreateRequest {
 
     @Schema(description = "排序值")
     private Integer sortOrder;
+
+    @Schema(description = "图标")
+    private String icon;
+
+    @Schema(description = "是否可见：1是 0否")
+    private Integer visible;
+
+    @Schema(description = "是否缓存：1是 0否")
+    private Integer cacheable;
+
+    @Schema(description = "外链地址")
+    private String externalLink;
+
+    @Schema(description = "备注")
+    private String remark;
 }

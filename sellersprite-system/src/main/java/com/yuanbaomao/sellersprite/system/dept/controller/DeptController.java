@@ -3,6 +3,8 @@ package com.yuanbaomao.sellersprite.system.dept.controller;
 import com.yuanbaomao.base.result.Result;
 import com.yuanbaomao.base.constants.SystemConstants;
 import com.yuanbaomao.sellersprite.system.dept.model.dto.DeptCreateRequest;
+import com.yuanbaomao.sellersprite.system.dept.model.dto.DeptStatusUpdateRequest;
+import com.yuanbaomao.sellersprite.system.dept.model.dto.DeptUpdateRequest;
 import com.yuanbaomao.sellersprite.system.dept.model.vo.DeptVo;
 import com.yuanbaomao.sellersprite.system.dept.service.DeptService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -11,7 +13,10 @@ import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -35,5 +40,39 @@ public class DeptController {
     @GetMapping
     public Result<List<DeptVo>> list(@RequestParam(defaultValue = SystemConstants.ROOT_PARENT_ID) String parentId) {
         return Result.success(deptService.listByParentId(parentId));
+    }
+
+    @Operation(summary = "查询部门树")
+    @GetMapping("/tree")
+    public Result<List<DeptVo>> tree() {
+        return Result.success(deptService.tree());
+    }
+
+    @Operation(summary = "查询部门详情")
+    @GetMapping("/{deptId}")
+    public Result<DeptVo> detail(@PathVariable String deptId) {
+        return Result.success(deptService.detail(deptId));
+    }
+
+    @Operation(summary = "编辑部门")
+    @PutMapping("/{deptId}")
+    public Result<DeptVo> update(@PathVariable String deptId,
+                                 @Valid @RequestBody DeptUpdateRequest request) {
+        return Result.success(deptService.update(deptId, request));
+    }
+
+    @Operation(summary = "更新部门状态")
+    @PutMapping("/{deptId}/status")
+    public Result<Void> updateStatus(@PathVariable String deptId,
+                                     @Valid @RequestBody DeptStatusUpdateRequest request) {
+        deptService.updateStatus(deptId, request.getStatus());
+        return Result.success();
+    }
+
+    @Operation(summary = "删除部门")
+    @DeleteMapping("/{deptId}")
+    public Result<Void> delete(@PathVariable String deptId) {
+        deptService.delete(deptId);
+        return Result.success();
     }
 }

@@ -14,7 +14,18 @@ import com.yuanbaomao.base.exception.BizException;
 import com.yuanbaomao.sellersprite.common.result.ResultCode;
 import com.yuanbaomao.sellersprite.db.dao.UserDao;
 import com.yuanbaomao.sellersprite.db.dao.UserTokenDao;
+import com.yuanbaomao.sellersprite.db.dao.UserRoleDao;
+import com.yuanbaomao.sellersprite.db.dao.RoleDao;
+import com.yuanbaomao.sellersprite.db.dao.DeptDao;
 import com.yuanbaomao.sellersprite.db.entity.User;
+import com.yuanbaomao.sellersprite.db.entity.Role;
+import com.yuanbaomao.sellersprite.db.entity.Dept;
+import com.yuanbaomao.sellersprite.db.entity.UserRole;
+import com.yuanbaomao.sellersprite.system.user.model.dto.UserUpdateRequest;
+import com.yuanbaomao.sellersprite.system.user.model.dto.UserPageRequest;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,12 +43,18 @@ class UserServiceImplTest {
     private UserTokenDao userTokenDao;
     @Mock
     private PasswordEncoder passwordEncoder;
+    @Mock
+    private UserRoleDao userRoleDao;
+    @Mock
+    private RoleDao roleDao;
+    @Mock
+    private DeptDao deptDao;
 
     private UserServiceImpl userService;
 
     @BeforeEach
     void setUp() {
-        userService = new UserServiceImpl(userDao, passwordEncoder, userTokenDao);
+        userService = new UserServiceImpl(userDao, passwordEncoder, userTokenDao, userRoleDao, roleDao, deptDao);
     }
 
     @AfterEach
@@ -79,6 +96,7 @@ class UserServiceImplTest {
         userService.delete("user-1");
 
         verify(userTokenDao).revokeByUserId(anyString(), any(Long.class), anyString());
+        verify(userRoleDao).replaceByUserId("user-1", null, Set.of());
         verify(userDao).removeById("user-1");
     }
 
@@ -94,11 +112,101 @@ class UserServiceImplTest {
         verify(userDao, never()).removeById(anyString());
     }
 
+    @Test
+    void shouldUpdateUserProfileAfterValidatingDepartmentAndUsername() {
+        User user = user();
+        when(userDao.getById("user-1")).thenReturn(user);
+        when(deptDao.getById("dept-1")).thenReturn(enabledDept());
+        UserUpdateRequest request = new UserUpdateRequest();
+        request.setUsername("yuanbao-new");
+        request.setNickname("元宝");
+        request.setRealName("元宝猫");
+        request.setEmail("yuanbao@example.com");
+        request.setPrimaryDeptId("dept-1");
+
+        userService.update("user-1", request);
+
+        assertThat(user.getUsername()).isEqualTo("yuanbao-new");
+        assertThat(user.getPrimaryDeptId()).isEqualTo("dept-1");
+        verify(userDao).updateById(user);
+    }
+
+    @Test
+    void shouldKeepUserRolesWhenAnyRequestedRoleIsInvalid() {
+        User user = user();
+        user.setPrimaryDeptId("dept-1");
+        when(userDao.getById("user-1")).thenReturn(user);
+        when(deptDao.getById("dept-1")).thenReturn(enabledDept());
+        when(roleDao.listByIds(Set.of("role-1", "role-missing"))).thenReturn(List.of(enabledRole("role-1")));
+
+        assertThatThrownBy(() -> userService.replaceRoles("user-1", List.of("role-1", "role-missing")))
+                .isInstanceOfSatisfying(BizException.class,
+                        exception -> assertThat(exception.getErrorCode()).isEqualTo(ResultCode.ROLE_NOT_FOUND));
+        verify(userRoleDao, never()).replaceByUserId(org.mockito.ArgumentMatchers.anyString(),
+                org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.anyCollection());
+    }
+
+    @Test
+    void shouldReplaceRolesAndIncrementPermissionVersion() {
+        User user = user();
+        user.setPrimaryDeptId("dept-1");
+        when(userDao.getById("user-1")).thenReturn(user);
+        when(deptDao.getById("dept-1")).thenReturn(enabledDept());
+        when(roleDao.listByIds(Set.of("role-1", "role-2")))
+                .thenReturn(List.of(enabledRole("role-1"), enabledRole("role-2")));
+
+        userService.replaceRoles("user-1", List.of("role-1", "role-2", "role-1"));
+
+        verify(userRoleDao).replaceByUserId(org.mockito.ArgumentMatchers.eq("user-1"),
+                org.mockito.ArgumentMatchers.eq("dept-1"),
+                org.mockito.ArgumentMatchers.argThat(ids -> Set.copyOf(ids).equals(Set.of("role-1", "role-2"))));
+        verify(userDao).incrementPermissionVersion(Set.of("user-1"));
+    }
+
+    @Test
+    void shouldPageUsersThroughDaoBoundary() {
+        UserPageRequest request = new UserPageRequest();
+        request.setCurrent(2L);
+        request.setSize(10L);
+        request.setUsername("yuan");
+        request.setStatus(1);
+        Page<User> page = Page.of(2, 10, 11);
+        page.setRecords(List.of(user()));
+        when(userDao.pageUsers("yuan", 1, 2, 10)).thenReturn(page);
+        UserRole userRole = new UserRole();
+        userRole.setUserId("user-1");
+        userRole.setRoleId("role-1");
+        when(userRoleDao.listByUserId("user-1")).thenReturn(List.of(userRole));
+
+        com.yuanbaomao.base.result.PageResult<com.yuanbaomao.sellersprite.system.user.model.vo.UserDetailVo> result =
+                userService.page(request);
+
+        assertThat(result.getCurrent()).isEqualTo(2L);
+        assertThat(result.getSize()).isEqualTo(10L);
+        assertThat(result.getTotal()).isEqualTo(11L);
+        assertThat(result.getRecords()).hasSize(1);
+        assertThat(result.getRecords().getFirst().getRoleIds()).containsExactly("role-1");
+    }
+
     private User user() {
         User user = new User();
         user.setUserId("user-1");
         user.setUsername("yuanbao");
         user.setStatus(1);
         return user;
+    }
+
+    private Role enabledRole(String roleId) {
+        Role role = new Role();
+        role.setRoleId(roleId);
+        role.setStatus(1);
+        return role;
+    }
+
+    private Dept enabledDept() {
+        Dept dept = new Dept();
+        dept.setDeptId("dept-1");
+        dept.setStatus(1);
+        return dept;
     }
 }

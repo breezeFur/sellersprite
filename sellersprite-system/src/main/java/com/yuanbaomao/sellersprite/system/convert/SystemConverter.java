@@ -1,7 +1,7 @@
 package com.yuanbaomao.sellersprite.system.convert;
 
 import com.yuanbaomao.sellersprite.db.entity.Dept;
-import com.yuanbaomao.dict.mybatis.entity.DictItemEntity;
+import com.yuanbaomao.dict.mybatis.entity.DictDataEntity;
 import com.yuanbaomao.dict.mybatis.entity.DictTypeEntity;
 import com.yuanbaomao.sellersprite.db.entity.Role;
 import com.yuanbaomao.sellersprite.db.entity.SysApi;
@@ -69,8 +69,14 @@ public final class SystemConverter {
         vo.setFunctionName(entity.getFunctionName());
         vo.setFunctionType(entity.getFunctionType());
         vo.setRoutePath(entity.getRoutePath());
+        vo.setComponentPath(entity.getComponentPath());
         vo.setPermissionCode(entity.getPermissionCode());
+        vo.setIcon(entity.getIcon());
+        vo.setVisible(entity.getVisible());
+        vo.setCacheable(entity.getCacheable());
+        vo.setExternalLink(entity.getExternalLink());
         vo.setSortOrder(entity.getSortOrder());
+        vo.setStatus(entity.getStatus());
         return vo;
     }
 
@@ -83,26 +89,35 @@ public final class SystemConverter {
         vo.setHttpMethod(entity.getHttpMethod());
         vo.setPathPattern(entity.getPathPattern());
         vo.setPermissionCode(entity.getPermissionCode());
+        vo.setModuleName(entity.getModuleName());
+        vo.setOperationName(entity.getOperationName());
+        vo.setStatus(entity.getStatus());
         return vo;
     }
 
     public static DictTypeVo toDictTypeVo(DictTypeEntity entity, List<DictItemVo> items) {
         DictTypeVo vo = new DictTypeVo();
-        vo.setDictTypeId(entity.getDictTypeId());
-        vo.setDictCode(entity.getDictCode());
-        vo.setDictName(entity.getDictName());
+        vo.setDictType(entity.getDictType());
+        vo.setDictName(entity.getDictTypeName());
+        vo.setSystemBuiltin(entity.getSystemBuiltin());
+        vo.setSortOrder(entity.getSortOrder());
+        vo.setStatus(entity.getStatus());
         vo.setItems(items);
         return vo;
     }
 
-    public static DictItemVo toDictItemVo(DictItemEntity entity) {
+    public static DictItemVo toDictItemVo(DictDataEntity entity) {
         DictItemVo vo = new DictItemVo();
-        vo.setDictItemId(entity.getDictItemId());
-        vo.setItemLabel(entity.getItemLabel());
-        vo.setItemValue(entity.getItemValue());
+        vo.setDictDataId(entity.getDictDataId());
+        vo.setDictType(entity.getDictType());
+        vo.setDictValue(entity.getDictValue());
+        vo.setDictLabel(entity.getDictLabel());
+        vo.setDictName(entity.getDictName());
         vo.setColor(entity.getColor());
-        vo.setDefaultItem(entity.getDefaultItem());
+        vo.setDefaultFlag(entity.getDefaultFlag());
         vo.setSortOrder(entity.getSortOrder());
+        vo.setSystemBuiltin(entity.getSystemBuiltin());
+        vo.setStatus(entity.getStatus());
         return vo;
     }
 }

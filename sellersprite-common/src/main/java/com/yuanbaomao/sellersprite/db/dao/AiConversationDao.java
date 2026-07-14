@@ -12,4 +12,6 @@ public interface AiConversationDao extends IService<AiConversation> {
     Page<AiConversation> pageByUserId(String userId, String title, long current, long size);
 
     boolean deleteByIdAndUserId(String conversationId, String userId);
+
+    long countByCreatedAtRange(long startTime, long endTime);
 }

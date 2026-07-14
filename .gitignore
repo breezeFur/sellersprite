@@ -2,6 +2,7 @@ target/
 *.class
 *.log
 logs/
+data/market-research/
 __pycache__/
 *.pyc
 
@@ -16,3 +17,10 @@ vibecodingdoc/
 .codegraph/
 openspec/
 .codex/
+
+sellersprite-web/node_modules/
+sellersprite-web/dist/
+sellersprite-web/coverage/
+sellersprite-web/playwright-report/
+sellersprite-web/test-results/
+*.tsbuildinfo

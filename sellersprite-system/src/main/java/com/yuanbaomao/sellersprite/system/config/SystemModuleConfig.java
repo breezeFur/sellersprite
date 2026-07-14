@@ -1,10 +1,14 @@
 package com.yuanbaomao.sellersprite.system.config;
 
-import com.yuanbaomao.sellersprite.system.auth.config.AuthProperties;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Bean;
+import java.time.Clock;
 
 @Configuration
-@EnableConfigurationProperties(AuthProperties.class)
 public class SystemModuleConfig {
+
+    @Bean
+    public Clock systemClock() {
+        return Clock.systemDefaultZone();
+    }
 }

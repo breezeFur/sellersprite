@@ -22,6 +22,7 @@
         <module>sellersprite-ai</module>
         <module>sellersprite-system</module>
         <module>sellersprite-api</module>
+        <module>sellersprite-research</module>
         <module>sellersprite-server</module>
     </modules>
 

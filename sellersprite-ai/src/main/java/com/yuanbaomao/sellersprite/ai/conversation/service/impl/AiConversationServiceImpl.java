@@ -7,8 +7,10 @@ import com.yuanbaomao.sellersprite.ai.context.AiCurrentUser;
 import com.yuanbaomao.sellersprite.ai.conversation.convert.AiConversationConverter;
 import com.yuanbaomao.sellersprite.ai.conversation.model.dto.AiConversationPageRequest;
 import com.yuanbaomao.sellersprite.ai.conversation.model.dto.AiConversationRenameRequest;
+import com.yuanbaomao.sellersprite.ai.conversation.model.dto.AiConversationSettingsRequest;
 import com.yuanbaomao.sellersprite.ai.conversation.model.vo.AiConversationDetailVo;
 import com.yuanbaomao.sellersprite.ai.conversation.model.vo.AiConversationMessageVo;
+import com.yuanbaomao.sellersprite.ai.conversation.model.vo.AiConversationSettingsVo;
 import com.yuanbaomao.sellersprite.ai.conversation.model.vo.AiConversationVo;
 import com.yuanbaomao.sellersprite.ai.conversation.service.AiConversationService;
 import com.yuanbaomao.sellersprite.common.result.ResultCode;
@@ -52,6 +54,7 @@ public class AiConversationServiceImpl implements AiConversationService {
         AiConversationDetailVo detail = new AiConversationDetailVo();
         detail.setConversation(AiConversationConverter.toConversationVo(conversation));
         detail.setMessages(messages);
+        detail.setSettings(AiConversationConverter.toSettingsVo(conversation));
         return detail;
     }
 
@@ -67,6 +70,16 @@ public class AiConversationServiceImpl implements AiConversationService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    public AiConversationSettingsVo updateSettings(String conversationId, AiConversationSettingsRequest request) {
+        String userId = currentUser.requireUserId();
+        AiConversation conversation = requireOwnedConversation(conversationId, userId);
+        conversation.setSystemPrompt(normalizeSystemPrompt(request.getSystemPrompt()));
+        conversationDao.updateById(conversation);
+        return AiConversationConverter.toSettingsVo(conversation);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
     public void delete(String conversationId) {
         String userId = currentUser.requireUserId();
         requireOwnedConversation(conversationId, userId);
@@ -78,5 +91,9 @@ public class AiConversationServiceImpl implements AiConversationService {
     private AiConversation requireOwnedConversation(String conversationId, String userId) {
         return conversationDao.findByIdAndUserId(conversationId, userId)
                 .orElseThrow(() -> new BizException(ResultCode.AI_CONVERSATION_NOT_FOUND));
+    }
+
+    private String normalizeSystemPrompt(String systemPrompt) {
+        return systemPrompt == null ? "" : systemPrompt.trim();
     }
 }

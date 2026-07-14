@@ -5,9 +5,15 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.yuanbaomao.base.exception.BizException;
 import com.yuanbaomao.sellersprite.ai.context.AiCurrentUser;
+import com.yuanbaomao.sellersprite.ai.conversation.model.dto.AiConversationPageRequest;
+import com.yuanbaomao.sellersprite.ai.conversation.model.dto.AiConversationRenameRequest;
+import com.yuanbaomao.sellersprite.ai.conversation.model.dto.AiConversationSettingsRequest;
 import com.yuanbaomao.sellersprite.ai.conversation.model.vo.AiConversationDetailVo;
+import com.yuanbaomao.sellersprite.ai.conversation.model.vo.AiConversationSettingsVo;
+import com.yuanbaomao.sellersprite.ai.conversation.model.vo.AiConversationVo;
 import com.yuanbaomao.sellersprite.common.result.ResultCode;
 import com.yuanbaomao.sellersprite.db.dao.AiConversationDao;
 import com.yuanbaomao.sellersprite.db.dao.AiConversationMessageDao;
@@ -44,10 +50,32 @@ class AiConversationServiceImplTest {
     private AiConversationServiceImpl conversationService;
 
     @Test
+    void shouldPageOnlyCurrentUsersConversations() {
+        AiConversationPageRequest request = new AiConversationPageRequest();
+        request.setTitle("测试");
+        request.setCurrent(2L);
+        request.setSize(10L);
+        Page<AiConversation> page = Page.of(2, 10, 1);
+        page.setRecords(List.of(conversation()));
+        when(currentUser.requireUserId()).thenReturn(USER_ID);
+        when(conversationDao.pageByUserId(USER_ID, "测试", 2L, 10L)).thenReturn(page);
+
+        com.yuanbaomao.base.result.PageResult<AiConversationVo> result = conversationService.page(request);
+
+        assertThat(result.getCurrent()).isEqualTo(2L);
+        assertThat(result.getTotal()).isEqualTo(1L);
+        assertThat(result.getRecords()).extracting(AiConversationVo::getConversationId)
+                .containsExactly(CONVERSATION_ID);
+    }
+
+    @Test
     void shouldReturnOwnedConversationWithCompleteMessages() {
         AiConversation conversation = conversation();
         AiConversationMessage userMessage = message("message-1", 1, "USER", "你好");
         AiConversationMessage assistantMessage = message("message-2", 2, "ASSISTANT", "你好，有什么可以帮你？");
+        assistantMessage.setMessageStatus("FAILED");
+        assistantMessage.setErrorCode("A0600");
+        assistantMessage.setErrorMessage("安全错误摘要");
         when(currentUser.requireUserId()).thenReturn(USER_ID);
         when(conversationDao.findByIdAndUserId(CONVERSATION_ID, USER_ID)).thenReturn(Optional.of(conversation));
         when(conversationMessageDao.listByConversationId(USER_ID, CONVERSATION_ID))
@@ -60,6 +88,57 @@ class AiConversationServiceImplTest {
                 .containsExactly(
                         org.assertj.core.groups.Tuple.tuple("USER", "你好"),
                         org.assertj.core.groups.Tuple.tuple("ASSISTANT", "你好，有什么可以帮你？"));
+        assertThat(detail.getMessages().getLast())
+                .extracting("messageStatus", "errorCode", "errorMessage")
+                .containsExactly("FAILED", "A0600", "安全错误摘要");
+        assertThat(detail.getSettings())
+                .extracting("provider", "model", "systemPrompt")
+                .containsExactly("openai", "gpt-5.5", "你是测试助手");
+    }
+
+    @Test
+    void shouldTrimAndPersistOwnedConversationTitle() {
+        when(currentUser.requireUserId()).thenReturn(USER_ID);
+        when(conversationDao.findByIdAndUserId(CONVERSATION_ID, USER_ID))
+                .thenReturn(Optional.of(conversation()));
+        AiConversationRenameRequest request = new AiConversationRenameRequest();
+        request.setTitle("  新标题  ");
+
+        AiConversationVo result = conversationService.rename(CONVERSATION_ID, request);
+
+        assertThat(result.getTitle()).isEqualTo("新标题");
+        verify(conversationDao).updateById(org.mockito.ArgumentMatchers.argThat(
+                conversation -> "新标题".equals(conversation.getTitle())));
+    }
+
+    @Test
+    void shouldUpdateOwnedConversationSystemPromptAndReturnReadOnlyModel() {
+        when(currentUser.requireUserId()).thenReturn(USER_ID);
+        when(conversationDao.findByIdAndUserId(CONVERSATION_ID, USER_ID))
+                .thenReturn(Optional.of(conversation()));
+        AiConversationSettingsRequest request = new AiConversationSettingsRequest();
+        request.setSystemPrompt("  你是严谨助手  ");
+
+        AiConversationSettingsVo result = conversationService.updateSettings(CONVERSATION_ID, request);
+
+        assertThat(result)
+                .extracting("provider", "model", "systemPrompt")
+                .containsExactly("openai", "gpt-5.5", "你是严谨助手");
+        verify(conversationDao).updateById(org.mockito.ArgumentMatchers.argThat(
+                conversation -> "你是严谨助手".equals(conversation.getSystemPrompt())));
+    }
+
+    @Test
+    void shouldRejectSettingsUpdateForAnotherUsersConversation() {
+        when(currentUser.requireUserId()).thenReturn(USER_ID);
+        when(conversationDao.findByIdAndUserId(CONVERSATION_ID, USER_ID)).thenReturn(Optional.empty());
+        AiConversationSettingsRequest request = new AiConversationSettingsRequest();
+        request.setSystemPrompt("你是严谨助手");
+
+        assertThatThrownBy(() -> conversationService.updateSettings(CONVERSATION_ID, request))
+                .isInstanceOfSatisfying(BizException.class,
+                        exception -> assertThat(exception.getCode())
+                                .isEqualTo(ResultCode.AI_CONVERSATION_NOT_FOUND.getCode()));
     }
 
     @Test
@@ -91,6 +170,7 @@ class AiConversationServiceImplTest {
         conversation.setTitle("测试会话");
         conversation.setProvider("openai");
         conversation.setModel("gpt-5.5");
+        conversation.setSystemPrompt("你是测试助手");
         conversation.setMessageCount(2);
         conversation.setLastMessageAt(1000L);
         conversation.setStatus("ACTIVE");

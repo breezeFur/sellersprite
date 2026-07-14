@@ -37,6 +37,14 @@ public class AiPromptRecord extends BaseAudit {
     @Schema(description = "实际送模消息JSON")
     private String requestMessages;
 
+    @TableField("prompt_summary")
+    @Schema(description = "截断脱敏后的Prompt摘要")
+    private String promptSummary;
+
+    @TableField("prompt_truncated")
+    @Schema(description = "摘要是否被截断：1是 0否")
+    private Integer promptTruncated;
+
     @TableField("response_content")
     @Schema(description = "模型响应文本")
     private String responseContent;
@@ -62,7 +70,7 @@ public class AiPromptRecord extends BaseAudit {
     private String finishReason;
 
     @TableField("status")
-    @Schema(description = "调用状态：PROCESSING SUCCESS FAILED")
+    @Schema(description = "调用状态：PROCESSING SUCCESS CANCELLED FAILED")
     private String status;
 
     @TableField("error_type")

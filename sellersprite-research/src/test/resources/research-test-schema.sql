@@ -1,0 +1,66 @@
+CREATE TABLE IF NOT EXISTS market_research_job (
+  job_id VARCHAR(36) PRIMARY KEY,
+  user_id VARCHAR(36) NOT NULL,
+  report_name VARCHAR(128) NOT NULL,
+  marketplace VARCHAR(16) NOT NULL,
+  keyword VARCHAR(256) NOT NULL,
+  seed_asins CLOB,
+  template_code VARCHAR(64) NOT NULL,
+  data_source_mode VARCHAR(16) NOT NULL,
+  job_status VARCHAR(32) NOT NULL,
+  current_phase VARCHAR(64) NOT NULL,
+  progress INT NOT NULL,
+  batch_job_instance_id BIGINT,
+  batch_job_execution_id BIGINT,
+  error_code VARCHAR(64) NOT NULL,
+  error_message VARCHAR(512) NOT NULL,
+  started_at BIGINT,
+  finished_at BIGINT,
+  created_at BIGINT DEFAULT 0 NOT NULL,
+  updated_at BIGINT DEFAULT 0 NOT NULL,
+  created_by VARCHAR(36) DEFAULT '' NOT NULL,
+  updated_by VARCHAR(36) DEFAULT '' NOT NULL,
+  deleted INT DEFAULT 0 NOT NULL,
+  remark VARCHAR(512) DEFAULT '' NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS market_research_snapshot (
+  snapshot_id VARCHAR(36) PRIMARY KEY,
+  job_id VARCHAR(36) NOT NULL,
+  phase VARCHAR(64) NOT NULL,
+  operation VARCHAR(128) NOT NULL,
+  business_key VARCHAR(128) NOT NULL,
+  data_source_mode VARCHAR(16) NOT NULL,
+  request_payload CLOB,
+  response_payload CLOB NOT NULL,
+  record_count INT DEFAULT 0 NOT NULL,
+  sha256 VARCHAR(64) NOT NULL,
+  fetched_at BIGINT NOT NULL,
+  created_at BIGINT DEFAULT 0 NOT NULL,
+  updated_at BIGINT DEFAULT 0 NOT NULL,
+  created_by VARCHAR(36) DEFAULT '' NOT NULL,
+  updated_by VARCHAR(36) DEFAULT '' NOT NULL,
+  deleted INT DEFAULT 0 NOT NULL,
+  remark VARCHAR(512) DEFAULT '' NOT NULL,
+  CONSTRAINT uk_market_research_snapshot_key
+    UNIQUE (job_id, phase, operation, business_key, deleted)
+);
+
+CREATE TABLE IF NOT EXISTS market_research_artifact (
+  artifact_id VARCHAR(36) PRIMARY KEY,
+  job_id VARCHAR(36) NOT NULL,
+  file_name VARCHAR(255) NOT NULL,
+  storage_key VARCHAR(512) NOT NULL,
+  media_type VARCHAR(128) NOT NULL,
+  file_size BIGINT,
+  sha256 VARCHAR(64) DEFAULT NULL,
+  artifact_status VARCHAR(32) NOT NULL,
+  published_at BIGINT,
+  created_at BIGINT DEFAULT 0 NOT NULL,
+  updated_at BIGINT DEFAULT 0 NOT NULL,
+  created_by VARCHAR(36) DEFAULT '' NOT NULL,
+  updated_by VARCHAR(36) DEFAULT '' NOT NULL,
+  deleted INT DEFAULT 0 NOT NULL,
+  remark VARCHAR(512) DEFAULT '' NOT NULL,
+  CONSTRAINT uk_market_research_artifact_job UNIQUE (job_id, deleted)
+);

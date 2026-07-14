@@ -20,9 +20,14 @@ from bs4 import BeautifulSoup
 
 ROOT = Path(__file__).resolve().parents[1]
 JAVA_ROOT = ROOT / "sellersprite-api/src/main/java"
+FRONTEND_CONTRACT_PATH = (
+    ROOT / "sellersprite-web/src/features/sellersprite/model/officialOperationContracts.generated.ts"
+)
 BASE_PACKAGE = "com.yuanbaomao.sellersprite.api"
 DOC_BASE_URL = "https://open.sellersprite.com/api"
-GENERATED_NOTICE = "// Generated from SellerSprite official documentation on 2026-07-10."
+CAPTURED_AT = "2026-07-14"
+MODEL_GENERATED_AT = "2026-07-10"
+GENERATED_NOTICE = f"// Generated from SellerSprite official documentation on {MODEL_GENERATED_AT}."
 
 
 @dataclass(frozen=True)
@@ -266,6 +271,10 @@ def simple_java_type(node: FieldNode, direction: str) -> str:
     documented = node.documented_type.strip().lower()
     if direction == "请求" and node.java_name == "marketplace":
         return "SellerSpriteMarketplace"
+    if direction == "请求" and node.java_name == "availableMonth":
+        # The web/API boundary carries LISTING_DATE_* labels; the client resolves them
+        # to the official numeric value immediately before the remote request.
+        return "String"
     if direction == "响应" and node.java_name == "keywordCn":
         # ABA weekly/monthly tables label keywordCn as Integer, while both the
         # description and official examples return translated text.
@@ -326,6 +335,14 @@ def collect_imports(nodes: Iterable[FieldNode], direction: str) -> set[str]:
         "io.swagger.v3.oas.annotations.media.Schema",
         "lombok.Data",
     }
+    if direction == "响应":
+        imports.update({
+            "com.fasterxml.jackson.annotation.JsonAnyGetter",
+            "com.fasterxml.jackson.annotation.JsonAnySetter",
+            "java.util.LinkedHashMap",
+            "java.util.Map",
+            "tools.jackson.databind.JsonNode",
+        })
 
     def visit(node: FieldNode, path: tuple[str, ...]) -> None:
         java_type = node_java_type(node, direction, path)
@@ -416,6 +433,25 @@ def request_default_initializer(node: FieldNode, java_type: str) -> str:
     return f" = {match.group(1)}" if match else ""
 
 
+def render_additional_properties(indent: str) -> list[str]:
+    return [
+        f"{indent}/** 官方响应中未建模字段的原始值。 */",
+        f'{indent}@Schema(description = "官方响应未建模字段", hidden = true)',
+        f"{indent}private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();",
+        "",
+        f"{indent}@JsonAnySetter",
+        f"{indent}public void putAdditionalProperty(String name, JsonNode value) {{",
+        f"{indent}    additionalProperties.put(name, value);",
+        f"{indent}}}",
+        "",
+        f"{indent}@JsonAnyGetter",
+        f"{indent}public Map<String, JsonNode> getAdditionalProperties() {{",
+        f"{indent}    return additionalProperties;",
+        f"{indent}}}",
+        "",
+    ]
+
+
 def request_maximum(node: FieldNode, java_type: str) -> int | None:
     """Parse explicit maximums for page sizes and collection cardinality."""
     is_collection = java_type.startswith("List<")
@@ -463,6 +499,8 @@ def render_model(package_name: str, class_name: str, contract_name: str,
         "",
     ])
     lines.extend(render_fields(contract_name, direction, nodes, (), "    "))
+    if direction == "响应":
+        lines.extend(render_additional_properties("    "))
     for nested_name, parent in collect_nested(nodes, direction):
         type_names.append(f"{package_name}.{class_name}.{nested_name}")
         description = field_description(contract_name, direction, parent)
@@ -474,6 +512,8 @@ def render_model(package_name: str, class_name: str, contract_name: str,
         ])
         lines.extend(render_fields(contract_name, direction, parent.children,
                                    tuple_part_from_nested(nested_name), "        "))
+        if direction == "响应":
+            lines.extend(render_additional_properties("        "))
         lines.extend(["    }", ""])
     lines.append("}")
     return "\n".join(lines) + "\n", type_names
@@ -492,7 +532,12 @@ def render_page_wrapper(package_name: str, class_name: str, contract_name: str,
         f"package {package_name};",
         "",
         f"import {BASE_PACKAGE}.common.model.vo.SellerSpritePageVo;",
+        "import com.fasterxml.jackson.annotation.JsonAnyGetter;",
+        "import com.fasterxml.jackson.annotation.JsonAnySetter;",
         "import io.swagger.v3.oas.annotations.media.Schema;",
+        "import java.util.LinkedHashMap;",
+        "import java.util.Map;",
+        "import tools.jackson.databind.JsonNode;",
     ]
     if item_import:
         lines.append(f"import {item_import};")
@@ -503,9 +548,9 @@ def render_page_wrapper(package_name: str, class_name: str, contract_name: str,
         " */",
         f'@Schema(description = "{contract_name}分页响应")',
         f"public class {class_name} extends SellerSpritePageVo<{item_type}> {{",
-        "}",
-        "",
     ])
+    lines.extend(render_additional_properties("    "))
+    lines.extend(["}", ""])
     return "\n".join(lines)
 
 
@@ -569,6 +614,12 @@ def render_index(contracts: list[Contract], model_types: list[str],
     operation_lines = ",\n            ".join(
         f"SellerSpriteOperation.{contract.endpoint.operation}" for contract in contracts
     )
+    endpoint_lines = ",\n            ".join(
+        "new DocumentedEndpoint("
+        f"SellerSpriteOperation.{contract.endpoint.operation}, "
+        f'"{java_string(contract.method)}", "{java_string(contract.path)}")'
+        for contract in contracts
+    )
     type_lines = ",\n            ".join(f"{type_name}.class" for type_name in model_types)
     example_lines = ",\n            ".join(
         "new OfficialExample("
@@ -592,6 +643,9 @@ public final class GeneratedSellerSpriteContractIndex {{
     private static final List<SellerSpriteOperation> OPERATIONS = List.of(
             {operation_lines});
 
+    private static final List<DocumentedEndpoint> DOCUMENTED_ENDPOINTS = List.of(
+            {endpoint_lines});
+
     private static final List<Class<?>> MODEL_TYPES = List.of(
             {type_lines});
 
@@ -607,6 +661,10 @@ public final class GeneratedSellerSpriteContractIndex {{
 
     public static List<Class<?>> getModelTypes() {{
         return MODEL_TYPES;
+    }}
+
+    public static List<DocumentedEndpoint> getDocumentedEndpoints() {{
+        return DOCUMENTED_ENDPOINTS;
     }}
 
     public static int getDocumentedRequestFieldCount() {{
@@ -632,6 +690,16 @@ public final class GeneratedSellerSpriteContractIndex {{
     public record OfficialExample(SellerSpriteOperation operation, String resourcePath,
                                   Class<?> dataType, boolean collection) {{
     }}
+
+    /**
+     * 官方文档中的 HTTP 方法与远端路径。
+     *
+     * @param operation SellerSprite 操作
+     * @param method 官方 HTTP 方法
+     * @param path 官方远端路径
+     */
+    public record DocumentedEndpoint(SellerSpriteOperation operation, String method, String path) {{
+    }}
 }}
 """
 
@@ -639,7 +707,7 @@ public final class GeneratedSellerSpriteContractIndex {{
 def snapshot(contracts: list[Contract]) -> None:
     payload = {
         "source": DOC_BASE_URL,
-        "capturedAt": "2026-07-10",
+        "capturedAt": CAPTURED_AT,
         "businessOperationCount": len(contracts),
         "endpoints": [
             {
@@ -658,6 +726,26 @@ def snapshot(contracts: list[Contract]) -> None:
     }
     path = ROOT / "docs/sellersprite-api-contract.json"
     path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8", newline="\n")
+
+
+def write_frontend_contracts(contracts: list[Contract]) -> None:
+    payload = [
+        {
+            "operation": contract.endpoint.operation,
+            "domain": contract.endpoint.domain,
+            "responseShape": contract.endpoint.response_shape,
+            "requestFields": contract.request_rows,
+            "responseFields": contract.response_rows,
+        }
+        for contract in contracts
+    ]
+    content = (
+        f"// Generated from SellerSprite official documentation on {CAPTURED_AT}.\n"
+        "export const officialSellerSpriteOperationContracts = "
+        f"{json.dumps(payload, ensure_ascii=False, indent=2)} as const\n"
+    )
+    FRONTEND_CONTRACT_PATH.parent.mkdir(parents=True, exist_ok=True)
+    FRONTEND_CONTRACT_PATH.write_text(content, encoding="utf-8", newline="\n")
 
 
 def write_official_examples(contracts: list[Contract]) -> int:
@@ -683,6 +771,7 @@ def main() -> None:
     write_java(f"{BASE_PACKAGE}.client", "GeneratedSellerSpriteContractIndex",
                render_index(contracts, model_types, request_count, response_count))
     snapshot(contracts)
+    write_frontend_contracts(contracts)
     example_count = write_official_examples(contracts)
     print(f"Generated {len(contracts)} endpoint contracts, {request_count} request fields, "
           f"{response_count} response fields, {len(model_types)} model types and "

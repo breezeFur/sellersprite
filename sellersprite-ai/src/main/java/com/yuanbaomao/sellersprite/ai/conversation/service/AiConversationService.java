@@ -3,8 +3,10 @@ package com.yuanbaomao.sellersprite.ai.conversation.service;
 import com.yuanbaomao.base.result.PageResult;
 import com.yuanbaomao.sellersprite.ai.conversation.model.dto.AiConversationPageRequest;
 import com.yuanbaomao.sellersprite.ai.conversation.model.dto.AiConversationRenameRequest;
+import com.yuanbaomao.sellersprite.ai.conversation.model.dto.AiConversationSettingsRequest;
 import com.yuanbaomao.sellersprite.ai.conversation.model.vo.AiConversationDetailVo;
 import com.yuanbaomao.sellersprite.ai.conversation.model.vo.AiConversationVo;
+import com.yuanbaomao.sellersprite.ai.conversation.model.vo.AiConversationSettingsVo;
 
 public interface AiConversationService {
 
@@ -13,6 +15,8 @@ public interface AiConversationService {
     AiConversationDetailVo detail(String conversationId);
 
     AiConversationVo rename(String conversationId, AiConversationRenameRequest request);
+
+    AiConversationSettingsVo updateSettings(String conversationId, AiConversationSettingsRequest request);
 
     void delete(String conversationId);
 }

@@ -16,8 +16,12 @@ class GeneratedSellerSpriteContractIndexTest {
         assertThat(GeneratedSellerSpriteContractIndex.getOperations())
                 .hasSize(44)
                 .doesNotHaveDuplicates();
-        assertThat(GeneratedSellerSpriteContractIndex.getDocumentedRequestFieldCount()).isGreaterThan(300);
-        assertThat(GeneratedSellerSpriteContractIndex.getDocumentedResponseFieldCount()).isGreaterThan(600);
+        assertThat(GeneratedSellerSpriteContractIndex.getDocumentedRequestFieldCount()).isEqualTo(529);
+        assertThat(GeneratedSellerSpriteContractIndex.getDocumentedResponseFieldCount()).isEqualTo(1197);
+        assertThat(GeneratedSellerSpriteContractIndex.getDocumentedEndpoints()).allSatisfy(endpoint -> {
+            assertThat(endpoint.operation().getMethod().name()).isEqualTo(endpoint.method());
+            assertThat(endpoint.operation().getPath()).isEqualTo(endpoint.path());
+        });
     }
 
     @Test

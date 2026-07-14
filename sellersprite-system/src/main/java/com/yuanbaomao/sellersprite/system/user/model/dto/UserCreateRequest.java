@@ -4,6 +4,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.Data;
 
 @Data
@@ -39,4 +41,7 @@ public class UserCreateRequest {
 
     @Schema(description = "主部门ID")
     private String primaryDeptId;
+
+    @Schema(description = "初始角色ID集合")
+    private List<@NotBlank(message = "角色ID不能为空") String> roleIds = new ArrayList<>();
 }

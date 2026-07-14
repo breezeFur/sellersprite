@@ -211,7 +211,7 @@ public class ProductResearchRequest {
 
     /** 选产品请求参数：上架月份；见表 1.3，默认不限制 */
     @Schema(description = "选产品请求参数：上架月份；见表 1.3，默认不限制")
-    private Integer availableMonth;
+    private String availableMonth;
 
     /** 选产品请求参数：尺寸类型集合,逗号分隔，默认不限制；见表 1.4 */
     @Schema(description = "选产品请求参数：尺寸类型集合,逗号分隔，默认不限制；见表 1.4")

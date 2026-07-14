@@ -1,6 +1,7 @@
 package com.yuanbaomao.sellersprite.ai.conversation.convert;
 
 import com.yuanbaomao.sellersprite.ai.conversation.model.vo.AiConversationMessageVo;
+import com.yuanbaomao.sellersprite.ai.conversation.model.vo.AiConversationSettingsVo;
 import com.yuanbaomao.sellersprite.ai.conversation.model.vo.AiConversationVo;
 import com.yuanbaomao.sellersprite.db.entity.AiConversation;
 import com.yuanbaomao.sellersprite.db.entity.AiConversationMessage;
@@ -33,7 +34,18 @@ public final class AiConversationConverter {
         vo.setContent(entity.getContent());
         vo.setContentType(entity.getContentType());
         vo.setMetadata(entity.getMetadata());
+        vo.setMessageStatus(entity.getMessageStatus());
+        vo.setErrorCode(entity.getErrorCode());
+        vo.setErrorMessage(entity.getErrorMessage());
         vo.setCreatedAt(entity.getCreatedAt());
+        return vo;
+    }
+
+    public static AiConversationSettingsVo toSettingsVo(AiConversation entity) {
+        AiConversationSettingsVo vo = new AiConversationSettingsVo();
+        vo.setProvider(entity.getProvider());
+        vo.setModel(entity.getModel());
+        vo.setSystemPrompt(entity.getSystemPrompt());
         return vo;
     }
 }

@@ -54,6 +54,52 @@ public final class GeneratedSellerSpriteContractIndex {
             SellerSpriteOperation.GLOBAL_BRAND_LIST,
             SellerSpriteOperation.GLOBAL_BRAND_STATS);
 
+    private static final List<DocumentedEndpoint> DOCUMENTED_ENDPOINTS = List.of(
+            new DocumentedEndpoint(SellerSpriteOperation.PRODUCT_COMPETITOR_LOOKUP, "POST", "/v1/product/competitor-lookup"),
+            new DocumentedEndpoint(SellerSpriteOperation.PRODUCT_RESEARCH, "POST", "/v1/product/research"),
+            new DocumentedEndpoint(SellerSpriteOperation.PRODUCT_NODE, "GET", "/v1/product/node"),
+            new DocumentedEndpoint(SellerSpriteOperation.ASIN_DETAIL, "GET", "/v1/asin/{marketplace}/{asin}"),
+            new DocumentedEndpoint(SellerSpriteOperation.ASIN_COUPON_TREND, "GET", "/v1/asin/{marketplace}/{asin}/coupon-trend"),
+            new DocumentedEndpoint(SellerSpriteOperation.ASIN_WITH_COUPON_TREND, "GET", "/v1/asin/{marketplace}/{asin}/with-coupon-trend"),
+            new DocumentedEndpoint(SellerSpriteOperation.ASIN_SALES_TREND, "GET", "/v1/asin/{marketplace}/{asin}/sales-trend"),
+            new DocumentedEndpoint(SellerSpriteOperation.ASIN_SALES_PREDICTION, "GET", "/v1/sales/prediction/asin"),
+            new DocumentedEndpoint(SellerSpriteOperation.BSR_SALES_PREDICTION, "GET", "/v1/sales/prediction/bsr"),
+            new DocumentedEndpoint(SellerSpriteOperation.ASIN_KEEPA_TREND, "GET", "/v1/keepa/{marketplace}/{asin}"),
+            new DocumentedEndpoint(SellerSpriteOperation.KEYWORD_RESEARCH, "POST", "/v1/keyword-research"),
+            new DocumentedEndpoint(SellerSpriteOperation.KEYWORD_RESEARCH_TRENDS, "POST", "/v1/keyword-research/trends"),
+            new DocumentedEndpoint(SellerSpriteOperation.KEYWORD_MINER, "POST", "/v1/keyword/miner"),
+            new DocumentedEndpoint(SellerSpriteOperation.KEYWORD_TRAFFIC_EXTEND, "POST", "/v1/traffic/extend"),
+            new DocumentedEndpoint(SellerSpriteOperation.ABA_RESEARCH_WEEKLY, "POST", "/v1/aba/research/weekly"),
+            new DocumentedEndpoint(SellerSpriteOperation.ABA_RESEARCH_MONTHLY, "POST", "/v1/aba/research/monthly"),
+            new DocumentedEndpoint(SellerSpriteOperation.ABA_RESEARCH_TRENDS, "POST", "/v1/aba/research/trends"),
+            new DocumentedEndpoint(SellerSpriteOperation.GOOGLE_TRENDS, "GET", "/v1/google/trends"),
+            new DocumentedEndpoint(SellerSpriteOperation.KEYWORD_ORDER, "POST", "/v1/keyword-order"),
+            new DocumentedEndpoint(SellerSpriteOperation.TRAFFIC_KEYWORD, "POST", "/v1/traffic/keyword"),
+            new DocumentedEndpoint(SellerSpriteOperation.TRAFFIC_LISTING_PAGE, "POST", "/v1/traffic/listing/page"),
+            new DocumentedEndpoint(SellerSpriteOperation.TRAFFIC_KEYWORD_STAT, "GET", "/v1/traffic/keyword/stat/{marketplace}/{asin}"),
+            new DocumentedEndpoint(SellerSpriteOperation.TRAFFIC_LISTING_STAT, "GET", "/v1/traffic/listing/stat/{marketplace}/{asin}"),
+            new DocumentedEndpoint(SellerSpriteOperation.TRAFFIC_SOURCE, "POST", "/v1/traffic/source"),
+            new DocumentedEndpoint(SellerSpriteOperation.MARKET_RESEARCH, "POST", "/v1/market/research"),
+            new DocumentedEndpoint(SellerSpriteOperation.MARKET_STATISTICS, "POST", "/v1/market/statistics"),
+            new DocumentedEndpoint(SellerSpriteOperation.MARKET_GOODS, "POST", "/v1/market/goods"),
+            new DocumentedEndpoint(SellerSpriteOperation.MARKET_BRAND, "POST", "/v1/market/brand"),
+            new DocumentedEndpoint(SellerSpriteOperation.MARKET_SELLER_LOCATION, "POST", "/v1/market/seller/location"),
+            new DocumentedEndpoint(SellerSpriteOperation.MARKET_SELLER, "POST", "/v1/market/seller"),
+            new DocumentedEndpoint(SellerSpriteOperation.MARKET_SELLER_TYPE, "POST", "/v1/market/seller/type"),
+            new DocumentedEndpoint(SellerSpriteOperation.MARKET_PERFORMANCE, "POST", "/v1/market/performance"),
+            new DocumentedEndpoint(SellerSpriteOperation.MARKET_SHELF_TIME, "POST", "/v1/market/shelf/time"),
+            new DocumentedEndpoint(SellerSpriteOperation.MARKET_SHELF_TREND, "POST", "/v1/market/shelf/trend"),
+            new DocumentedEndpoint(SellerSpriteOperation.MARKET_RATINGS, "POST", "/v1/market/ratings"),
+            new DocumentedEndpoint(SellerSpriteOperation.MARKET_RATING, "POST", "/v1/market/rating"),
+            new DocumentedEndpoint(SellerSpriteOperation.MARKET_PRICE, "POST", "/v1/market/price"),
+            new DocumentedEndpoint(SellerSpriteOperation.MARKET_EBC, "POST", "/v1/market/ebc"),
+            new DocumentedEndpoint(SellerSpriteOperation.REVIEW_LIST, "POST", "/v1/review"),
+            new DocumentedEndpoint(SellerSpriteOperation.OCR, "POST", "/v1/ocr"),
+            new DocumentedEndpoint(SellerSpriteOperation.GLOBAL_BRAND_RANGE, "GET", "/v1/global/brand/range"),
+            new DocumentedEndpoint(SellerSpriteOperation.GLOBAL_BRAND_DETAIL, "GET", "/v1/global/brand/detail"),
+            new DocumentedEndpoint(SellerSpriteOperation.GLOBAL_BRAND_LIST, "POST", "/v1/global/brand/list"),
+            new DocumentedEndpoint(SellerSpriteOperation.GLOBAL_BRAND_STATS, "POST", "/v1/global/brand/stats"));
+
     private static final List<Class<?>> MODEL_TYPES = List.of(
             com.yuanbaomao.sellersprite.api.common.model.dto.SortOrder.class,
             com.yuanbaomao.sellersprite.api.common.model.vo.SellerSpritePageVo.class,
@@ -266,6 +312,10 @@ public final class GeneratedSellerSpriteContractIndex {
         return MODEL_TYPES;
     }
 
+    public static List<DocumentedEndpoint> getDocumentedEndpoints() {
+        return DOCUMENTED_ENDPOINTS;
+    }
+
     public static int getDocumentedRequestFieldCount() {
         return 529;
     }
@@ -288,5 +338,15 @@ public final class GeneratedSellerSpriteContractIndex {
      */
     public record OfficialExample(SellerSpriteOperation operation, String resourcePath,
                                   Class<?> dataType, boolean collection) {
+    }
+
+    /**
+     * 官方文档中的 HTTP 方法与远端路径。
+     *
+     * @param operation SellerSprite 操作
+     * @param method 官方 HTTP 方法
+     * @param path 官方远端路径
+     */
+    public record DocumentedEndpoint(SellerSpriteOperation operation, String method, String path) {
     }
 }

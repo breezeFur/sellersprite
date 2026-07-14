@@ -1,6 +1,8 @@
 package com.yuanbaomao.sellersprite.system.user.model.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.Data;
 
 @Data
@@ -33,4 +35,7 @@ public class UserDetailVo {
 
     @Schema(description = "状态：1启用 0禁用")
     private Integer status;
+
+    @Schema(description = "角色ID集合")
+    private List<String> roleIds = new ArrayList<>();
 }

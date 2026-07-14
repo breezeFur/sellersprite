@@ -12,12 +12,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yuanbaomao.base.result.Result;
-import com.yuanbaomao.sellersprite.system.auth.config.AuthProperties;
 import com.yuanbaomao.sellersprite.system.auth.model.dto.AuthLoginRequest;
 import com.yuanbaomao.sellersprite.system.auth.model.vo.AuthLoginVo;
 import com.yuanbaomao.sellersprite.system.auth.model.vo.AuthSessionVo;
+import com.yuanbaomao.sellersprite.system.permission.model.vo.PermissionMenuVo;
+import com.yuanbaomao.sellersprite.system.role.model.vo.RoleVo;
 import com.yuanbaomao.sellersprite.system.auth.service.AuthService;
 import com.yuanbaomao.sellersprite.system.user.model.vo.UserDetailVo;
+import java.util.List;
+import java.util.Set;
 import jakarta.servlet.http.Cookie;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
@@ -27,14 +30,13 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 class AuthControllerTest {
 
+    private static final String APPLICATION_NAME = "sellersprite-service";
+    private static final String REFRESH_COOKIE_NAME = APPLICATION_NAME + "_refresh_token";
+
     @Test
     void shouldWriteRefreshTokenToHttpOnlySameSiteCookieAndHideItFromJson() throws Exception {
         AuthService authService = mock(AuthService.class);
-        AuthProperties properties = new AuthProperties();
-        properties.setRefreshCookieName("sellersprite_refresh_token");
-        properties.setRefreshCookieSecure(false);
-        properties.setRefreshTokenExpireDays(14L);
-        AuthController controller = new AuthController(authService, properties);
+        AuthController controller = new AuthController(authService, APPLICATION_NAME);
 
         AuthLoginRequest loginRequest = new AuthLoginRequest();
         loginRequest.setUsername("yuanbao");
@@ -52,17 +54,36 @@ class AuthControllerTest {
 
         String setCookie = response.getHeader("Set-Cookie");
         assertThat(setCookie)
-                .contains("sellersprite_refresh_token=refresh-token", "HttpOnly", "SameSite=Lax", "Path=/api/auth",
-                        "Max-Age=1209600")
+                .contains(REFRESH_COOKIE_NAME + "=refresh-token", "HttpOnly", "SameSite=Lax", "Path=/api/auth",
+                        "Max-Age=2592000")
                 .doesNotContain("Secure");
         String json = new ObjectMapper().writeValueAsString(result.getData());
         assertThat(json).contains("access-token").doesNotContain("refresh-token", "refreshToken");
     }
 
     @Test
+    void shouldMarkRefreshCookieSecureForHttpsRequest() {
+        AuthService authService = mock(AuthService.class);
+        AuthController controller = new AuthController(authService, APPLICATION_NAME);
+        AuthLoginRequest loginRequest = new AuthLoginRequest();
+        AuthLoginVo loginVo = new AuthLoginVo();
+        loginVo.setRefreshToken("refresh-token");
+        when(authService.login(loginRequest, "127.0.0.1", "JUnit")).thenReturn(loginVo);
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.setRemoteAddr("127.0.0.1");
+        request.addHeader("User-Agent", "JUnit");
+        request.setSecure(true);
+        MockHttpServletResponse response = new MockHttpServletResponse();
+
+        controller.login(loginRequest, request, response);
+
+        assertThat(response.getHeader("Set-Cookie")).contains("Secure");
+    }
+
+    @Test
     void shouldRotateCookieThroughRefreshEndpoint() throws Exception {
         AuthService authService = mock(AuthService.class);
-        AuthController controller = new AuthController(authService, authProperties());
+        AuthController controller = new AuthController(authService, APPLICATION_NAME);
         AuthLoginVo refreshed = new AuthLoginVo();
         refreshed.setAccessToken("new-access-token");
         refreshed.setRefreshToken("new-refresh-token");
@@ -70,7 +91,7 @@ class AuthControllerTest {
         MockMvc mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
 
         mockMvc.perform(post("/api/auth/refresh")
-                        .cookie(new Cookie("sellersprite_refresh_token", "old-refresh-token"))
+                        .cookie(new Cookie(REFRESH_COOKIE_NAME, "old-refresh-token"))
                         .with(request -> {
                             request.setRemoteAddr("127.0.0.1");
                             return request;
@@ -87,11 +108,11 @@ class AuthControllerTest {
     @Test
     void shouldRevokeSessionAndClearCookieThroughLogoutEndpoint() throws Exception {
         AuthService authService = mock(AuthService.class);
-        AuthController controller = new AuthController(authService, authProperties());
+        AuthController controller = new AuthController(authService, APPLICATION_NAME);
         MockMvc mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
 
         mockMvc.perform(post("/api/auth/logout")
-                        .cookie(new Cookie("sellersprite_refresh_token", "refresh-token")))
+                        .cookie(new Cookie(REFRESH_COOKIE_NAME, "refresh-token")))
                 .andExpect(status().isOk())
                 .andExpect(header().string("Set-Cookie", org.hamcrest.Matchers.allOf(
                         org.hamcrest.Matchers.containsString("Max-Age=0"),
@@ -102,26 +123,31 @@ class AuthControllerTest {
     @Test
     void shouldReturnCurrentSession() throws Exception {
         AuthService authService = mock(AuthService.class);
-        AuthController controller = new AuthController(authService, authProperties());
+        AuthController controller = new AuthController(authService, APPLICATION_NAME);
         AuthSessionVo session = new AuthSessionVo();
         UserDetailVo user = new UserDetailVo();
         user.setUserId("user-1");
         user.setUsername("yuanbao");
         session.setUser(user);
+        RoleVo role = new RoleVo();
+        role.setRoleCode("admin");
+        session.setRoles(List.of(role));
+        PermissionMenuVo menu = new PermissionMenuVo();
+        menu.setFunctionId("menu-system");
+        session.setMenuTree(List.of(menu));
+        session.setPermissionCodes(Set.of("system:user:view"));
+        session.setPermissionVersion(7L);
         when(authService.current()).thenReturn(session);
         MockMvc mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
 
         mockMvc.perform(get("/api/auth/session"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.user.userId").value("user-1"))
-                .andExpect(jsonPath("$.data.user.username").value("yuanbao"));
+                .andExpect(jsonPath("$.data.user.username").value("yuanbao"))
+                .andExpect(jsonPath("$.data.roles[0].roleCode").value("admin"))
+                .andExpect(jsonPath("$.data.menuTree[0].functionId").value("menu-system"))
+                .andExpect(jsonPath("$.data.permissionCodes[0]").value("system:user:view"))
+                .andExpect(jsonPath("$.data.permissionVersion").value(7));
     }
 
-    private AuthProperties authProperties() {
-        AuthProperties properties = new AuthProperties();
-        properties.setRefreshCookieName("sellersprite_refresh_token");
-        properties.setRefreshCookieSecure(false);
-        properties.setRefreshTokenExpireDays(14L);
-        return properties;
-    }
 }

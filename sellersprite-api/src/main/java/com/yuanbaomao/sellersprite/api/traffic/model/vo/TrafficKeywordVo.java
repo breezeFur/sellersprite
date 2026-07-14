@@ -1,10 +1,15 @@
 // Generated from SellerSprite official documentation on 2026-07-10.
 package com.yuanbaomao.sellersprite.api.traffic.model.vo;
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.math.BigDecimal;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import lombok.Data;
+import tools.jackson.databind.JsonNode;
 
 /**
  * 关键词反查(流量词列表)响应模型。
@@ -34,6 +39,20 @@ public class TrafficKeywordVo {
     /** 关键词反查(流量词列表)响应参数：高频词 */
     @Schema(description = "关键词反查(流量词列表)响应参数：高频词")
     private List<StatsVo> stats;
+
+    /** 官方响应中未建模字段的原始值。 */
+    @Schema(description = "官方响应未建模字段", hidden = true)
+    private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
+
+    @JsonAnySetter
+    public void putAdditionalProperty(String name, JsonNode value) {
+        additionalProperties.put(name, value);
+    }
+
+    @JsonAnyGetter
+    public Map<String, JsonNode> getAdditionalProperties() {
+        return additionalProperties;
+    }
 
     @Data
     @Schema(description = "关键词反查(流量词列表)响应参数：词条；1848")
@@ -151,6 +170,20 @@ public class TrafficKeywordVo {
         @Schema(description = "关键词反查(流量词列表)响应参数：流量分布-广告占比；0.0688")
         private BigDecimal adRatio;
 
+        /** 官方响应中未建模字段的原始值。 */
+        @Schema(description = "官方响应未建模字段", hidden = true)
+        private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
+
+        @JsonAnySetter
+        public void putAdditionalProperty(String name, JsonNode value) {
+            additionalProperties.put(name, value);
+        }
+
+        @JsonAnyGetter
+        public Map<String, JsonNode> getAdditionalProperties() {
+            return additionalProperties;
+        }
+
     }
 
     @Data
@@ -176,6 +209,20 @@ public class TrafficKeywordVo {
         /** 关键词反查(流量词列表)响应参数：排名时间 */
         @Schema(description = "关键词反查(流量词列表)响应参数：排名时间")
         private Long updatedTime;
+
+        /** 官方响应中未建模字段的原始值。 */
+        @Schema(description = "官方响应未建模字段", hidden = true)
+        private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
+
+        @JsonAnySetter
+        public void putAdditionalProperty(String name, JsonNode value) {
+            additionalProperties.put(name, value);
+        }
+
+        @JsonAnyGetter
+        public Map<String, JsonNode> getAdditionalProperties() {
+            return additionalProperties;
+        }
 
     }
 
@@ -203,6 +250,20 @@ public class TrafficKeywordVo {
         @Schema(description = "关键词反查(流量词列表)响应参数：排名时间")
         private Long updatedTime;
 
+        /** 官方响应中未建模字段的原始值。 */
+        @Schema(description = "官方响应未建模字段", hidden = true)
+        private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
+
+        @JsonAnySetter
+        public void putAdditionalProperty(String name, JsonNode value) {
+            additionalProperties.put(name, value);
+        }
+
+        @JsonAnyGetter
+        public Map<String, JsonNode> getAdditionalProperties() {
+            return additionalProperties;
+        }
+
     }
 
     @Data
@@ -216,6 +277,20 @@ public class TrafficKeywordVo {
         /** 关键词反查(流量词列表)响应参数：总条数；90 */
         @Schema(description = "关键词反查(流量词列表)响应参数：总条数；90")
         private Integer total;
+
+        /** 官方响应中未建模字段的原始值。 */
+        @Schema(description = "官方响应未建模字段", hidden = true)
+        private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
+
+        @JsonAnySetter
+        public void putAdditionalProperty(String name, JsonNode value) {
+            additionalProperties.put(name, value);
+        }
+
+        @JsonAnyGetter
+        public Map<String, JsonNode> getAdditionalProperties() {
+            return additionalProperties;
+        }
 
     }
 

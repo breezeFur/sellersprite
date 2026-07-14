@@ -24,4 +24,8 @@ public class RoleApi extends BaseAudit {
     @TableField("sys_api_id")
     @Schema(description = "系统接口ID")
     private String sysApiId;
+
+    @TableField("grant_source")
+    @Schema(description = "授权来源：FUNCTION功能派生 EXTRA直接附加 BOTH双重来源")
+    private String grantSource;
 }

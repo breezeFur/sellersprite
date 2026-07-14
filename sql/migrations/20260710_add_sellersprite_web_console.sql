@@ -37,6 +37,10 @@ CREATE TABLE `function_api` (
   KEY `idx_function_api_api_id` (`sys_api_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='功能接口关联表';
 
+ALTER TABLE `role_api`
+  ADD COLUMN `grant_source` varchar(16) NOT NULL DEFAULT 'EXTRA'
+    COMMENT '授权来源：FUNCTION功能派生 EXTRA直接附加 BOTH双重来源' AFTER `sys_api_id`;
+
 ALTER TABLE `login_log`
   ADD COLUMN `error_code` varchar(64) NOT NULL DEFAULT '' COMMENT '稳定错误码' AFTER `success`;
 

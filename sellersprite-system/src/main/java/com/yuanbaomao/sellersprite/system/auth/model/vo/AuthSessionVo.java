@@ -1,5 +1,7 @@
 package com.yuanbaomao.sellersprite.system.auth.model.vo;
 
+import com.yuanbaomao.sellersprite.system.permission.model.vo.PermissionMenuVo;
+import com.yuanbaomao.sellersprite.system.role.model.vo.RoleVo;
 import com.yuanbaomao.sellersprite.system.user.model.vo.UserDetailVo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.ArrayList;
@@ -18,9 +20,12 @@ public class AuthSessionVo {
     @Schema(description = "权限版本")
     private Long permissionVersion;
 
-    @Schema(description = "菜单树")
-    private List<AuthMenuVo> menus = new ArrayList<>();
+    @Schema(description = "启用角色")
+    private List<RoleVo> roles = new ArrayList<>();
 
-    @Schema(description = "按钮权限标识")
-    private Set<String> permissions = new LinkedHashSet<>();
+    @Schema(description = "菜单树")
+    private List<PermissionMenuVo> menuTree = new ArrayList<>();
+
+    @Schema(description = "权限标识")
+    private Set<String> permissionCodes = new LinkedHashSet<>();
 }
