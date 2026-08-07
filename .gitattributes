@@ -1,0 +1,6 @@
+# Maven artifacts and their checksums must remain byte-for-byte stable across checkouts.
+maven-repository/** binary
+
+# Keep the Unix wrapper executable with predictable line endings.
+mvnw text eol=lf
+mvnw.cmd text eol=crlf

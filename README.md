@@ -34,7 +34,7 @@ SellerSprite Open API 全栈集成服务。项目已同步 `D:\develop\scaffold`
 - JDK 21、Maven 3.9+
 - Node.js 22.12+、npm
 - MySQL 8.x
-- `yuanbaomao-scaffold-parent:0.1.0-SNAPSHOT` 及其 Starter 可从本地仓库或制品仓库解析
+- 元宝猫基础组件已内置在项目 Maven 文件仓库中，无需预先安装到个人 Maven 本地仓库
 - 使用 AI 时提供 OpenAI 兼容模型密钥
 - 实际调用卖家精灵上游时提供 `SELLERSPRITE_API_SECRET_KEY`
 
@@ -56,26 +56,13 @@ mysql -uroot -p -e "source sql/schema.sql"
 
 ### 已有数据库
 
-仅执行尚未应用的迁移，顺序如下：
-
-1. `sql/migrations/20260710_add_sellersprite_web_console.sql`
-2. `sql/migrations/20260713_upgrade_scaffold_console.sql`
-3. `sql/migrations/20260713_add_sellersprite_workbench.sql`
-4. `sql/migrations/20260714_add_market_research_console.sql`
-5. `sql/migrations/20260714_add_sellersprite_appendix_dicts.sql`
-6. `sql/migrations/20260714_expand_sellersprite_operation_menus.sql`
-7. `sql/migrations/20260715_rebuild_market_research_graph_runtime.sql`
-8. `sql/migrations/20260716_add_market_research_selection_context.sql`
-9. `sql/migrations/20260728_integrate_curation_market_research_agent.sql`
-10. `sql/migrations/20260805_rebuild_market_research_human_review_stages.sql`
-
-`20260710_add_sellersprite_web_console.sql` 是一次性结构迁移，不要重复执行。`20260713_upgrade_scaffold_console.sql` 包含 `ALTER TABLE ... MODIFY COLUMN`，大表可能锁表或重建，应安排维护窗口。工作台迁移可安全重跑；若执行时接口目录尚未同步，它会先写入菜单和角色授权，接口关联写入 0 行。
+项目只保留一份最终结构脚本，不再维护按日期拆分的增量迁移。已有数据库升级前必须先备份，并在维护窗口内对照 `sql/schema.sql` 手工生成差异 SQL；不要直接重复执行整份脚本。
 
 市场调研由 Spring AI Alibaba Graph 编排，官方 `GRAPH_THREAD`、`GRAPH_CHECKPOINT` 表负责控制流恢复。业务表中，`market_research_job`、`market_research_node_execution`、`market_research_dataset` 和 `market_research_artifact` 保存数据任务、节点审计、不可变证据和附件；`market_research_analysis_run` 与 `market_research_event` 保存独立的 Curation 分析生命周期和可重放事件。系统不再依赖 Spring Batch 元数据表。
 
-`20260715_rebuild_market_research_graph_runtime.sql` 是旧 Graph 运行时的破坏性重建迁移。开发阶段升级 v5 时直接执行 `20260805_rebuild_market_research_human_review_stages.sql`：它会清理旧市场调研任务及其 scoped checkpoint，重建人工关卡所需的任务字段和 `market_research_stage_input`。该迁移不兼容旧任务，执行前必须停止旧调度器并按需备份；完整新库直接使用最新 `sql/schema.sql`。
+开发阶段重建数据库时可直接重新创建 `sellersprite_service` 后执行最新 `sql/schema.sql`；脚本包含当前人工关卡、分析运行和事件流锁所需的最终结构。
 
-应用启动后，管理员在“接口资源”页面依次执行“同步接口目录”和“同步菜单接口绑定”，即可按前端固定清单关联工作台的 45 个代理端点与市场调研端点；也可以在接口目录同步后重跑对应菜单迁移。
+应用启动后，管理员在“接口资源”页面依次执行“同步接口目录”和“同步菜单接口绑定”，即可按前端固定清单关联工作台的 45 个代理端点与市场调研端点。
 
 ## 本地配置
 
@@ -209,7 +196,7 @@ sellersprite:
     output-directory: ./data/market-research
 ```
 
-`checkpoint-initialize-schema` 在生产环境保持 `false`，表结构由 `schema.sql` 或版本化迁移管理；仅隔离测试环境可显式开启。父 Graph 的 thread ID 由工作流版本和 `jobId` 组成。任务 Dispatcher 通过原子抢占、execution token、租约和心跳支持多实例；应用重启或租约过期后从父 Graph checkpoint 恢复。不可变数据集通过请求摘要和 SHA-256 避免重复调用已经完成的采集节点，短暂错误按有界指数退避进入 `RETRY_WAIT`。
+`checkpoint-initialize-schema` 在生产环境保持 `false`，表结构由唯一入口 `schema.sql` 管理；仅隔离测试环境可显式开启。父 Graph 的 thread ID 由工作流版本和 `jobId` 组成。任务 Dispatcher 通过原子抢占、execution token、租约和心跳支持多实例；应用重启或租约过期后从父 Graph checkpoint 恢复。不可变数据集通过请求摘要和 SHA-256 避免重复调用已经完成的采集节点，短暂错误按有界指数退避进入 `RETRY_WAIT`。
 
 `SCREENING`、`DEEP_DIVE` 和 `FINAL_ANALYSIS` 使用三个独立 analysis run，但共享同一个 `conversationId`。阶段运行使用父任务 execution token 做归属校验；后续追问和失败分析重试仍使用独立分析运行、租约与心跳，运行中的分析可协作式取消。
 
@@ -312,10 +299,16 @@ python tools/generate_sellersprite_endpoints.py
 
 ## 构建与验证
 
-后端全量测试：
+后端全量测试并完成打包：
 
 ```bash
-mvn test --no-transfer-progress
+./mvnw clean verify --no-transfer-progress
+```
+
+Windows 下可执行完整隔离验证。脚本会使用空 Maven 本地仓库和无认证 settings，确认构建没有借用当前电脑已安装的 `cyou.yuanbaomao` 构件：
+
+```powershell
+.\scripts\verify-vendored-build.ps1
 ```
 
 前端门禁：
@@ -327,3 +320,20 @@ npm run test:unit
 npm run build
 npm run test:e2e
 ```
+
+## 内置 Maven 文件仓库
+
+`maven-repository` 使用标准 Maven 2 布局，只收录当前应用实际依赖的私有二进制闭包：
+
+- `yuanbaomao-base:0.1.1`
+- `yuanbaomao-web-starter:0.1.2-SNAPSHOT`
+- `yuanbaomao-mybatis-starter:0.1.1`
+- `yuanbaomao-cache-starter:0.1.1`
+- `yuanbaomao-log-starter:0.1.2-SNAPSHOT`
+- `yuanbaomao-dict-starter:0.1.1`
+
+根 `pom.xml` 不再继承私有 `yuanbaomao-scaffold-parent`，而是通过 `file://${maven.multiModuleProjectDirectory}/maven-repository` 解析上述构件。第三方开源依赖仍从 Maven Central 或团队镜像下载，因此该方案不是完全离线构建。
+
+仓库目录只在构建时充当依赖来源，不是应用资源。`sellersprite-server` 完成 Spring Boot `repackage` 后，六个运行依赖会进入可执行 JAR 的 `BOOT-INF/lib`，POM、校验文件和整个 `maven-repository` 目录不会被打包。
+
+升级内置组件时必须同步替换主 JAR及发布生成的扁平 POM，重新生成 `.sha1`、`.md5` 与 `SHA256SUMS`，更新根 POM 的 `yuanbaomao-*.version`，最后执行 `scripts/verify-vendored-build.ps1`。不要复制 `.lastUpdated`、`_remote.repositories`、sources 或 javadoc 文件。

@@ -1,3 +1,5 @@
+-- SellerSprite 当前最终数据库结构与初始化数据唯一入口。
+-- 历史增量迁移已合并到本文件；新环境只需执行本脚本一次。
 CREATE DATABASE IF NOT EXISTS `sellersprite_service`
   DEFAULT CHARACTER SET utf8mb4
   COLLATE utf8mb4_0900_ai_ci;
