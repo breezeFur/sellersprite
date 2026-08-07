@@ -4,6 +4,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import * as dictionaryApi from '@/features/system/api/dictionaryApi'
 
 import * as sellerSpriteApi from '../api/sellerspriteApi'
+import * as excelExport from '../utils/sellerSpriteExcelExport'
 import SellerSpriteGuidedWorkbench from './SellerSpriteGuidedWorkbench.vue'
 
 vi.mock('@/features/system/api/dictionaryApi', () => ({
@@ -18,9 +19,17 @@ vi.mock('../api/sellerspriteApi', async (importOriginal) => {
   }
 })
 
+vi.mock('../utils/sellerSpriteExcelExport', () => ({
+  exportSellerSpriteQueryResult: vi.fn(),
+}))
+
 describe('SellerSpriteGuidedWorkbench', () => {
   beforeEach(() => {
     vi.mocked(sellerSpriteApi.executeSellerSpriteOperation).mockReset()
+    vi.mocked(excelExport.exportSellerSpriteQueryResult).mockReset().mockResolvedValue({
+      fileName: 'sellersprite-result.xlsx',
+      rowCount: 1,
+    })
     vi.mocked(dictionaryApi.getEnabledDictionary).mockImplementation(async (dictType) => dictionaryFixture(dictType))
   })
 
@@ -75,6 +84,37 @@ describe('SellerSpriteGuidedWorkbench', () => {
       expect.objectContaining({ marketplace: 'MARKET_US', page: 2, size: 50 }),
     )
     expect(wrapper.text()).toContain('PAGE-2')
+  })
+
+  it('exports only the records returned by the current guided query', async () => {
+    vi.mocked(sellerSpriteApi.executeSellerSpriteOperation).mockResolvedValue({
+      data: {
+        page: 1,
+        size: 50,
+        total: 2,
+        items: [{ asin: 'B001', title: 'Keyboard', price: 49.9 }],
+      },
+      durationMs: 12,
+      completedAt: Date.now(),
+    })
+    const wrapper = mount(SellerSpriteGuidedWorkbench)
+    expect(wrapper.get('[aria-label="导出引导查询结果"]').attributes('disabled')).toBeDefined()
+
+    await wrapper.get('[aria-label="执行引导查询"]').trigger('click')
+    await flushPromises()
+    await wrapper.get('[aria-label="导出引导查询结果"]').trigger('click')
+    await flushPromises()
+
+    expect(excelExport.exportSellerSpriteQueryResult).toHaveBeenCalledWith({
+      operationId: 'PRODUCT_COMPETITOR_LOOKUP',
+      operationName: '查竞品',
+      data: [{ asin: 'B001', title: 'Keyboard', price: 49.9 }],
+      columns: expect.arrayContaining([
+        { key: 'asin', label: 'ASIN' },
+        { key: 'title', label: '标题' },
+        { key: 'price', label: '价格' },
+      ]),
+    })
   })
 
   it('renders every returned product field instead of truncating the table to nine columns', async () => {

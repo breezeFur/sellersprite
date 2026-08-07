@@ -6,15 +6,22 @@ import type { AuthMenu } from '@/features/auth/model/auth'
 
 import AuthenticatedLayout from '@/layouts/AuthenticatedLayout.vue'
 import { routeComponentWhitelist } from '../router/componentWhitelist'
-import { buildDynamicRoutes, type RouteComponentWhitelist } from '../router/dynamicRoutes'
+import {
+  buildDynamicRoutes,
+  preloadAccessibleRouteComponents,
+  type RouteComponentWhitelist,
+} from '../router/dynamicRoutes'
 
 const AUTHENTICATED_ROUTE_NAME = 'authenticated-root'
 const SUPER_ADMIN_BOOTSTRAP_COMPONENT = 'dashboard/overview'
 const SUPER_ADMIN_BOOTSTRAP_PATH = 'dashboard'
+const ROUTE_COMPONENT_PRELOAD_TIMEOUT_MS = 1_500
 
 export const usePermissionStore = defineStore('permission', () => {
   const routesRegistered = ref(false)
   const firstAccessiblePath = ref<string | null>(null)
+  let cancelPendingPreload: (() => void) | null = null
+  let removePreloadNavigationHook: (() => void) | null = null
 
   function registerRoutes(
     router: Router,
@@ -55,14 +62,40 @@ export const usePermissionStore = defineStore('permission', () => {
     })
     firstAccessiblePath.value = firstPath
     routesRegistered.value = true
+    schedulePreloadAfterFirstDynamicNavigation(router, menuTree, whitelist)
   }
 
   function resetRoutes(router: Router) {
+    cancelPreloadScheduling()
     if (router.hasRoute(AUTHENTICATED_ROUTE_NAME)) {
       router.removeRoute(AUTHENTICATED_ROUTE_NAME)
     }
     routesRegistered.value = false
     firstAccessiblePath.value = null
+  }
+
+  function schedulePreloadAfterFirstDynamicNavigation(
+    router: Router,
+    menuTree: AuthMenu[],
+    whitelist: RouteComponentWhitelist,
+  ) {
+    removePreloadNavigationHook = router.afterEach((to) => {
+      if (!to.meta.dynamic) return
+
+      removePreloadNavigationHook?.()
+      removePreloadNavigationHook = null
+      cancelPendingPreload = scheduleWhenBrowserIsIdle(() => {
+        cancelPendingPreload = null
+        void preloadAccessibleRouteComponents(menuTree, whitelist)
+      })
+    })
+  }
+
+  function cancelPreloadScheduling() {
+    removePreloadNavigationHook?.()
+    removePreloadNavigationHook = null
+    cancelPendingPreload?.()
+    cancelPendingPreload = null
   }
 
   return {
@@ -72,3 +105,19 @@ export const usePermissionStore = defineStore('permission', () => {
     resetRoutes,
   }
 })
+
+function scheduleWhenBrowserIsIdle(callback: () => void) {
+  if (typeof window === 'undefined') {
+    callback()
+    return () => undefined
+  }
+  if (typeof window.requestIdleCallback === 'function') {
+    const requestId = window.requestIdleCallback(callback, {
+      timeout: ROUTE_COMPONENT_PRELOAD_TIMEOUT_MS,
+    })
+    return () => window.cancelIdleCallback(requestId)
+  }
+
+  const timeoutId = window.setTimeout(callback, 0)
+  return () => window.clearTimeout(timeoutId)
+}

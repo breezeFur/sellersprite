@@ -20,7 +20,7 @@ function stableRouteKey(route: RouteLocationNormalizedLoaded) {
     <Component
       :is="routeComponent"
       v-if="!currentRoute.meta.cacheable"
-      :key="currentRoute.fullPath"
+      :key="stableRouteKey(currentRoute)"
     />
   </RouterView>
 </template>

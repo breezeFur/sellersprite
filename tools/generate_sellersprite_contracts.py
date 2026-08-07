@@ -23,7 +23,7 @@ JAVA_ROOT = ROOT / "sellersprite-api/src/main/java"
 FRONTEND_CONTRACT_PATH = (
     ROOT / "sellersprite-web/src/features/sellersprite/model/officialOperationContracts.generated.ts"
 )
-BASE_PACKAGE = "com.yuanbaomao.sellersprite.api"
+BASE_PACKAGE = "cyou.yuanbaomao.sellersprite.api"
 DOC_BASE_URL = "https://open.sellersprite.com/api"
 CAPTURED_AT = "2026-07-14"
 MODEL_GENERATED_AT = "2026-07-10"
@@ -86,6 +86,14 @@ ENDPOINTS = [
     Endpoint(48, "trademark", "TrademarkList", "GLOBAL_BRAND_LIST", "page"),
     Endpoint(47, "trademark", "TrademarkStats", "GLOBAL_BRAND_STATS", "object"),
 ]
+
+# 官方字段表与实际响应示例不一致时，以线上响应字段为准。
+RESPONSE_FIELD_OVERRIDES = {
+    "MARKET_SELLER": {
+        "name": "sellerName",
+        "asinSet": "asins",
+    },
+}
 
 
 @dataclass
@@ -229,6 +237,10 @@ def fetch_contract(session: requests.Session, endpoint: Endpoint) -> Contract:
                     "name": cells[3], "description": cells[4],
                 })
 
+    overrides = RESPONSE_FIELD_OVERRIDES.get(endpoint.operation, {})
+    for row in response_rows:
+        row["field"] = overrides.get(row["field"], row["field"])
+
     # The URL is part of the authoritative request contract. A few official
     # pages omit a path placeholder from the request table (for example,
     # /v1/traffic/listing/stat/{marketplace}/{asin} documents asinList only).
@@ -341,6 +353,7 @@ def collect_imports(nodes: Iterable[FieldNode], direction: str) -> set[str]:
             "com.fasterxml.jackson.annotation.JsonAnySetter",
             "java.util.LinkedHashMap",
             "java.util.Map",
+            "lombok.extern.slf4j.Slf4j",
             "tools.jackson.databind.JsonNode",
         })
 
@@ -441,6 +454,8 @@ def render_additional_properties(indent: str) -> list[str]:
         "",
         f"{indent}@JsonAnySetter",
         f"{indent}public void putAdditionalProperty(String name, JsonNode value) {{",
+        f'{indent}    log.warn("SellerSprite 响应包含未建模字段 modelType={{}}, fieldName={{}}, fieldValue={{}}",',
+        f"{indent}            getClass().getName(), name, value);",
         f"{indent}    additionalProperties.put(name, value);",
         f"{indent}}}",
         "",
@@ -484,6 +499,8 @@ def render_model(package_name: str, class_name: str, contract_name: str,
     for import_name in sorted(imports):
         lines.append(f"import {import_name};")
     class_annotations = ["@Data"]
+    if direction == "响应":
+        class_annotations.insert(0, "@Slf4j")
     if is_ocr_request:
         class_annotations.insert(0, "@ValidOcrSource")
     lines.extend([
@@ -504,8 +521,11 @@ def render_model(package_name: str, class_name: str, contract_name: str,
     for nested_name, parent in collect_nested(nodes, direction):
         type_names.append(f"{package_name}.{class_name}.{nested_name}")
         description = field_description(contract_name, direction, parent)
+        nested_annotations = ["    @Data"]
+        if direction == "响应":
+            nested_annotations.insert(0, "    @Slf4j")
         lines.extend([
-            "    @Data",
+            *nested_annotations,
             f'    @Schema(description = "{java_string(description)}")',
             f"    public static class {nested_name} {{",
             "",
@@ -537,6 +557,7 @@ def render_page_wrapper(package_name: str, class_name: str, contract_name: str,
         "import io.swagger.v3.oas.annotations.media.Schema;",
         "import java.util.LinkedHashMap;",
         "import java.util.Map;",
+        "import lombok.extern.slf4j.Slf4j;",
         "import tools.jackson.databind.JsonNode;",
     ]
     if item_import:
@@ -546,6 +567,7 @@ def render_page_wrapper(package_name: str, class_name: str, contract_name: str,
         "/**",
         f" * {contract_name}分页响应。",
         " */",
+        "@Slf4j",
         f'@Schema(description = "{contract_name}分页响应")',
         f"public class {class_name} extends SellerSpritePageVo<{item_type}> {{",
     ])

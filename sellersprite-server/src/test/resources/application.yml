@@ -1,11 +1,6 @@
 spring:
   application:
     name: sellersprite-service
-  batch:
-    job:
-      enabled: false
-    jdbc:
-      initialize-schema: always
   ai:
     tools:
       throw-exception-on-error: true
@@ -45,8 +40,8 @@ ybm:
   mybatis:
     mapper:
       base-packages:
-        - com.yuanbaomao.sellersprite.db.mapper
+        - cyou.yuanbaomao.sellersprite.db.mapper
 
 sellersprite:
   research:
-    recovery-enabled: false
+    dispatcher-enabled: false

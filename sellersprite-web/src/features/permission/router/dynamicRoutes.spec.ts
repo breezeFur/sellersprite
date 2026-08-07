@@ -1,9 +1,14 @@
 import type { Component } from 'vue'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 import type { AuthMenu } from '@/features/auth/model/auth'
 
-import { RouteComponentNotAllowedError, buildDynamicRoutes, type RouteComponentWhitelist } from './dynamicRoutes'
+import {
+  RouteComponentNotAllowedError,
+  buildDynamicRoutes,
+  preloadAccessibleRouteComponents,
+  type RouteComponentWhitelist,
+} from './dynamicRoutes'
 
 const pageLoader = () => Promise.resolve({ default: { template: '<p>页面</p>' } as Component })
 const whitelist: RouteComponentWhitelist = {
@@ -76,5 +81,35 @@ describe('buildDynamicRoutes', () => {
 
     expect(result.routes).toEqual([])
     expect(result.firstAccessiblePath).toBeNull()
+  })
+
+  it('preloads accessible component loaders once and isolates individual failures', async () => {
+    const sharedLoader = vi.fn(pageLoader)
+    const failedLoader = vi.fn(() => Promise.reject(new Error('chunk unavailable')))
+    const unauthorizedLoader = vi.fn(pageLoader)
+    const preloadWhitelist: RouteComponentWhitelist = {
+      'dashboard/overview': sharedLoader,
+      'system/users': failedLoader,
+      'ops/logs': unauthorizedLoader,
+    }
+    const menuTree = [
+      menu({ functionId: 'menu-dashboard', componentPath: 'dashboard/overview' }),
+      menu({
+        functionId: 'menu-dashboard-copy',
+        routePath: '/dashboard-copy',
+        componentPath: 'dashboard/overview',
+      }),
+      menu({
+        functionId: 'menu-users',
+        routePath: '/system/users',
+        componentPath: 'system/users',
+      }),
+    ]
+
+    await expect(preloadAccessibleRouteComponents(menuTree, preloadWhitelist)).resolves.toBeUndefined()
+
+    expect(sharedLoader).toHaveBeenCalledTimes(1)
+    expect(failedLoader).toHaveBeenCalledTimes(1)
+    expect(unauthorizedLoader).not.toHaveBeenCalled()
   })
 })

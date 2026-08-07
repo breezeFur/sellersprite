@@ -358,7 +358,7 @@ def render_controller(domain: str, endpoints: list[LayerEndpoint]) -> str:
     domain_class, domain_label, base_path = DOMAIN_INFO[domain]
     package_name = f"{BASE_PACKAGE}.{domain}.controller"
     imports: set[str] = {
-        "com.yuanbaomao.base.result.Result",
+        "cyou.yuanbaomao.base.result.Result",
         "io.swagger.v3.oas.annotations.Operation",
         "io.swagger.v3.oas.annotations.tags.Tag",
         "lombok.RequiredArgsConstructor",

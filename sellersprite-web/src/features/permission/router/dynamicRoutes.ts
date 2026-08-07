@@ -11,6 +11,8 @@ export interface DynamicRouteResult {
   firstAccessiblePath: string | null
 }
 
+const ROUTE_COMPONENT_PRELOAD_CONCURRENCY = 2
+
 export class RouteComponentNotAllowedError extends Error {
   constructor(componentPath: string) {
     super(`动态组件路径未登记：${componentPath}`)
@@ -61,6 +63,30 @@ export function buildDynamicRoutes(
 
 export function normalizeFullRoutePath(routePath: string) {
   return `/${normalizeChildRoutePath(routePath)}`
+}
+
+export async function preloadAccessibleRouteComponents(
+  menuTree: AuthMenu[],
+  whitelist: RouteComponentWhitelist,
+) {
+  const componentPaths = new Set<string>()
+
+  function visit(items: AuthMenu[]) {
+    for (const item of items) {
+      if (item.type !== 'BUTTON' && item.routePath && item.componentPath) {
+        const componentPath = item.componentPath.trim()
+        if (whitelist[componentPath]) componentPaths.add(componentPath)
+      }
+      if (item.children.length > 0) visit(item.children)
+    }
+  }
+
+  visit(menuTree)
+  const loaders = [...componentPaths].map((componentPath) => whitelist[componentPath])
+  for (let index = 0; index < loaders.length; index += ROUTE_COMPONENT_PRELOAD_CONCURRENCY) {
+    const batch = loaders.slice(index, index + ROUTE_COMPONENT_PRELOAD_CONCURRENCY)
+    await Promise.allSettled(batch.map((loader) => Promise.resolve().then(loader)))
+  }
 }
 
 function normalizeChildRoutePath(routePath: string) {

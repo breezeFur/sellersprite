@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { Menu, Setting } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 
 import { useAuthStore } from '@/features/auth/stores/useAuthStore'
 import { ApiError } from '@/shared/api/ApiError'
 import StatePanel from '@/shared/components/StatePanel.vue'
+import { useAutoFollowScroll } from '@/shared/composables/useAutoFollowScroll'
 
 import {
   deleteConversation,
@@ -39,7 +40,12 @@ const composerText = ref('')
 const streaming = ref(false)
 const settingsOpen = ref(false)
 const mobileConversationsOpen = ref(false)
-const messagesContainer = ref<HTMLElement>()
+const {
+  handleScroll: handleMessagesScroll,
+  resetAutoFollow: resetMessagesAutoFollow,
+  setScrollContainer: setMessagesContainer,
+  scrollToBottom: scrollMessagesToEnd,
+} = useAutoFollowScroll()
 let activeController: AbortController | null = null
 let activeAssistantId: string | null = null
 let activeUserId: string | null = null
@@ -81,16 +87,20 @@ async function selectConversation(conversationId: string) {
   selectedId.value = conversationId
   detailLoading.value = true
   mobileConversationsOpen.value = false
+  let loaded = false
   try {
     const detail = await getConversation(conversationId)
     currentConversation.value = detail.conversation
     messages.value = detail.messages
     settings.value = detail.settings
-    await scrollMessagesToEnd()
+    loaded = true
   } catch (error) {
     ElMessage.error(errorMessage(error, '会话详情加载失败'))
   } finally {
     detailLoading.value = false
+  }
+  if (loaded) {
+    await scrollMessagesToEnd(true)
   }
 }
 
@@ -104,6 +114,7 @@ function startNewConversation() {
   settings.value = emptySettings()
   composerText.value = ''
   mobileConversationsOpen.value = false
+  resetMessagesAutoFollow()
 }
 
 async function sendMessage() {
@@ -118,7 +129,7 @@ async function sendMessage() {
   activeUserId = userMessage.messageId
   activeAssistantId = assistantMessage.messageId
   composerText.value = ''
-  await scrollMessagesToEnd()
+  await scrollMessagesToEnd(true)
 
   await executeStream((options) => streamChat({
     conversationId: selectedId.value || undefined,
@@ -135,7 +146,7 @@ async function retryMessage(message: AiConversationMessage) {
   messages.value.push(assistantMessage)
   activeUserId = null
   activeAssistantId = assistantMessage.messageId
-  await scrollMessagesToEnd()
+  await scrollMessagesToEnd(true)
   const conversationId = selectedId.value
   await executeStream(
     (options) => retryChat(conversationId, message.messageId, options),
@@ -210,7 +221,6 @@ function handleStreamEvent(event: AiStreamEvent, fallbackTitle: string) {
   }
   if (event.event === 'delta') {
     assistant.content += event.data.content
-    void scrollMessagesToEnd()
   } else if (event.event === 'done') {
     terminalReceived = true
     assistant.messageId = event.data.chat.messageId
@@ -233,6 +243,7 @@ function handleStreamEvent(event: AiStreamEvent, fallbackTitle: string) {
     assistant.errorMessage = event.data.message
     assistant.retryable = event.data.retryable
   }
+  void scrollMessagesToEnd()
 }
 
 function stopStream() {
@@ -250,6 +261,7 @@ function markActiveAssistantCancelled() {
     assistant.errorCode = 'CANCELLED'
     assistant.errorMessage = ''
     assistant.retryable = true
+    void scrollMessagesToEnd()
   }
   terminalReceived = true
 }
@@ -261,6 +273,7 @@ function markActiveAssistantFailed(code: string, message: string) {
     assistant.errorCode = code
     assistant.errorMessage = message
     assistant.retryable = true
+    void scrollMessagesToEnd()
   }
   terminalReceived = true
 }
@@ -369,13 +382,6 @@ function errorMessage(error: unknown, fallback: string) {
   return error instanceof ApiError ? error.message : fallback
 }
 
-async function scrollMessagesToEnd() {
-  await nextTick()
-  if (messagesContainer.value) {
-    messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight
-  }
-}
-
 onMounted(() => loadConversations(true))
 onBeforeUnmount(() => activeController?.abort())
 </script>
@@ -438,9 +444,10 @@ onBeforeUnmount(() => activeController?.abort())
       />
 
       <div
-        ref="messagesContainer"
+        :ref="setMessagesContainer"
         class="ai-chat__messages"
         aria-live="polite"
+        @scroll.passive="handleMessagesScroll"
       >
         <StatePanel
           v-if="detailLoading"

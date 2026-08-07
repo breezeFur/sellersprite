@@ -23,9 +23,11 @@
     "element-plus": "^2.14.3",
     "highlight.js": "^11.11.1",
     "marked": "^18.0.6",
+    "mermaid": "11.16.0",
     "pinia": "^3.0.4",
     "vue": "^3.5.39",
-    "vue-router": "^5.1.0"
+    "vue-router": "^5.1.0",
+    "write-excel-file": "^4.1.1"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

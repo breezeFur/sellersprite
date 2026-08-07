@@ -21,7 +21,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: process.env.SELLERSPRITE_API_TARGET ?? 'http://localhost:8090',
+        target: process.env.SELLERSPRITE_API_TARGET ?? 'http://localhost:8092',
         changeOrigin: true,
       },
     },

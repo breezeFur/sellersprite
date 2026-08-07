@@ -5,6 +5,7 @@ export const routeComponentWhitelist: RouteComponentWhitelist = {
   'ai/chat': () => import('@/features/ai/pages/AiChatPage.vue'),
   'sellersprite/workbench': () => import('@/features/sellersprite/pages/SellerSpriteWorkbenchPage.vue'),
   'research/market-report': () => import('@/features/research/pages/MarketResearchPage.vue'),
+  'research/report-history': () => import('@/features/research/pages/ResearchHistoryPage.vue'),
   'system/users': () => import('@/features/system/pages/UserManagementPage.vue'),
   'system/departments': () => import('@/features/system/pages/DepartmentManagementPage.vue'),
   'system/roles': () => import('@/features/system/pages/RoleManagementPage.vue'),

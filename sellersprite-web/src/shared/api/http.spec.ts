@@ -44,7 +44,7 @@ describe('createApiClient', () => {
     const client = createApiClient({ adapter })
 
     await expect(client.requestRaw<Blob>({
-      url: '/market-research/jobs/job-1/download',
+      url: '/market-research/jobs/job-1/artifacts/artifact-1/download',
       responseType: 'blob',
     })).resolves.toBe(workbook)
   })
@@ -68,7 +68,7 @@ describe('createApiClient', () => {
     const client = createApiClient({ adapter })
 
     await expect(client.requestRaw<Blob>({
-      url: '/market-research/jobs/job-1/download',
+      url: '/market-research/jobs/job-1/artifacts/artifact-1/download',
       responseType: 'blob',
     })).rejects.toMatchObject({
       code: 'R409',

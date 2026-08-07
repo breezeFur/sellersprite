@@ -1,12 +1,20 @@
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 
 export const useLayoutStore = defineStore('layout', () => {
   const sidebarCollapsed = ref(false)
   const mobileSidebarOpen = ref(false)
+  const navigationCollapsed = computed(() => (
+    sidebarCollapsed.value && !mobileSidebarOpen.value
+  ))
+
+  function setSidebarCollapsed(collapsed: boolean) {
+    sidebarCollapsed.value = collapsed
+    mobileSidebarOpen.value = false
+  }
 
   function toggleSidebar() {
-    sidebarCollapsed.value = !sidebarCollapsed.value
+    setSidebarCollapsed(!sidebarCollapsed.value)
   }
 
   function openMobileSidebar() {
@@ -20,6 +28,8 @@ export const useLayoutStore = defineStore('layout', () => {
   return {
     sidebarCollapsed,
     mobileSidebarOpen,
+    navigationCollapsed,
+    setSidebarCollapsed,
     toggleSidebar,
     openMobileSidebar,
     closeMobileSidebar,

@@ -18,7 +18,7 @@ describe('AppShell', () => {
       },
     })
 
-    expect(wrapper.text()).toContain('元宝猫管理台')
+    expect(wrapper.text()).toContain('opc管理台')
     expect(wrapper.text()).toContain('首页概览')
     expect(wrapper.text()).toContain('元宝管理员')
     expect(wrapper.text()).toContain('页面内容')
@@ -30,10 +30,35 @@ describe('AppShell', () => {
     await wrapper.get('[aria-label="收起导航"]').trigger('click')
     expect(wrapper.classes()).toContain('is-collapsed')
     expect(wrapper.find('[aria-label="展开导航"]').exists()).toBe(true)
+    expect(wrapper.get('[aria-label="展开导航"]').attributes('aria-expanded')).toBe('false')
 
     await wrapper.get('[aria-label="打开导航"]').trigger('click')
     expect(wrapper.classes()).toContain('is-mobile-open')
-    await wrapper.get('[aria-label="关闭导航"]').trigger('click')
+    expect(wrapper.get('[aria-label="打开导航"]').attributes('aria-expanded')).toBe('true')
+    await wrapper.get('.app-shell__mobile-close').trigger('click')
     expect(wrapper.classes()).not.toContain('is-mobile-open')
+  })
+
+  it('closes the mobile drawer when the viewport crosses into desktop width', async () => {
+    const originalInnerWidth = window.innerWidth
+    Object.defineProperty(window, 'innerWidth', { configurable: true, value: 640 })
+    const wrapper = mount(AppShell)
+
+    try {
+      await wrapper.get('[aria-label="打开导航"]').trigger('click')
+      expect(wrapper.classes()).toContain('is-mobile-open')
+
+      Object.defineProperty(window, 'innerWidth', { configurable: true, value: 1024 })
+      window.dispatchEvent(new Event('resize'))
+      await wrapper.vm.$nextTick()
+
+      expect(wrapper.classes()).not.toContain('is-mobile-open')
+    } finally {
+      wrapper.unmount()
+      Object.defineProperty(window, 'innerWidth', {
+        configurable: true,
+        value: originalInnerWidth,
+      })
+    }
   })
 })

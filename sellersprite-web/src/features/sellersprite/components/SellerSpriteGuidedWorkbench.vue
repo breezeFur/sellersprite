@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import {
   CopyDocument,
+  Download,
   Refresh,
   Search,
   UploadFilled,
@@ -31,6 +32,7 @@ import type {
   SellerSpriteOperation,
   SellerSpriteRequestPayload,
 } from '../model/sellersprite'
+import { exportSellerSpriteQueryResult } from '../utils/sellerSpriteExcelExport'
 
 interface GuidedQueryError {
   code: string
@@ -58,6 +60,7 @@ const formModel = ref<SellerSpriteRequestPayload>(createFormModel(firstConfig))
 const selectedFiles = ref<Record<string, File | undefined>>({})
 const validationErrors = ref<Record<string, string>>({})
 const submitting = ref(false)
+const exporting = ref(false)
 const executionResult = ref<SellerSpriteExecutionResult | null>(null)
 const pageResult = ref<PageResult<Record<string, unknown>> | null>(null)
 const pageMetadata = ref<Record<string, unknown>>({})
@@ -107,6 +110,8 @@ const displayRows = computed<DisplayRow[]>(() => (
     __rowKey: createRowKey(row, index),
   }))
 ))
+
+const canExportResult = computed(() => executionResult.value !== null && resultRows.value.length > 0)
 
 const tableColumns = computed(() => {
   const keys = new Set<string>()
@@ -359,6 +364,28 @@ async function copyRawResult() {
     ElMessage.success('原始响应已复制')
   } catch {
     ElMessage.error('复制失败，请手动选择响应内容')
+  }
+}
+
+async function exportCurrentResult() {
+  if (!canExportResult.value || exporting.value) return
+
+  const operation = selectedOperation.value
+  const rows = resultRows.value
+  const columns = tableColumns.value.map((key) => ({ key, label: columnLabel(key) }))
+  exporting.value = true
+  try {
+    const exported = await exportSellerSpriteQueryResult({
+      operationId: operation.id,
+      operationName: operation.name,
+      data: rows,
+      columns,
+    })
+    ElMessage.success(`已导出本次查询结果（${exported.rowCount} 条）`)
+  } catch (error) {
+    ElMessage.error(error instanceof Error ? error.message : '导出失败，请稍后重试')
+  } finally {
+    exporting.value = false
   }
 }
 
@@ -784,15 +811,27 @@ function columnLabel(key: string) {
             完整字段表格
           </p>
         </div>
-        <ElTooltip content="复制原始响应">
-          <ElButton
-            :icon="CopyDocument"
-            circle
-            :disabled="!rawResultSource"
-            aria-label="复制引导查询原始响应"
-            @click="copyRawResult"
-          />
-        </ElTooltip>
+        <div class="guided-result-actions">
+          <ElTooltip content="复制原始响应">
+            <ElButton
+              :icon="CopyDocument"
+              circle
+              :disabled="!rawResultSource"
+              aria-label="复制引导查询原始响应"
+              @click="copyRawResult"
+            />
+          </ElTooltip>
+          <ElTooltip :content="pageResult ? '导出本次查询结果（当前页）' : '导出本次查询结果'">
+            <ElButton
+              :icon="Download"
+              circle
+              :loading="exporting"
+              :disabled="!canExportResult || exporting"
+              aria-label="导出引导查询结果"
+              @click="exportCurrentResult"
+            />
+          </ElTooltip>
+        </div>
       </header>
 
       <StatePanel
@@ -897,5 +936,5 @@ function columnLabel(key: string) {
 
 <style scoped>
 .guided-workbench{display:grid;min-height:0;flex:1;grid-template-columns:220px 360px minmax(0,1fr);background:#fff}.guided-catalog,.guided-form-panel,.guided-results{min-width:0;min-height:0}.guided-catalog{display:flex;flex-direction:column;background:#f8fafc;border-right:1px solid var(--color-border)}.guided-groups{display:grid;gap:4px;padding:12px}.guided-groups button{display:flex;min-height:34px;align-items:center;justify-content:space-between;padding:0 10px;color:var(--color-text-secondary);background:transparent;border:1px solid transparent;border-radius:5px;cursor:pointer;font-size:12px;text-align:left}.guided-groups button:hover{background:#fff;border-color:var(--color-border)}.guided-groups button.active{color:var(--color-brand-700);background:#fff;border-color:var(--color-brand-200);font-weight:600}.guided-groups small{color:var(--color-text-muted);font-size:10px}.guided-operations{min-height:0;padding:8px;overflow:auto;border-top:1px solid var(--color-border)}.guided-operations>button{display:grid;width:100%;min-height:56px;align-items:start;grid-template-columns:18px minmax(0,1fr);gap:8px;margin-bottom:4px;padding:9px;color:var(--color-text);background:transparent;border:0;border-radius:5px;cursor:pointer;text-align:left}.guided-operations>button:hover{background:#eef2f7}.guided-operations>button.active{background:#e8f0fc;box-shadow:inset 3px 0 var(--color-brand-600)}.guided-operations .el-icon{margin-top:2px;color:var(--color-text-muted)}.guided-operations span{display:flex;min-width:0;flex-direction:column}.guided-operations strong{font-size:12px;line-height:1.35}.guided-operations small{display:-webkit-box;margin-top:4px;overflow:hidden;color:var(--color-text-muted);font-size:10px;line-height:1.4;-webkit-box-orient:vertical;-webkit-line-clamp:2}.guided-form-panel{display:flex;flex-direction:column;border-right:1px solid var(--color-border)}.guided-panel-heading,.guided-result-heading{display:flex;min-height:88px;align-items:flex-start;justify-content:space-between;gap:12px;padding:16px 18px;border-bottom:1px solid var(--color-border)}.guided-panel-heading span{display:block;overflow:hidden;color:var(--color-text-muted);font:10px/1.4 var(--font-mono);text-overflow:ellipsis;white-space:nowrap}.guided-panel-heading h2,.guided-result-heading h2{margin:4px 0 0;font-size:16px}.guided-panel-heading p,.guided-result-heading p{margin:4px 0 0;color:var(--color-text-secondary);font-size:11px;line-height:1.45}.guided-form{min-height:0;flex:1;padding:16px 18px;overflow:auto}.guided-form :deep(.el-form-item){margin-bottom:16px}.guided-form :deep(.el-form-item__label){padding-bottom:6px;color:var(--color-text-secondary);font-size:12px;font-weight:600;line-height:1.4}.guided-form :deep(.el-select),.guided-form :deep(.el-date-editor),.guided-form :deep(.el-input-number){width:100%}.guided-files{display:grid;gap:8px;margin-top:4px}.guided-files label{display:flex;min-height:54px;align-items:center;gap:10px;padding:9px 12px;background:#f8fafc;border:1px dashed #aab8cb;border-radius:6px;cursor:pointer}.guided-files input{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}.guided-files .el-icon{width:20px;height:20px;flex:0 0 auto;color:var(--color-brand-600)}.guided-files span{display:flex;min-width:0;flex-direction:column}.guided-files strong{font-size:12px}.guided-files small{margin-top:3px;overflow:hidden;color:var(--color-text-muted);font-size:11px;text-overflow:ellipsis;white-space:nowrap}.guided-form-actions{display:flex;min-height:62px;align-items:center;justify-content:space-between;gap:12px;padding:12px 18px;border-top:1px solid var(--color-border)}.guided-form-actions span{min-width:0;overflow:hidden;color:var(--color-text-muted);font-size:10px;text-overflow:ellipsis;white-space:nowrap}.guided-form-actions code{font-family:var(--font-mono)}.guided-results{display:flex;min-height:0;flex-direction:column;background:#fbfcfe}.guided-result-heading{min-height:88px}.guided-result-heading h2{margin-top:0}.guided-state{min-height:0;flex:1}.guided-error{display:flex;max-width:560px;align-items:flex-start;gap:12px;margin:32px 20px;padding:16px;color:#8a2c2c;background:#fff6f5;border:1px solid #efc5c1;border-radius:7px}.guided-error>.el-icon{width:24px;height:24px;flex:0 0 auto}.guided-error span{font:600 11px/1.4 var(--font-mono)}.guided-error h3{margin:5px 0 0;font-size:14px;line-height:1.5}.guided-error p{margin:8px 0 0;color:#a14b43;font-size:11px}.guided-table-wrap{min-height:280px;flex:1;padding:12px 12px 0}.guided-pagination{display:flex;min-height:62px;align-items:center;justify-content:space-between;gap:16px;padding:10px 16px;background:#fff;border-top:1px solid var(--color-border)}.guided-pagination>span{color:var(--color-text-muted);font-size:11px;white-space:nowrap}.guided-raw{max-height:220px;background:#111827;border-top:1px solid #26334a;color:#dbeafe}.guided-raw summary{padding:10px 16px;cursor:pointer;font-size:11px}.guided-raw pre{max-height:170px;margin:0;padding:0 16px 14px;overflow:auto;font:11px/1.55 var(--font-mono);white-space:pre-wrap;overflow-wrap:anywhere}.guided-idle,.guided-unpaged{display:flex;min-height:320px;flex:1;align-items:center;justify-content:center;flex-direction:column;color:var(--color-text-muted);text-align:center}.guided-idle>.el-icon,.guided-unpaged>.el-icon{width:34px;height:34px}.guided-idle h3,.guided-unpaged h3{margin:12px 0 0;color:var(--color-text-secondary);font-size:14px}.guided-idle p,.guided-unpaged p{margin:5px 0 0;font-size:11px}@media(max-width:1280px){.guided-workbench{grid-template-columns:200px 340px minmax(0,1fr)}}@media(max-width:1080px){.guided-workbench{grid-template-columns:210px minmax(360px,1fr)}.guided-results{min-height:560px;grid-column:1/-1;border-top:1px solid var(--color-border)}.guided-form-panel{border-right:0}}@media(max-width:760px){.guided-workbench{display:flex;flex-direction:column}.guided-catalog{max-height:360px;border-right:0;border-bottom:1px solid var(--color-border)}.guided-groups{grid-template-columns:repeat(2,minmax(0,1fr))}.guided-form-panel{min-height:620px}.guided-results{min-height:560px}.guided-pagination{align-items:flex-start;flex-direction:column}.guided-pagination :deep(.el-pagination){max-width:100%;justify-content:flex-start;overflow-x:auto}.guided-table-wrap{min-height:360px}}
-.guided-sort-control{display:grid;width:100%;grid-template-columns:minmax(0,1fr) auto;gap:12px}.guided-sort-control>label{display:flex;min-width:72px;align-items:center;justify-content:flex-end;gap:8px;color:var(--color-text-secondary);font-size:12px;white-space:nowrap}.guided-field-error{width:100%;margin:5px 0 0;color:var(--color-danger);font-size:11px;line-height:1.4}
+.guided-result-actions{display:flex;align-items:center;gap:8px}.guided-sort-control{display:grid;width:100%;grid-template-columns:minmax(0,1fr) auto;gap:12px}.guided-sort-control>label{display:flex;min-width:72px;align-items:center;justify-content:flex-end;gap:8px;color:var(--color-text-secondary);font-size:12px;white-space:nowrap}.guided-field-error{width:100%;margin:5px 0 0;color:var(--color-danger);font-size:11px;line-height:1.4}
 </style>

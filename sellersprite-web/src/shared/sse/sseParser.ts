@@ -1,4 +1,5 @@
 export interface SseMessage {
+  id?: string
   event: string
   data: string
 }
@@ -13,6 +14,7 @@ export function createSseParser(onEvent: (message: SseMessage) => void): SsePars
 
   function dispatch(block: string) {
     const data: string[] = []
+    let id: string | undefined
     let event = 'message'
 
     for (const line of block.split(/\r?\n/)) {
@@ -27,13 +29,17 @@ export function createSseParser(onEvent: (message: SseMessage) => void): SsePars
       }
       if (field === 'event') {
         event = value || 'message'
+      } else if (field === 'id') {
+        id = value
       } else if (field === 'data') {
         data.push(value)
       }
     }
 
     if (data.length > 0) {
-      onEvent({ event, data: data.join('\n') })
+      const message: SseMessage = { event, data: data.join('\n') }
+      if (id !== undefined) message.id = id
+      onEvent(message)
     }
   }
 

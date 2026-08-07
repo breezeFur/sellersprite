@@ -5,12 +5,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>com.yuanbaomao</groupId>
+        <groupId>cyou.yuanbaomao</groupId>
         <artifactId>yuanbaomao-scaffold-parent</artifactId>
-        <version>0.1.0-SNAPSHOT</version>
+        <version>0.1.2-SNAPSHOT</version>
     </parent>
 
-    <groupId>com.yuanbaomao</groupId>
+    <groupId>cyou.yuanbaomao</groupId>
     <artifactId>sellersprite-service</artifactId>
     <version>0.1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
@@ -23,6 +23,8 @@
         <module>sellersprite-system</module>
         <module>sellersprite-api</module>
         <module>sellersprite-research</module>
+        <module>sellersprite-research-graph</module>
+        <module>sellersprite-graph-learning</module>
         <module>sellersprite-server</module>
     </modules>
 

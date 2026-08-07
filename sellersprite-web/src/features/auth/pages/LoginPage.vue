@@ -66,7 +66,7 @@ async function submit() {
   <main class="login-page">
     <section
       class="login-page__brand"
-      aria-label="元宝猫管理台"
+      aria-label="opc管理台"
     >
       <div class="login-page__brand-lockup">
         <span
@@ -74,7 +74,7 @@ async function submit() {
           aria-hidden="true"
         >元</span>
         <div>
-          <h1>元宝猫</h1>
+          <h1>opc</h1>
           <p>管理控制台</p>
         </div>
       </div>

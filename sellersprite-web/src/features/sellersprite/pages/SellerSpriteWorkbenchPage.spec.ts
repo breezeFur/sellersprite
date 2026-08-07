@@ -5,6 +5,7 @@ import { ApiError } from '@/shared/api/ApiError'
 
 import * as sellerSpriteApi from '../api/sellerspriteApi'
 import type { SellerSpriteExecutionResult } from '../model/sellersprite'
+import * as excelExport from '../utils/sellerSpriteExcelExport'
 import SellerSpriteWorkbenchPage from './SellerSpriteWorkbenchPage.vue'
 
 const { routeState } = vi.hoisted(() => ({
@@ -23,10 +24,22 @@ vi.mock('../api/sellerspriteApi', async (importOriginal) => {
   }
 })
 
+vi.mock('../utils/sellerSpriteExcelExport', async (importOriginal) => {
+  const original = await importOriginal<typeof import('../utils/sellerSpriteExcelExport')>()
+  return {
+    ...original,
+    exportSellerSpriteQueryResult: vi.fn(),
+  }
+})
+
 describe('SellerSpriteWorkbenchPage', () => {
   beforeEach(() => {
     routeState.path = '/sellersprite/workbench'
     vi.mocked(sellerSpriteApi.executeSellerSpriteOperation).mockReset()
+    vi.mocked(excelExport.exportSellerSpriteQueryResult).mockReset().mockResolvedValue({
+      fileName: 'sellersprite-result.xlsx',
+      rowCount: 1,
+    })
   })
 
   it('opens the guided query mode by default and keeps the API debugger available', async () => {
@@ -104,6 +117,28 @@ describe('SellerSpriteWorkbenchPage', () => {
     expect(wrapper.text()).toContain('S429')
     expect(wrapper.text()).toContain('SellerSprite 接口可用次数已耗尽')
     expect(wrapper.text()).toContain('track-seller-1')
+  })
+
+  it('exports the latest successful API debugger response', async () => {
+    const response = { remaining: 100, resetAt: 1784000000000 }
+    vi.mocked(sellerSpriteApi.executeSellerSpriteOperation).mockResolvedValue({
+      data: response,
+      durationMs: 7,
+      completedAt: Date.now(),
+    })
+    const wrapper = await mountDebugWorkbench()
+    expect(wrapper.get('[aria-label="导出 API 调试结果"]').attributes('disabled')).toBeDefined()
+
+    await wrapper.get('[aria-label="发送 SellerSprite 请求"]').trigger('click')
+    await flushPromises()
+    await wrapper.get('[aria-label="导出 API 调试结果"]').trigger('click')
+    await flushPromises()
+
+    expect(excelExport.exportSellerSpriteQueryResult).toHaveBeenCalledWith({
+      operationId: 'PRODUCT_COMPETITOR_LOOKUP',
+      operationName: '查竞品',
+      data: response,
+    })
   })
 
   it('shows an explicit file selector for multipart operations', async () => {

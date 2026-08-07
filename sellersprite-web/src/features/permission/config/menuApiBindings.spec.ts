@@ -11,6 +11,7 @@ describe('menuApiBindings', () => {
       'ai.chat',
       'sellersprite.workbench',
       'research.market-report',
+      'research.report-history',
       'system.user',
       'system.dept',
       'system.role',
@@ -42,16 +43,33 @@ describe('menuApiBindings', () => {
     expect(workbench?.apis[0]).toEqual({ httpMethod: 'GET', pathPattern: '/api/auth/session' })
   })
 
-  it('binds the market research page to its complete three-endpoint workflow', () => {
+  it('binds the market research page to its complete runtime workflow', () => {
     const research = menuApiBindings.find(
       (binding) => binding.functionCode === 'research.market-report',
     )
 
     expect(research?.apis).toEqual([
       { httpMethod: 'GET', pathPattern: '/api/auth/session' },
+      { httpMethod: 'GET', pathPattern: '/api/market-research/categories' },
       { httpMethod: 'POST', pathPattern: '/api/market-research/jobs' },
       { httpMethod: 'GET', pathPattern: '/api/market-research/jobs/{jobId}' },
-      { httpMethod: 'GET', pathPattern: '/api/market-research/jobs/{jobId}/download' },
+      { httpMethod: 'GET', pathPattern: '/api/market-research/jobs/{jobId}/nodes' },
+      { httpMethod: 'POST', pathPattern: '/api/market-research/jobs/{jobId}/cancel' },
+      { httpMethod: 'POST', pathPattern: '/api/market-research/jobs/{jobId}/retry' },
+      { httpMethod: 'GET', pathPattern: '/api/market-research/jobs/{jobId}/artifacts/{artifactId}/download' },
+      { httpMethod: 'GET', pathPattern: '/api/market-research/workflow' },
+    ])
+  })
+
+  it('binds report history to list and published file downloads', () => {
+    const history = menuApiBindings.find(
+      (binding) => binding.functionCode === 'research.report-history',
+    )
+
+    expect(history?.apis).toEqual([
+      { httpMethod: 'GET', pathPattern: '/api/auth/session' },
+      { httpMethod: 'GET', pathPattern: '/api/market-research/jobs' },
+      { httpMethod: 'GET', pathPattern: '/api/market-research/jobs/{jobId}/artifacts/{artifactId}/download' },
     ])
   })
 

@@ -20,9 +20,10 @@ const visibleItems = computed(() => props.items.filter((item) => item.type !== '
   <ElMenu
     class="sidebar-navigation"
     :default-active="route.path"
-    :collapse="layoutStore.sidebarCollapsed"
+    :collapse="layoutStore.navigationCollapsed"
     :collapse-transition="false"
     router
+    @select="layoutStore.closeMobileSidebar"
   >
     <SidebarMenuItem
       v-for="item in visibleItems"

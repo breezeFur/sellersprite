@@ -6,6 +6,7 @@ describe('routeComponentWhitelist', () => {
   it('registers fixed business component paths only', () => {
     expect(routeComponentWhitelist['sellersprite/workbench']).toBeTypeOf('function')
     expect(routeComponentWhitelist['research/market-report']).toBeTypeOf('function')
+    expect(routeComponentWhitelist['research/report-history']).toBeTypeOf('function')
     expect(routeComponentWhitelist['sellersprite/api']).toBeUndefined()
     expect(routeComponentWhitelist['research/jobs']).toBeUndefined()
   })

@@ -32,4 +32,18 @@ describe('createSseParser', () => {
 
     expect(onEvent).toHaveBeenCalledWith({ event: 'error', data: 'first\nsecond' })
   })
+
+  it('keeps the persisted SSE id for cursor based resume', () => {
+    const onEvent = vi.fn()
+    const parser = createSseParser(onEvent)
+
+    parser.push('id: 42\nevent: summary_delta\ndata: {"sequenceNo":42}\n\n')
+    parser.finish()
+
+    expect(onEvent).toHaveBeenCalledWith({
+      id: '42',
+      event: 'summary_delta',
+      data: '{"sequenceNo":42}',
+    })
+  })
 })

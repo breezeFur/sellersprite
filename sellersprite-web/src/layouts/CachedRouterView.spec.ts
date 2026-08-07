@@ -59,6 +59,13 @@ describe('CachedRouterView', () => {
     const wrapper = mount(CachedRouterView, { global: { plugins: [router] } })
 
     await wrapper.get('[aria-label="非缓存页面输入框"]').setValue('temporary-value')
+    await router.replace('/uncached?section=process')
+    await flushPromises()
+
+    expect(uncachedPageMounts).toBe(1)
+    expect(wrapper.get<HTMLInputElement>('[aria-label="非缓存页面输入框"]').element.value)
+      .toBe('temporary-value')
+
     await router.push('/other')
     await flushPromises()
     await router.push('/uncached')

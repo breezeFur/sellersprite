@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { Expand, Fold, Menu, UserFilled } from '@element-plus/icons-vue'
+import { Close, Expand, Fold, Menu, UserFilled } from '@element-plus/icons-vue'
 import { storeToRefs } from 'pinia'
+import { onBeforeUnmount, onMounted } from 'vue'
 
 import { useLayoutStore } from './useLayoutStore'
 
@@ -17,6 +18,22 @@ withDefaults(
 
 const layoutStore = useLayoutStore()
 const { mobileSidebarOpen, sidebarCollapsed } = storeToRefs(layoutStore)
+
+const DESKTOP_MIN_WIDTH_PX = 769
+
+function closeMobileSidebarAtDesktopWidth() {
+  if (window.innerWidth >= DESKTOP_MIN_WIDTH_PX) {
+    layoutStore.closeMobileSidebar()
+  }
+}
+
+onMounted(() => {
+  window.addEventListener('resize', closeMobileSidebarAtDesktopWidth)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', closeMobileSidebarAtDesktopWidth)
+})
 </script>
 
 <template>
@@ -33,6 +50,7 @@ const { mobileSidebarOpen, sidebarCollapsed } = storeToRefs(layoutStore)
     />
 
     <aside
+      id="app-sidebar-navigation"
       class="app-shell__sidebar"
       aria-label="主导航"
     >
@@ -41,7 +59,16 @@ const { mobileSidebarOpen, sidebarCollapsed } = storeToRefs(layoutStore)
           class="app-shell__brand-mark"
           aria-hidden="true"
         >元</span>
-        <span class="app-shell__brand-name">元宝猫管理台</span>
+        <span class="app-shell__brand-name">opc管理台</span>
+        <button
+          class="app-shell__icon-button app-shell__mobile-close"
+          type="button"
+          title="关闭导航"
+          aria-label="关闭导航"
+          @click="layoutStore.closeMobileSidebar"
+        >
+          <Close aria-hidden="true" />
+        </button>
       </div>
       <nav
         class="app-shell__navigation"
@@ -61,6 +88,8 @@ const { mobileSidebarOpen, sidebarCollapsed } = storeToRefs(layoutStore)
           type="button"
           title="打开导航"
           aria-label="打开导航"
+          aria-controls="app-sidebar-navigation"
+          :aria-expanded="mobileSidebarOpen"
           @click="layoutStore.openMobileSidebar"
         >
           <Menu aria-hidden="true" />
@@ -70,6 +99,8 @@ const { mobileSidebarOpen, sidebarCollapsed } = storeToRefs(layoutStore)
           type="button"
           :title="sidebarCollapsed ? '展开导航' : '收起导航'"
           :aria-label="sidebarCollapsed ? '展开导航' : '收起导航'"
+          aria-controls="app-sidebar-navigation"
+          :aria-expanded="!sidebarCollapsed"
           @click="layoutStore.toggleSidebar"
         >
           <Expand
@@ -236,6 +267,17 @@ const { mobileSidebarOpen, sidebarCollapsed } = storeToRefs(layoutStore)
   display: none;
 }
 
+.app-shell__mobile-close {
+  display: none;
+  margin-left: auto;
+  color: var(--color-sidebar-text);
+}
+
+.app-shell__mobile-close:hover {
+  color: #ffffff;
+  background: rgb(255 255 255 / 10%);
+}
+
 .app-shell__heading {
   min-width: 0;
 }
@@ -357,6 +399,10 @@ const { mobileSidebarOpen, sidebarCollapsed } = storeToRefs(layoutStore)
   }
 
   .app-shell__mobile-trigger {
+    display: grid;
+  }
+
+  .app-shell__mobile-close {
     display: grid;
   }
 

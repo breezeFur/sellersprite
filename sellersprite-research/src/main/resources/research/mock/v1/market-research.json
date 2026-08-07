@@ -11,6 +11,9 @@
           "modules": {
             "productResearch": {"remaining": 9999, "unit": "request"},
             "keywordResearch": {"remaining": 9999, "unit": "request"},
+            "marketResearch": {"remaining": 9999, "unit": "request"},
+            "asinDetail": {"remaining": 9999, "unit": "request"},
+            "trafficKeyword": {"remaining": 9999, "unit": "request"},
             "reviewList": {"remaining": 9999, "unit": "request"}
           }
         }
@@ -19,19 +22,23 @@
   ],
   "marketAndProducts": [
     {
-      "datasetCode": "market.overview",
+      "datasetCode": "market.research",
       "operation": "MARKET_RESEARCH",
       "recordCount": 1,
       "payload": {
-        "marketplace": "US",
-        "keyword": "facial cleansing device",
-        "currency": "USD",
-        "metrics": {
-          "productCount": 128,
-          "averagePrice": 49.9,
-          "monthlyUnits": 18420,
-          "monthlyRevenue": 918558
-        }
+        "page": 1,
+        "size": 50,
+        "total": 1,
+        "items": [
+          {
+            "nodeIdPath": "1055398:1063236:1063242",
+            "nodeLabelPath": "Home & Kitchen:Bath:Bath Rugs",
+            "productCount": 128,
+            "averagePrice": 49.9,
+            "monthlyUnits": 18420,
+            "monthlyRevenue": 918558
+          }
+        ]
       }
     },
     {
@@ -117,6 +124,119 @@
         "hasNextPage": null,
         "guestVisited": false
       }
+    },
+    {
+      "datasetCode": "market.sales-trend",
+      "operation": "PRODUCT_RESEARCH",
+      "recordCount": 5,
+      "payload": [
+        {"month": "2026-02", "products": 100, "units": 131200, "revenue": 12982000, "averageBsr": 17240},
+        {"month": "2026-03", "products": 100, "units": 136800, "revenue": 13496000, "averageBsr": 16810},
+        {"month": "2026-04", "products": 100, "units": 142300, "revenue": 14078000, "averageBsr": 16190},
+        {"month": "2026-05", "products": 100, "units": 149600, "revenue": 14933000, "averageBsr": 15480},
+        {"month": "2026-06", "products": 100, "units": 153900, "revenue": 15521000, "averageBsr": 14820}
+      ]
+    },
+    {
+      "datasetCode": "market.statistics",
+      "operation": "MARKET_STATISTICS",
+      "recordCount": 1,
+      "payload": {
+        "nodeIdPath": "1055398:1063236:1063242",
+        "productCount": 128,
+        "averagePrice": 49.9,
+        "monthlyUnits": 18420,
+        "monthlyRevenue": 918558
+      }
+    },
+    {
+      "datasetCode": "market.demand-trend",
+      "operation": "MARKET_PERFORMANCE",
+      "recordCount": 1,
+      "payload": {
+        "items": [
+          {"month": "2024-05", "searches": 17100, "units": 16200},
+          {"month": "2024-06", "searches": 18500, "units": 18420}
+        ]
+      }
+    },
+    {
+      "datasetCode": "market.shelf-time",
+      "operation": "MARKET_SHELF_TIME",
+      "recordCount": 2,
+      "payload": [
+        {"label": "0-6 months", "productCount": 23, "proportion": 17.97},
+        {"label": "over 6 months", "productCount": 105, "proportion": 82.03}
+      ]
+    },
+    {
+      "datasetCode": "market.shelf-trend",
+      "operation": "MARKET_SHELF_TREND",
+      "recordCount": 2,
+      "payload": [
+        {"month": "2024-05", "newProductCount": 8},
+        {"month": "2024-06", "newProductCount": 11}
+      ]
+    },
+    {
+      "datasetCode": "market.price",
+      "operation": "MARKET_PRICE",
+      "recordCount": 2,
+      "payload": [
+        {"range": "$0-$30", "productCount": 45, "proportion": 35.16},
+        {"range": "$30+", "productCount": 83, "proportion": 64.84}
+      ]
+    },
+    {
+      "datasetCode": "market.goods-concentration",
+      "operation": "MARKET_GOODS",
+      "recordCount": 2,
+      "payload": [
+        {"asin": "B0DB5VT4QJ", "brand": "OLANLY", "units": 158113},
+        {"asin": "B0MOCK0002", "brand": "FOREO", "units": 9720}
+      ]
+    },
+    {
+      "datasetCode": "market.brand-concentration",
+      "operation": "MARKET_BRAND",
+      "recordCount": 2,
+      "payload": [
+        {"brand": "OLANLY", "units": 158113, "proportion": 36.2},
+        {"brand": "FOREO", "units": 9720, "proportion": 12.4}
+      ]
+    },
+    {
+      "datasetCode": "market.seller-concentration",
+      "operation": "MARKET_SELLER",
+      "recordCount": 2,
+      "payload": [
+        {"sellerName": "OLANLY", "units": 158113, "proportion": 36.2},
+        {"sellerName": "FOREO", "units": 9720, "proportion": 12.4}
+      ]
+    },
+    {
+      "datasetCode": "asins.B0DB5VT4QJ.detail",
+      "operation": "ASIN_DETAIL",
+      "recordCount": 1,
+      "payload": {
+        "asin": "B0DB5VT4QJ",
+        "brand": "MOCK BRAND",
+        "title": "Mock facial cleansing device",
+        "price": 49.9,
+        "rating": 4.5
+      }
+    },
+    {
+      "datasetCode": "asins.B0DB5VT4QJ.sales-trend",
+      "operation": "ASIN_SALES_TREND",
+      "recordCount": 1,
+      "payload": {
+        "asin": "B0DB5VT4QJ",
+        "items": [
+          {"month": "2024-05", "units": 920},
+          {"month": "2024-06", "units": 1040}
+        ]
+      }
     }
   ],
   "keywords": [
@@ -135,6 +255,43 @@
           {"keyword": "facial massager", "monthlySearches": 7700, "products": 173}
         ]
       }
+    },
+    {
+      "datasetCode": "keywords.trend",
+      "operation": "KEYWORD_RESEARCH_TRENDS",
+      "recordCount": 2,
+      "payload": [
+        {"month": "2024-05", "searches": 17100},
+        {"month": "2024-06", "searches": 18500}
+      ]
+    },
+    {
+      "datasetCode": "keywords.miner",
+      "operation": "KEYWORD_MINER",
+      "recordCount": 2,
+      "payload": {
+        "page": 1,
+        "size": 50,
+        "total": 2,
+        "items": [
+          {"keyword": "facial cleansing brush", "monthlySearches": 12100},
+          {"keyword": "electric face scrubber", "monthlySearches": 6800}
+        ]
+      }
+    },
+    {
+      "datasetCode": "traffic-keywords.B0DB5VT4QJ",
+      "operation": "TRAFFIC_KEYWORD",
+      "recordCount": 2,
+      "payload": {
+        "page": 1,
+        "size": 50,
+        "total": 2,
+        "items": [
+          {"asin": "B0DB5VT4QJ", "keyword": "face cleansing brush", "organicRank": 12},
+          {"asin": "B0DB5VT4QJ", "keyword": "facial massager", "organicRank": 27}
+        ]
+      }
     }
   ],
   "reviews": [
@@ -147,8 +304,8 @@
         "size": 10,
         "total": 4,
         "items": [
-          {"asin": "B0MOCK0001", "rating": 5, "verified": true, "title": "Easy to use", "content": "Simple controls and gentle cleaning."},
-          {"asin": "B0MOCK0001", "rating": 3, "verified": true, "title": "Battery could improve", "content": "Useful device but charging takes time."},
+          {"asin": "B0DB5VT4QJ", "rating": 5, "verified": true, "title": "Easy to use", "content": "Simple controls and gentle cleaning."},
+          {"asin": "B0DB5VT4QJ", "rating": 3, "verified": true, "title": "Battery could improve", "content": "Useful device but charging takes time."},
           {"asin": "B0MOCK0002", "rating": 4, "verified": false, "title": "Good routine addition", "content": "Fits into a daily skin care routine."},
           {"asin": "B0MOCK0003", "rating": 2, "verified": false, "title": "Too much vibration", "content": "The strongest setting is uncomfortable."}
         ]

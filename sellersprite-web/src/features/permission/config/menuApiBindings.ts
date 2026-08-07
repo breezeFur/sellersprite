@@ -87,9 +87,22 @@ export const menuApiBindings = [
     functionCode: 'research.market-report',
     apis: [
       sessionApi,
+      { httpMethod: 'GET', pathPattern: '/api/market-research/categories' },
       { httpMethod: 'POST', pathPattern: '/api/market-research/jobs' },
       { httpMethod: 'GET', pathPattern: '/api/market-research/jobs/{jobId}' },
-      { httpMethod: 'GET', pathPattern: '/api/market-research/jobs/{jobId}/download' },
+      { httpMethod: 'GET', pathPattern: '/api/market-research/jobs/{jobId}/nodes' },
+      { httpMethod: 'POST', pathPattern: '/api/market-research/jobs/{jobId}/cancel' },
+      { httpMethod: 'POST', pathPattern: '/api/market-research/jobs/{jobId}/retry' },
+      { httpMethod: 'GET', pathPattern: '/api/market-research/jobs/{jobId}/artifacts/{artifactId}/download' },
+      { httpMethod: 'GET', pathPattern: '/api/market-research/workflow' },
+    ],
+  },
+  {
+    functionCode: 'research.report-history',
+    apis: [
+      sessionApi,
+      { httpMethod: 'GET', pathPattern: '/api/market-research/jobs' },
+      { httpMethod: 'GET', pathPattern: '/api/market-research/jobs/{jobId}/artifacts/{artifactId}/download' },
     ],
   },
   {
