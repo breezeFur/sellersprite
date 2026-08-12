@@ -9,21 +9,36 @@ spring:
   profiles:
     # 默认加载本机开发配置；部署环境应显式指定对应 Profile。
     active: ${SPRING_PROFILES_ACTIVE:local}
-  ai:
-    openai:
-      # 单次模型请求超时；长报告分析允许最多等待 300 秒。
-      timeout: ${SPRING_AI_OPENAI_TIMEOUT:300s}
-      # 模型请求发生可重试错误时的最大重试次数。
-      max-retries: ${SPRING_AI_OPENAI_MAX_RETRIES:3}
-    tools:
-      # 工具调用失败时抛出异常，避免模型把失败结果当作成功数据继续分析。
-      throw-exception-on-error: true
   jackson:
     # JSON 日期时间统一按上海时区序列化和反序列化。
     time-zone: Asia/Shanghai
     # JSON 不输出 null 字段，减少接口与事件载荷体积。
     default-property-inclusion: non_null
-
+  data:
+    redis:
+      host: ${SPRING_DATA_REDIS_HOST}
+      port: ${SPRING_DATA_REDIS_PORT}
+      database: 0
+  ai:
+    model:
+      chat: openai
+    openai:
+      # 单次模型请求超时；长报告分析允许最多等待 300 秒。
+      timeout: ${SPRING_AI_OPENAI_TIMEOUT:300s}
+      # 模型请求发生可重试错误时的最大重试次数。
+      max-retries: ${SPRING_AI_OPENAI_MAX_RETRIES:3}
+      tools:
+        # 工具调用失败时抛出异常，避免模型把失败结果当作成功数据继续分析。
+        throw-exception-on-error: true
+      api-key: ${SPRING_AI_OPENAI_API_KEY:}
+      base-url: ${SPRING_AI_OPENAI_BASE_URL:}
+      chat:
+        completions-path: /chat/completions
+        model: ${SPRING_AI_OPENAI_CHAT_MODEL:}
+  datasource:
+    url: ${SPRING_AI_DATASOURCE_URL:}
+    username: ${SPRING_AI_DATASOURCE_USERNAME:}
+    password: ${SPRING_AI_DATASOURCE_PASSWORD:}
 mybatis-plus:
   # MyBatis XML Mapper 的统一扫描路径。
   mapper-locations: classpath*:/mapper/**/*.xml
@@ -53,7 +68,7 @@ ybm:
         - cyou.yuanbaomao.sellersprite.db.mapper
   cache:
     # 框架通用缓存默认使用进程内实现；local Profile 可按环境覆盖为 Redis。
-    type: local
+    type: redis
     # 框架通用缓存键前缀；与 SellerSprite 外部响应缓存不是同一套键。
     key-prefix: sellersprite
   log:
