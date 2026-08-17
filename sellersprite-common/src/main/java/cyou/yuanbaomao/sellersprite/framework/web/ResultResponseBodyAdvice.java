@@ -22,8 +22,8 @@ public class ResultResponseBodyAdvice implements ResponseBodyAdvice<Result<?>> {
     public Result<?> beforeBodyWrite(Result<?> body, MethodParameter returnType, MediaType selectedContentType,
             Class<? extends HttpMessageConverter<?>> selectedConverterType, ServerHttpRequest request,
             ServerHttpResponse response) {
-        if (body != null && (body.getTrackId() == null || body.getTrackId().isBlank())) {
-            body.withTrackId(RequestContextHolder.currentTrackId());
+        if (body != null && (body.getTraceId() == null || body.getTraceId().isBlank())) {
+            body.withTraceId(RequestContextHolder.currentTraceId());
         }
         return body;
     }

@@ -11,6 +11,8 @@ import org.springframework.web.client.RestClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import cyou.yuanbaomao.base.result.Result;
@@ -60,7 +62,11 @@ class SellerSpriteDomainArchitectureTest {
                 for (Parameter parameter : method.getParameters()) {
                     assertThat(parameter.getType()).isNotEqualTo(SellerSpriteProperties.class);
                     assertThat(parameter.isAnnotationPresent(RequestHeader.class)).isFalse();
-                    assertThat(parameter.isAnnotationPresent(Valid.class)).isTrue();
+                    assertThat(parameter.isAnnotationPresent(Valid.class)
+                            || parameter.isAnnotationPresent(RequestParam.class)
+                            || parameter.isAnnotationPresent(PathVariable.class))
+                            .as("Controller 参数 %s#%s 未声明校验或直接查询绑定", controllerType.getName(), method.getName())
+                            .isTrue();
                 }
             }
         }

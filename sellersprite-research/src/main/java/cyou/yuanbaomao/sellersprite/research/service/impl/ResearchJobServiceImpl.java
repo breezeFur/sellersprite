@@ -4,7 +4,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import cyou.yuanbaomao.base.context.RequestContextHolder;
 import cyou.yuanbaomao.base.exception.BizException;
 import cyou.yuanbaomao.base.id.IdGenerator;
-import cyou.yuanbaomao.base.result.PageResult;
+import cyou.yuanbaomao.mybatis.result.YPage;
+import cyou.yuanbaomao.sellersprite.api.common.enums.SellerSpriteMarketplace;
 import cyou.yuanbaomao.sellersprite.common.result.ResultCode;
 import cyou.yuanbaomao.sellersprite.db.dao.MarketResearchAnalysisRunDao;
 import cyou.yuanbaomao.sellersprite.db.dao.MarketResearchArtifactDao;
@@ -26,7 +27,6 @@ import cyou.yuanbaomao.sellersprite.research.model.CollectionGraphConfig;
 import cyou.yuanbaomao.sellersprite.research.model.ResearchDownload;
 import cyou.yuanbaomao.sellersprite.research.model.ResearchInput;
 import cyou.yuanbaomao.sellersprite.research.model.dto.ResearchJobCreateRequest;
-import cyou.yuanbaomao.sellersprite.research.model.dto.ResearchJobPageRequest;
 import cyou.yuanbaomao.sellersprite.research.model.vo.ResearchAnalysisRunVo;
 import cyou.yuanbaomao.sellersprite.research.model.vo.ResearchArtifactVo;
 import cyou.yuanbaomao.sellersprite.research.model.vo.ResearchJobCreatedVo;
@@ -145,34 +145,38 @@ public class ResearchJobServiceImpl implements ResearchJobService {
 
     @Override
     @Transactional(readOnly = true)
-    public PageResult<ResearchJobHistoryVo> page(ResearchJobPageRequest request) {
+    public YPage<ResearchJobHistoryVo> page(YPage<ResearchJobHistoryVo> page, String keyword,
+            ResearchJobStatus status, SellerSpriteMarketplace marketplace, String month) {
         String userId = currentUserId();
-        Page<MarketResearchJob> page = jobDao.pageByUserId(
+        Page<MarketResearchJob> entityPage = jobDao.pageByUserId(
                 userId,
-                normalizeOptional(request.getKeyword()),
-                request.getStatus() == null ? null : request.getStatus().name(),
-                request.getMarketplace() == null ? null : request.getMarketplace().getCode(),
-                normalizeOptional(request.getMonth()),
-                request.getCurrent(),
-                request.getSize());
-        if (page.getRecords().isEmpty()) {
-            return PageResult.of(page.getCurrent(), page.getSize(), page.getTotal(), List.of());
+                normalizeOptional(keyword),
+                status == null ? null : status.name(),
+                marketplace == null ? null : marketplace.getCode(),
+                normalizeOptional(month),
+                page.getCurrent(),
+                page.getSize());
+        page.setTotal(entityPage.getTotal());
+        if (entityPage.getRecords().isEmpty()) {
+            page.setRecords(List.of());
+            return page;
         }
 
-        List<String> jobIds = page.getRecords().stream()
+        List<String> jobIds = entityPage.getRecords().stream()
                 .map(MarketResearchJob::getJobId)
                 .toList();
         Map<String, MarketResearchAnalysisRun> latestAnalysisRuns = latestAnalysisRuns(
                 analysisRunDao.listByJobIdsAndUserId(jobIds, userId));
         Map<String, List<ResearchArtifactVo>> artifactsByJob = artifactsByJob(
                 artifactDao.listAvailableByJobIds(jobIds));
-        List<ResearchJobHistoryVo> records = page.getRecords().stream()
+        List<ResearchJobHistoryVo> records = entityPage.getRecords().stream()
                 .map(job -> toHistoryVo(
                         job,
                         latestAnalysisRuns.get(job.getJobId()),
                         artifactsByJob.getOrDefault(job.getJobId(), List.of())))
                 .toList();
-        return PageResult.of(page.getCurrent(), page.getSize(), page.getTotal(), records);
+        page.setRecords(records);
+        return page;
     }
 
     @Override

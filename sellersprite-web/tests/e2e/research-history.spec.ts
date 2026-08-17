@@ -61,8 +61,8 @@ const historyRecord = {
     artifactId: 'artifact-history-005',
     analysisRunId: 'analysis-history-001',
     artifactType: 'AI_ANALYSIS_REPORT',
-    fileName: '美国站美容仪 AI 分析报告.md',
-    mediaType: 'text/markdown',
+    fileName: '美国站美容仪 AI 分析报告.pdf',
+    mediaType: 'application/pdf',
     fileSize: 1024,
     createdAt: Date.UTC(2026, 6, 29, 2, 45),
   }],
@@ -289,7 +289,7 @@ test('filters, pages, downloads, and opens an owned historical report responsive
   await expect(page.getByTestId('history-artifact-group-job-history-001-STAGE2_EVIDENCE_WORKBOOK'))
     .toContainText('美国站美容仪阶段二证据数据.xlsx')
   await expect(page.getByTestId('history-artifact-group-job-history-001-AI_ANALYSIS_REPORT'))
-    .toContainText('美国站美容仪 AI 分析报告.md')
+    .toContainText('美国站美容仪 AI 分析报告.pdf')
 
   await page.getByTestId('history-keyword').fill(' cleansing device ')
   await page.getByTestId('history-status').selectOption('SUCCEEDED')

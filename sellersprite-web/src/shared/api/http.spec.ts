@@ -20,11 +20,11 @@ describe('parseApiResult', () => {
     expect(parseApiResult({ code: '00000', message: '操作成功', data: { id: '1' } })).toEqual({ id: '1' })
   })
 
-  it('preserves business code, message and trackId', () => {
+  it('preserves business code, message and traceId', () => {
     expect(() =>
-      parseApiResult({ code: 'D409', message: '资源仍被引用', data: null, trackId: 'track-1' }),
+      parseApiResult({ code: 'D409', message: '资源仍被引用', data: null, traceId: 'trace-1' }),
     ).toThrowError(
-      expect.objectContaining({ code: 'D409', message: '资源仍被引用', trackId: 'track-1' }),
+      expect.objectContaining({ code: 'D409', message: '资源仍被引用', traceId: 'trace-1' }),
     )
   })
 })
@@ -55,7 +55,7 @@ describe('createApiClient', () => {
         code: 'R409',
         message: '市场调研报告尚未生成',
         data: null,
-        trackId: 'track-download-1',
+        traceId: 'trace-download-1',
       }),
     ], { type: 'application/json' })
     const adapter: AxiosAdapter = (config) => Promise.resolve({
@@ -73,7 +73,7 @@ describe('createApiClient', () => {
     })).rejects.toMatchObject({
       code: 'R409',
       message: '市场调研报告尚未生成',
-      trackId: 'track-download-1',
+      traceId: 'trace-download-1',
     })
   })
 

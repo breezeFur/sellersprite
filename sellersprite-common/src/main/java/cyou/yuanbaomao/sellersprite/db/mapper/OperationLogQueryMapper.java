@@ -14,7 +14,7 @@ public interface OperationLogQueryMapper {
     @Select("""
             SELECT operation_log_id, user_id, username, module_name, operation_name, operation_type,
                    http_method, request_uri, request_params, response_payload, response_status,
-                   success, error_message, client_ip, user_agent, cost_ms, track_id, created_at
+                   success, error_message, client_ip, user_agent, cost_ms, trace_id, created_at
             FROM operation_log
             ORDER BY created_at DESC
             LIMIT #{limit}
@@ -25,7 +25,7 @@ public interface OperationLogQueryMapper {
             <script>
             SELECT operation_log_id, user_id, username, module_name, operation_name, operation_type,
                    http_method, request_uri, request_params, response_payload, response_status,
-                   success, error_message, client_ip, user_agent, cost_ms, track_id, created_at
+                   success, error_message, client_ip, user_agent, cost_ms, trace_id, created_at
             FROM operation_log
             WHERE 1 = 1
             <if test="userId != null and userId != ''">AND user_id = #{userId}</if>
@@ -39,7 +39,7 @@ public interface OperationLogQueryMapper {
                 AND operation_type = #{operationType}
             </if>
             <if test="success != null">AND success = #{success}</if>
-            <if test="trackId != null and trackId != ''">AND track_id = #{trackId}</if>
+            <if test="traceId != null and traceId != ''">AND trace_id = #{traceId}</if>
             <if test="startTime != null">AND created_at &gt;= #{startTime}</if>
             <if test="endTime != null">AND created_at &lt;= #{endTime}</if>
             ORDER BY created_at DESC
@@ -51,14 +51,14 @@ public interface OperationLogQueryMapper {
                                   @Param("moduleName") String moduleName,
                                   @Param("operationType") String operationType,
                                   @Param("success") Integer success,
-                                  @Param("trackId") String trackId,
+                                  @Param("traceId") String traceId,
                                   @Param("startTime") Long startTime,
                                   @Param("endTime") Long endTime);
 
     @Select("""
             SELECT operation_log_id, user_id, username, module_name, operation_name, operation_type,
                    http_method, request_uri, request_params, response_payload, response_status,
-                   success, error_message, client_ip, user_agent, cost_ms, track_id, created_at
+                   success, error_message, client_ip, user_agent, cost_ms, trace_id, created_at
             FROM operation_log
             WHERE operation_log_id = #{operationLogId}
             """)

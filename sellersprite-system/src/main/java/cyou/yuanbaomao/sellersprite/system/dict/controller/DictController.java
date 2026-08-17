@@ -1,17 +1,16 @@
 package cyou.yuanbaomao.sellersprite.system.dict.controller;
 
-import cyou.yuanbaomao.base.result.PageResult;
+import cyou.yuanbaomao.mybatis.result.YPage;
 import cyou.yuanbaomao.base.result.Result;
 import cyou.yuanbaomao.sellersprite.system.dict.model.dto.DictItemCreateRequest;
-import cyou.yuanbaomao.sellersprite.system.dict.model.dto.DictItemPageRequest;
 import cyou.yuanbaomao.sellersprite.system.dict.model.dto.DictItemUpdateRequest;
 import cyou.yuanbaomao.sellersprite.system.dict.model.dto.DictStatusUpdateRequest;
 import cyou.yuanbaomao.sellersprite.system.dict.model.dto.DictTypeCreateRequest;
-import cyou.yuanbaomao.sellersprite.system.dict.model.dto.DictTypePageRequest;
 import cyou.yuanbaomao.sellersprite.system.dict.model.dto.DictTypeUpdateRequest;
 import cyou.yuanbaomao.sellersprite.system.dict.model.vo.DictItemVo;
 import cyou.yuanbaomao.sellersprite.system.dict.model.vo.DictTypeVo;
 import cyou.yuanbaomao.sellersprite.system.dict.service.DictService;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -22,6 +21,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -41,8 +41,14 @@ public class DictController {
 
     @Operation(summary = "分页查询字典类型")
     @GetMapping("/types")
-    public Result<PageResult<DictTypeVo>> pageTypes(@Valid DictTypePageRequest request) {
-        return Result.success(dictService.pageTypes(request));
+    public Result<YPage<DictTypeVo>> pageTypes(@Valid YPage<DictTypeVo> page,
+            @Parameter(description = "字典类型关键字")
+            @RequestParam(value = "dictType", required = false) String dictType,
+            @Parameter(description = "字典名称关键字")
+            @RequestParam(value = "dictName", required = false) String dictName,
+            @Parameter(description = "状态：1 启用，0 禁用")
+            @RequestParam(value = "status", required = false) Integer status) {
+        return Result.success(dictService.pageTypes(page, dictType, dictName, status));
     }
 
     @Operation(summary = "查询字典类型详情")
@@ -81,9 +87,18 @@ public class DictController {
 
     @Operation(summary = "分页查询字典项")
     @GetMapping("/types/{dictTypeId}/items")
-    public Result<PageResult<DictItemVo>> pageItems(@PathVariable String dictTypeId,
-            @Valid DictItemPageRequest request) {
-        return Result.success(dictService.pageItems(dictTypeId, request));
+    public Result<YPage<DictItemVo>> pageItems(
+            @Parameter(description = "字典类型 ID") @PathVariable String dictTypeId,
+            @Valid YPage<DictItemVo> page,
+            @Parameter(description = "稳定标签关键字")
+            @RequestParam(value = "dictLabel", required = false) String dictLabel,
+            @Parameter(description = "展示名称关键字")
+            @RequestParam(value = "dictName", required = false) String dictName,
+            @Parameter(description = "远端参数值关键字")
+            @RequestParam(value = "dictValue", required = false) String dictValue,
+            @Parameter(description = "状态：1 启用，0 禁用")
+            @RequestParam(value = "status", required = false) Integer status) {
+        return Result.success(dictService.pageItems(dictTypeId, page, dictLabel, dictName, dictValue, status));
     }
 
     @Operation(summary = "查询字典项详情")

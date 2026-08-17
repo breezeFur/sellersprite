@@ -18,7 +18,7 @@ import {
   type FormRules,
 } from 'element-plus'
 import { storeToRefs } from 'pinia'
-import { computed, onBeforeUnmount, reactive, ref, toRaw, watch } from 'vue'
+import { computed, onActivated, onBeforeUnmount, onDeactivated, onMounted, reactive, ref, toRaw, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import { useAuthStore } from '@/features/auth/stores/useAuthStore'
@@ -79,7 +79,7 @@ interface ResearchFormModel {
 interface PageError {
   code?: string
   message: string
-  trackId?: string
+  traceId?: string
 }
 
 interface CategorySearchTreeNode {
@@ -144,13 +144,35 @@ const researchAgentStore = useResearchAgentStore()
 const {
   activeAnalysisRunId,
   analysisState,
+  connecting,
+  connectionError,
   events: researchEvents,
+  historyLoading,
   job: currentJob,
   lastSequence,
   nodes: nodeExecutions,
+  reconnecting,
+  workflowTerminal,
   workspaceActiveEventId,
   workspaceSuggestedSection,
 } = storeToRefs(researchAgentStore)
+const workspaceStreamStatusLabel = computed(() => {
+  if (historyLoading.value) return '正在恢复历史事件'
+  if (reconnecting.value) return `连接中断，正在从 #${lastSequence.value} 恢复`
+  if (connecting.value) return '正在建立事件流'
+  if (workflowTerminal.value || analysisState.value === 'SUCCEEDED') {
+    return '本轮工作流已结束，可继续追问'
+  }
+  if (analysisState.value === 'FAILED') return '本轮分析失败，可重新执行或继续分析'
+  if (currentJob.value?.status !== 'SUCCEEDED') return '等待数据 Graph 产出证据'
+  return '等待分析事件'
+})
+const workspaceStreamStatusType = computed<'info' | 'warning' | 'success' | 'danger'>(() => {
+  if (connectionError.value || analysisState.value === 'FAILED') return 'danger'
+  if (workflowTerminal.value || analysisState.value === 'SUCCEEDED') return 'success'
+  if (historyLoading.value || reconnecting.value || connecting.value) return 'warning'
+  return 'info'
+})
 const currentJobId = computed(() => researchAgentStore.jobId)
 const productSelectionDraftAsins = ref<string[] | undefined>(undefined)
 const activeEvidenceStage = computed<'SCREENING' | 'DEEP_DIVE'>({
@@ -1133,14 +1155,14 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 }
 
 function formatError(error: PageError) {
-  return [error.code, error.message, error.trackId ? `追踪号 ${error.trackId}` : '']
+  return [error.code, error.message, error.traceId ? `追踪号 ${error.traceId}` : '']
     .filter(Boolean)
     .join(' · ')
 }
 
 function normalizeError(error: unknown, fallback: string): PageError {
   if (error instanceof ApiError) {
-    return { code: error.code, message: error.message, trackId: error.trackId }
+    return { code: error.code, message: error.message, traceId: error.traceId }
   }
   if (error instanceof Error) return { message: error.message || fallback }
   return { message: fallback }
@@ -1245,7 +1267,16 @@ watch([() => form.marketplace, () => form.month], () => {
 })
 watch(workspaceMode, (enabled) => {
   if (enabled) layoutStore.setSidebarCollapsed(true)
+  layoutStore.setWorkspaceFocusMode(enabled)
 }, { immediate: true })
+
+function syncWorkspaceFocusMode() {
+  layoutStore.setWorkspaceFocusMode(workspaceMode.value)
+}
+
+onMounted(syncWorkspaceFocusMode)
+onActivated(syncWorkspaceFocusMode)
+onDeactivated(() => layoutStore.setWorkspaceFocusMode(false))
 watch(deepDiveEvidenceVisible, (visible) => {
   if (!visible) activeEvidenceStage.value = 'SCREENING'
 })
@@ -1279,6 +1310,7 @@ watch(readRouteJobId, (jobId, previousJobId) => {
 }, { immediate: true })
 
 onBeforeUnmount(() => {
+  layoutStore.setWorkspaceFocusMode(false)
   disposed = true
   clearAutoWorkspaceTimer()
   streamVersion += 1
@@ -1602,15 +1634,6 @@ onBeforeUnmount(() => {
                         controls-position="right"
                       />
                     </label>
-                    <label>
-                      <span>新品月数</span>
-                      <ElInputNumber
-                        v-model="form.collectionConfig.collectKeywordDemandTrend.newProduct"
-                        aria-label="关键词需求新品月数"
-                        :min="0"
-                        controls-position="right"
-                      />
-                    </label>
                   </div>
                 </ElCollapseItem>
                 <ElCollapseItem
@@ -1836,6 +1859,9 @@ onBeforeUnmount(() => {
             :status-label="currentStatus?.label || currentJob.status"
             :status-type="currentStatus?.type || 'info'"
             :status-detail="currentNodeName"
+            :stream-status-label="workspaceStreamStatusLabel"
+            :stream-status-type="workspaceStreamStatusType"
+            :stream-status-sequence="lastSequence"
             :selection-available="selectionReviewVisible"
             @select="selectWorkspaceSection"
             @back="exitWorkspaceMode"
@@ -1879,6 +1905,16 @@ onBeforeUnmount(() => {
               </ElTooltip>
             </template>
 
+            <template #context>
+              <ElSegmented
+                v-if="workspaceSection === 'evidence' && evidenceStageOptions.length > 1"
+                v-model="activeEvidenceStage"
+                :options="evidenceStageOptions"
+                size="small"
+                aria-label="证据阶段"
+              />
+            </template>
+
             <ResearchConversationPanel
               v-if="workspaceShowsAgentPanel"
               :job-id="currentJob.jobId"
@@ -1888,6 +1924,7 @@ onBeforeUnmount(() => {
               workspace
               @resume="resumeStream"
               @follow-up-runs-change="updateFollowUpAnalysisRunIds"
+              @open-product-selection="navigateToWorkspace('selection')"
             />
 
             <section
@@ -1901,13 +1938,6 @@ onBeforeUnmount(() => {
                   <h2>证据数据</h2>
                   <p>核对报告引用的市场、商品与消费者证据。</p>
                 </div>
-                <ElSegmented
-                  v-if="evidenceStageOptions.length > 1"
-                  v-model="activeEvidenceStage"
-                  :options="evidenceStageOptions"
-                  size="small"
-                  aria-label="证据阶段"
-                />
               </header>
               <ResearchEvidencePanel
                 :key="`${currentJob.jobId}-${activeEvidenceStage}`"
@@ -2544,8 +2574,8 @@ onBeforeUnmount(() => {
 }
 
 .research-page--workspace {
-  height: calc(100dvh - 104px);
-  min-height: calc(100dvh - 104px);
+  height: 100dvh;
+  min-height: 100dvh;
   min-width: 0;
   border: 0;
   border-radius: 0;
@@ -2568,6 +2598,7 @@ onBeforeUnmount(() => {
 
 .workspace-pane {
   display: flex;
+  position: relative;
   min-width: 0;
   min-height: 0;
   height: 100%;
@@ -2603,6 +2634,28 @@ onBeforeUnmount(() => {
   margin: 5px 0 0;
   color: var(--color-text-secondary);
   font-size: 12px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .workspace-pane {
+    padding-top: 10px;
+  }
+
+  .workspace-pane__header {
+    position: absolute;
+    inset: 0 0 auto;
+    z-index: 2;
+    padding: 0 0 14px;
+    background: var(--color-surface-muted);
+    transform: translateY(calc(-100% + 8px));
+    transition: padding var(--motion-fast) ease, transform var(--motion-fast) ease;
+  }
+
+  .workspace-pane__header:hover,
+  .workspace-pane__header:focus-within {
+    padding-top: 14px;
+    transform: translateY(0);
+  }
 }
 
 .workspace-pane--evidence :deep(.evidence-panel),
@@ -2648,8 +2701,8 @@ onBeforeUnmount(() => {
   }
 
   .research-page--workspace {
-    height: calc(100dvh - 88px);
-    min-height: calc(100dvh - 88px);
+    height: 100dvh;
+    min-height: 100dvh;
   }
 
   .workspace-pane {
@@ -2657,8 +2710,11 @@ onBeforeUnmount(() => {
   }
 
   .workspace-pane__header {
+    position: static;
     align-items: flex-start;
     flex-direction: column;
+    padding-bottom: 14px;
+    transform: none;
   }
 
   .workspace-pane__header :deep(.el-segmented) {

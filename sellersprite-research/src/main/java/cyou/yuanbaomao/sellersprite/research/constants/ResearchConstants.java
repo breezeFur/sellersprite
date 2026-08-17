@@ -17,11 +17,15 @@ public final class ResearchConstants {
     public static final String ARTIFACT_TYPE_STAGE1_RAW_WORKBOOK = "STAGE1_RAW_WORKBOOK";
     /** 阶段一市场初筛证据工作簿。 */
     public static final String ARTIFACT_TYPE_STAGE1_EVIDENCE_WORKBOOK = "STAGE1_EVIDENCE_WORKBOOK";
+    /** 阶段一评分结论表 PDF。 */
+    public static final String ARTIFACT_TYPE_STAGE1_CONCLUSION_REPORT = "STAGE1_CONCLUSION_REPORT";
     /** 阶段二评论、关键词与ASIN趋势原始响应工作簿。 */
     public static final String ARTIFACT_TYPE_STAGE2_RAW_WORKBOOK = "STAGE2_RAW_WORKBOOK";
     /** 阶段二评价、VOC、Keywords 与ASIN趋势证据工作簿。 */
     public static final String ARTIFACT_TYPE_STAGE2_EVIDENCE_WORKBOOK = "STAGE2_EVIDENCE_WORKBOOK";
-    /** 最终市场调研 Markdown 报告。 */
+    /** 阶段二评分结论表 PDF。 */
+    public static final String ARTIFACT_TYPE_STAGE2_CONCLUSION_REPORT = "STAGE2_CONCLUSION_REPORT";
+    /** 最终市场调研 AI 分析报告。 */
     public static final String ARTIFACT_TYPE_AI_ANALYSIS_REPORT = "AI_ANALYSIS_REPORT";
     /** 尚未阶段化的调用默认写入阶段一原始工作簿类型。 */
     @Deprecated
@@ -30,6 +34,8 @@ public final class ResearchConstants {
     @Deprecated
     public static final String ARTIFACT_TYPE_EVIDENCE_WORKBOOK = ARTIFACT_TYPE_STAGE1_EVIDENCE_WORKBOOK;
     public static final String MARKDOWN_MEDIA_TYPE = "text/markdown;charset=UTF-8";
+    /** AI 分析报告下载文件的 PDF 媒体类型。 */
+    public static final String PDF_MEDIA_TYPE = "application/pdf";
     public static final String EXCEL_MEDIA_TYPE =
             "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
     public static final String ERROR_CODE_EXECUTION_FAILED = "MR_EXECUTION_FAILED";

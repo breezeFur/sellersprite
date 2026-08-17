@@ -27,6 +27,7 @@ public class AmazonSelectionAnalysisException extends RuntimeException {
         AGENT_EXECUTION_FAILED,
         SHEET_LIMIT_EXCEEDED,
         MODEL_CALL_LIMIT_EXCEEDED,
-        EXECUTION_DURATION_EXCEEDED
+        EXECUTION_DURATION_EXCEEDED,
+        REPORT_STRUCTURE_INVALID
     }
 }

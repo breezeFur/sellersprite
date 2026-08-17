@@ -6,7 +6,7 @@
 
     <groupId>cyou.yuanbaomao</groupId>
     <artifactId>sellersprite-service</artifactId>
-    <version>0.1.0-SNAPSHOT</version>
+    <version>0.2.0</version>
     <packaging>pom</packaging>
     <name>sellersprite-service</name>
     <description>SellerSprite Open API 集成服务</description>
@@ -39,12 +39,12 @@
         <maven.compiler.plugin.version>3.15.0</maven.compiler.plugin.version>
         <maven.surefire.plugin.version>3.5.6</maven.surefire.plugin.version>
 
-        <yuanbaomao-base.version>0.1.1</yuanbaomao-base.version>
-        <yuanbaomao-web-starter.version>0.1.2-SNAPSHOT</yuanbaomao-web-starter.version>
-        <yuanbaomao-mybatis-starter.version>0.1.1</yuanbaomao-mybatis-starter.version>
-        <yuanbaomao-cache-starter.version>0.1.1</yuanbaomao-cache-starter.version>
-        <yuanbaomao-log-starter.version>0.1.2-SNAPSHOT</yuanbaomao-log-starter.version>
-        <yuanbaomao-dict-starter.version>0.1.1</yuanbaomao-dict-starter.version>
+        <yuanbaomao-base.version>0.2.0</yuanbaomao-base.version>
+        <yuanbaomao-web-starter.version>0.2.0</yuanbaomao-web-starter.version>
+        <yuanbaomao-mybatis-starter.version>0.2.0</yuanbaomao-mybatis-starter.version>
+        <yuanbaomao-cache-starter.version>0.2.0</yuanbaomao-cache-starter.version>
+        <yuanbaomao-log-starter.version>0.2.0</yuanbaomao-log-starter.version>
+        <yuanbaomao-dict-starter.version>0.2.0</yuanbaomao-dict-starter.version>
     </properties>
 
     <repositories>
@@ -157,6 +157,16 @@
     </dependencies>
 
     <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <!-- The aggregator has no application entry point; only the server module runs. -->
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+        </plugins>
         <pluginManagement>
             <plugins>
                 <plugin>

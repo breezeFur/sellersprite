@@ -27,7 +27,7 @@ public final class OperationLogConverter {
         vo.setClientIp(entity.getClientIp());
         vo.setUserAgent(SensitiveDataMasker.mask(entity.getUserAgent()));
         vo.setCostMs(entity.getCostMs());
-        vo.setTrackId(entity.getTrackId());
+        vo.setTraceId(entity.getTraceId());
         vo.setCreatedAt(entity.getCreatedAt());
         return vo;
     }

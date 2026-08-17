@@ -32,6 +32,7 @@ public final class ResearchEventTypes {
     public static final String SHEET_THINK = "sheet_think";
     public static final String SUMMARY_PREPARE = "summary_prepare";
     public static final String SUMMARY_DELTA = "summary_delta";
+    public static final String REPORT_CHART = "report_chart";
     public static final String SUMMARY = "summary";
     public static final String REPORT = "report";
     public static final String DOWNLOAD = "download";

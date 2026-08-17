@@ -30,9 +30,47 @@ public class MarketResearchDatasetDaoImpl
     }
 
     @Override
+    public Optional<MarketResearchDataset> findPayloadByJobIdAndDatasetCode(
+            String jobId, String datasetCode) {
+        return Optional.ofNullable(lambdaQuery()
+                .select(
+                        MarketResearchDataset::getDatasetId,
+                        MarketResearchDataset::getDatasetCode,
+                        MarketResearchDataset::getSourcePayload,
+                        MarketResearchDataset::getSchemaVersion,
+                        MarketResearchDataset::getValidationStatus,
+                        MarketResearchDataset::getSha256)
+                .eq(MarketResearchDataset::getJobId, jobId)
+                .eq(MarketResearchDataset::getDatasetCode, datasetCode)
+                .orderByAsc(MarketResearchDataset::getCreatedAt)
+                .orderByAsc(MarketResearchDataset::getDatasetId)
+                .last("LIMIT 1")
+                .one());
+    }
+
+    @Override
     public List<MarketResearchDataset> listByJobId(String jobId) {
         return lambdaQuery()
                 .eq(MarketResearchDataset::getJobId, jobId)
+                .orderByAsc(MarketResearchDataset::getCreatedAt)
+                .orderByAsc(MarketResearchDataset::getDatasetId)
+                .list();
+    }
+
+    @Override
+    public List<MarketResearchDataset> listMetadataByJobIdAndDatasetCodes(
+            String jobId, List<String> datasetCodes) {
+        if (datasetCodes == null || datasetCodes.isEmpty()) {
+            return List.of();
+        }
+        return lambdaQuery()
+                .select(
+                        MarketResearchDataset::getDatasetId,
+                        MarketResearchDataset::getDatasetCode,
+                        MarketResearchDataset::getRecordCount,
+                        MarketResearchDataset::getCreatedAt)
+                .eq(MarketResearchDataset::getJobId, jobId)
+                .in(MarketResearchDataset::getDatasetCode, datasetCodes)
                 .orderByAsc(MarketResearchDataset::getCreatedAt)
                 .orderByAsc(MarketResearchDataset::getDatasetId)
                 .list();

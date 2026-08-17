@@ -1,14 +1,14 @@
 package cyou.yuanbaomao.sellersprite.ai.conversation.controller;
 
-import cyou.yuanbaomao.base.result.PageResult;
+import cyou.yuanbaomao.mybatis.result.YPage;
 import cyou.yuanbaomao.base.result.Result;
-import cyou.yuanbaomao.sellersprite.ai.conversation.model.dto.AiConversationPageRequest;
 import cyou.yuanbaomao.sellersprite.ai.conversation.model.dto.AiConversationRenameRequest;
 import cyou.yuanbaomao.sellersprite.ai.conversation.model.dto.AiConversationSettingsRequest;
 import cyou.yuanbaomao.sellersprite.ai.conversation.model.vo.AiConversationDetailVo;
 import cyou.yuanbaomao.sellersprite.ai.conversation.model.vo.AiConversationVo;
 import cyou.yuanbaomao.sellersprite.ai.conversation.model.vo.AiConversationSettingsVo;
 import cyou.yuanbaomao.sellersprite.ai.conversation.service.AiConversationService;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "AI 会话管理", description = "管理当前用户的 AI 会话和完整聊天历史")
@@ -31,8 +32,10 @@ public class AiConversationController {
 
     @Operation(summary = "分页查询会话")
     @GetMapping
-    public Result<PageResult<AiConversationVo>> page(@Valid AiConversationPageRequest request) {
-        return Result.success(conversationService.page(request));
+    public Result<YPage<AiConversationVo>> page(@Valid YPage<AiConversationVo> page,
+            @Parameter(description = "会话标题，支持模糊查询")
+            @RequestParam(value = "title", required = false) String title) {
+        return Result.success(conversationService.page(page, title));
     }
 
     @Operation(summary = "查询会话详情", description = "返回不受模型Memory窗口影响的完整前端可见消息")

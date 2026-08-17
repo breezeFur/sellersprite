@@ -2,7 +2,7 @@ package cyou.yuanbaomao.sellersprite.system.ops.ai.service.impl;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import cyou.yuanbaomao.base.exception.BizException;
-import cyou.yuanbaomao.base.result.PageResult;
+import cyou.yuanbaomao.mybatis.result.YPage;
 import cyou.yuanbaomao.sellersprite.common.result.ResultCode;
 import cyou.yuanbaomao.sellersprite.db.dao.AiPromptRecordDao;
 import cyou.yuanbaomao.sellersprite.db.entity.AiPromptRecord;
@@ -21,19 +21,21 @@ public class AiPromptLogServiceImpl implements AiPromptLogService {
     private final AiPromptRecordDao promptRecordDao;
 
     @Override
-    public PageResult<AiPromptLogVo> page(AiPromptLogPageRequest request) {
+    public YPage<AiPromptLogVo> page(YPage<AiPromptLogVo> page, AiPromptLogPageRequest request) {
         if (request.getStartTime() != null && request.getEndTime() != null
                 && request.getStartTime() > request.getEndTime()) {
             throw new BizException(ResultCode.PARAM_INVALID, "开始时间不能晚于结束时间");
         }
-        Page<AiPromptRecord> page = promptRecordDao.page(
+        Page<AiPromptRecord> entityPage = promptRecordDao.page(
                 request.getUserId(), request.getConversationId(), request.getProvider(), request.getModel(),
                 request.getStatus(), request.getStartTime(), request.getEndTime(),
-                request.getCurrent(), request.getSize());
-        List<AiPromptLogVo> records = page.getRecords().stream()
+                page.getCurrent(), page.getSize());
+        List<AiPromptLogVo> records = entityPage.getRecords().stream()
                 .map(AiPromptLogConverter::toSummaryVo)
                 .toList();
-        return PageResult.of(page.getCurrent(), page.getSize(), page.getTotal(), records);
+        page.setTotal(entityPage.getTotal());
+        page.setRecords(records);
+        return page;
     }
 
     @Override

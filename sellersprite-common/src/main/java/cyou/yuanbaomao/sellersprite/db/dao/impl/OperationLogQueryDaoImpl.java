@@ -26,10 +26,10 @@ public class OperationLogQueryDaoImpl implements OperationLogQueryDao {
 
     @Override
     public Page<OperationLogEntity> page(String userId, String username, String moduleName, String operationType,
-                                         Integer success, String trackId, Long startTime, Long endTime,
+                                         Integer success, String traceId, Long startTime, Long endTime,
                                          long current, long size) {
         return mapper.page(Page.of(current, size), userId, username, moduleName, operationType,
-                success, trackId, startTime, endTime);
+                success, traceId, startTime, endTime);
     }
 
     @Override

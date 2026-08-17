@@ -39,7 +39,7 @@ public final class AiPromptLogConverter {
         vo.setErrorType(entity.getErrorType());
         vo.setErrorMessage(SensitiveDataMasker.mask(entity.getErrorMessage()));
         vo.setCostMs(entity.getCostMs());
-        vo.setTrackId(entity.getTrackId());
+        vo.setTraceId(entity.getTraceId());
         vo.setCreatedAt(entity.getCreatedAt());
         return vo;
     }

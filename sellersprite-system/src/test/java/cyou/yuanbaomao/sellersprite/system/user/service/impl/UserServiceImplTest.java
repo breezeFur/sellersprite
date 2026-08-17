@@ -22,7 +22,6 @@ import cyou.yuanbaomao.sellersprite.db.entity.Role;
 import cyou.yuanbaomao.sellersprite.db.entity.Dept;
 import cyou.yuanbaomao.sellersprite.db.entity.UserRole;
 import cyou.yuanbaomao.sellersprite.system.user.model.dto.UserUpdateRequest;
-import cyou.yuanbaomao.sellersprite.system.user.model.dto.UserPageRequest;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import java.util.List;
 import java.util.Set;
@@ -165,11 +164,6 @@ class UserServiceImplTest {
 
     @Test
     void shouldPageUsersThroughDaoBoundary() {
-        UserPageRequest request = new UserPageRequest();
-        request.setCurrent(2L);
-        request.setSize(10L);
-        request.setUsername("yuan");
-        request.setStatus(1);
         Page<User> page = Page.of(2, 10, 11);
         page.setRecords(List.of(user()));
         when(userDao.pageUsers("yuan", 1, 2, 10)).thenReturn(page);
@@ -178,8 +172,8 @@ class UserServiceImplTest {
         userRole.setRoleId("role-1");
         when(userRoleDao.listByUserId("user-1")).thenReturn(List.of(userRole));
 
-        cyou.yuanbaomao.base.result.PageResult<cyou.yuanbaomao.sellersprite.system.user.model.vo.UserDetailVo> result =
-                userService.page(request);
+        cyou.yuanbaomao.mybatis.result.YPage<cyou.yuanbaomao.sellersprite.system.user.model.vo.UserDetailVo> result =
+                userService.page(cyou.yuanbaomao.mybatis.result.YPage.of(2L, 10L), "yuan", 1);
 
         assertThat(result.getCurrent()).isEqualTo(2L);
         assertThat(result.getSize()).isEqualTo(10L);

@@ -25,6 +25,6 @@ public class AiPromptLogVo {
     private String errorType;
     private String errorMessage;
     private Long costMs;
-    private String trackId;
+    private String traceId;
     private Long createdAt;
 }

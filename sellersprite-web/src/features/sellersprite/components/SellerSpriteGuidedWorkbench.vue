@@ -37,7 +37,7 @@ import { exportSellerSpriteQueryResult } from '../utils/sellerSpriteExcelExport'
 interface GuidedQueryError {
   code: string
   message: string
-  trackId?: string
+  traceId?: string
 }
 
 type DisplayRow = Record<string, unknown> & { __rowKey: string }
@@ -443,7 +443,7 @@ function isEmptyValue(value: unknown) {
 
 function normalizeQueryError(error: unknown): GuidedQueryError {
   if (error instanceof ApiError) {
-    return { code: error.code, message: error.message, trackId: error.trackId }
+    return { code: error.code, message: error.message, traceId: error.traceId }
   }
   if (error instanceof Error) {
     return { code: 'REQUEST_FAILED', message: error.message || '请求失败，请稍后重试。' }
@@ -851,8 +851,8 @@ function columnLabel(key: string) {
         <div>
           <span>{{ queryError.code }}</span>
           <h3>{{ queryError.message }}</h3>
-          <p v-if="queryError.trackId">
-            trackId: <code>{{ queryError.trackId }}</code>
+          <p v-if="queryError.traceId">
+            traceId: <code>{{ queryError.traceId }}</code>
           </p>
         </div>
       </div>

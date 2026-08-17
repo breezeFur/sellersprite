@@ -13,8 +13,12 @@ public class BizExceptionHandler {
 
     @ExceptionHandler(BizException.class)
     public Result<Void> handleBizException(BizException exception) {
-        log.warn("业务异常 code={}, message={}", exception.getCode(), exception.getMessage());
+        if (exception.getCause() == null) {
+            log.warn("业务异常 code={}, message={}", exception.getCode(), exception.getMessage());
+        } else {
+            log.error("业务异常包含原始异常 code={}, message={}", exception.getCode(), exception.getMessage(), exception);
+        }
         return Result.<Void>fail(exception.getCode(), exception.getMessage())
-                .withTrackId(RequestContextHolder.currentTrackId());
+                .withTraceId(RequestContextHolder.currentTraceId());
     }
 }

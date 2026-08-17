@@ -16,7 +16,7 @@ class GeneratedSellerSpriteContractIndexTest {
         assertThat(GeneratedSellerSpriteContractIndex.getOperations())
                 .hasSize(44)
                 .doesNotHaveDuplicates();
-        assertThat(GeneratedSellerSpriteContractIndex.getDocumentedRequestFieldCount()).isEqualTo(529);
+        assertThat(GeneratedSellerSpriteContractIndex.getDocumentedRequestFieldCount()).isEqualTo(528);
         assertThat(GeneratedSellerSpriteContractIndex.getDocumentedResponseFieldCount()).isEqualTo(1197);
         assertThat(GeneratedSellerSpriteContractIndex.getDocumentedEndpoints()).allSatisfy(endpoint -> {
             assertThat(endpoint.operation().getMethod().name()).isEqualTo(endpoint.method());

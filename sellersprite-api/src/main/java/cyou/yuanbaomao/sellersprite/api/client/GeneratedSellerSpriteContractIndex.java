@@ -317,7 +317,7 @@ public final class GeneratedSellerSpriteContractIndex {
     }
 
     public static int getDocumentedRequestFieldCount() {
-        return 529;
+        return 528;
     }
 
     public static int getDocumentedResponseFieldCount() {

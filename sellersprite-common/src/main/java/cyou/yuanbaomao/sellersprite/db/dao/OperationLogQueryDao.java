@@ -10,7 +10,7 @@ public interface OperationLogQueryDao {
     List<OperationLogEntity> listRecent(int limit);
 
     Page<OperationLogEntity> page(String userId, String username, String moduleName, String operationType,
-                                  Integer success, String trackId, Long startTime, Long endTime,
+                                  Integer success, String traceId, Long startTime, Long endTime,
                                   long current, long size);
 
     Optional<OperationLogEntity> findById(String operationLogId);

@@ -208,8 +208,7 @@ public class RemoteResearchDataProvider implements ResearchDataProvider {
                 marketplace,
                 nodeIdPath,
                 sellerSpriteMonth,
-                config.getTopN(),
-                config.getNewProduct());
+                config.getTopN());
         datasets.add(cachedDataset(
                 MARKET_DEMAND_TREND_DATASET_CODE,
                 SellerSpriteOperation.MARKET_PERFORMANCE,
@@ -342,7 +341,7 @@ public class RemoteResearchDataProvider implements ResearchDataProvider {
                     SellerSpriteOperation.ASIN_SALES_TREND,
                     salesRequest,
                     sourceCacheService.asinPolicy(),
-                    () -> asinService.getSalesTrend(salesRequest)));
+                    () -> asinService.getSalesTrend(salesRequest.getMarketplace(), salesRequest.getAsin())));
 
             KeepaTrendRequest keepaRequest = copyRequest(config.getKeepaTrend(), KeepaTrendRequest.class);
             keepaRequest.setMarketplace(marketplace);
@@ -704,7 +703,7 @@ public class RemoteResearchDataProvider implements ResearchDataProvider {
                 SellerSpriteOperation.ASIN_DETAIL,
                 detailRequest,
                 sourceCacheService.asinPolicy(),
-                () -> asinService.getAsinDetail(detailRequest)));
+                () -> asinService.getAsinDetail(detailRequest.getMarketplace(), detailRequest.getAsin())));
 
         AsinSalesTrendRequest salesTrendRequest = new AsinSalesTrendRequest();
         salesTrendRequest.setMarketplace(marketplace);
@@ -715,7 +714,8 @@ public class RemoteResearchDataProvider implements ResearchDataProvider {
                 SellerSpriteOperation.ASIN_SALES_TREND,
                 salesTrendRequest,
                 sourceCacheService.asinPolicy(),
-                () -> asinService.getSalesTrend(salesTrendRequest)));
+                () -> asinService.getSalesTrend(
+                        salesTrendRequest.getMarketplace(), salesTrendRequest.getAsin())));
     }
 
     private void configureMarketRequest(
@@ -738,12 +738,10 @@ public class RemoteResearchDataProvider implements ResearchDataProvider {
             SellerSpriteMarketplace marketplace,
             String nodeIdPath,
             String sellerSpriteMonth,
-            Integer topN,
-            Integer newProduct) {
+            Integer topN) {
         request.setMarketplace(marketplace);
         request.setMonth(sellerSpriteMonth);
         request.setTopN(topN);
-        request.setNewProduct(newProduct);
         request.setNodeIdPath(nodeIdPath);
         validateRequest(request);
     }

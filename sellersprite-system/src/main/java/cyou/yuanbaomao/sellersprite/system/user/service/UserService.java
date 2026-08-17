@@ -1,8 +1,7 @@
 package cyou.yuanbaomao.sellersprite.system.user.service;
 
-import cyou.yuanbaomao.base.result.PageResult;
+import cyou.yuanbaomao.mybatis.result.YPage;
 import cyou.yuanbaomao.sellersprite.system.user.model.dto.UserCreateRequest;
-import cyou.yuanbaomao.sellersprite.system.user.model.dto.UserPageRequest;
 import cyou.yuanbaomao.sellersprite.system.user.model.dto.UserUpdateRequest;
 import cyou.yuanbaomao.sellersprite.system.user.model.vo.UserDetailVo;
 import java.util.Collection;
@@ -13,7 +12,7 @@ public interface UserService {
 
     UserDetailVo detail(String userId);
 
-    PageResult<UserDetailVo> page(UserPageRequest request);
+    YPage<UserDetailVo> page(YPage<UserDetailVo> page, String username, Integer status);
 
     UserDetailVo update(String userId, UserUpdateRequest request);
 

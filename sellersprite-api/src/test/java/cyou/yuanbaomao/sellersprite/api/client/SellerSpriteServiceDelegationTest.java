@@ -16,7 +16,6 @@ import org.springframework.core.io.Resource;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.util.MultiValueMap;
 
-import cyou.yuanbaomao.sellersprite.api.asin.model.dto.AsinDetailRequest;
 import cyou.yuanbaomao.sellersprite.api.asin.model.vo.AsinDetailVo;
 import cyou.yuanbaomao.sellersprite.api.asin.service.impl.AsinServiceImpl;
 import cyou.yuanbaomao.sellersprite.api.common.enums.SellerSpriteMarketplace;
@@ -47,14 +46,11 @@ class SellerSpriteServiceDelegationTest {
     @Test
     void shouldDelegateGetWithEncodedPathVariables() {
         SellerSpriteClient client = mock(SellerSpriteClient.class);
-        AsinDetailRequest request = new AsinDetailRequest();
-        request.setMarketplace(SellerSpriteMarketplace.US);
-        request.setAsin("B0TESTASIN");
         AsinDetailVo expected = new AsinDetailVo();
         doReturn(expected).when(client).get(
                 eq(SellerSpriteOperation.ASIN_DETAIL), any(Map.class), any(MultiValueMap.class), any());
 
-        AsinDetailVo result = new AsinServiceImpl(client).getAsinDetail(request);
+        AsinDetailVo result = new AsinServiceImpl(client).getAsinDetail(SellerSpriteMarketplace.US, "B0TESTASIN");
 
         assertThat(result).isSameAs(expected);
         @SuppressWarnings("unchecked")

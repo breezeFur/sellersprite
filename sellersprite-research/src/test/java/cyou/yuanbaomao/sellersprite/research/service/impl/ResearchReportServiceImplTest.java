@@ -97,18 +97,24 @@ class ResearchReportServiceImplTest {
     }
 
     @Test
-    void shouldAcceptExactlyFiveArtifactsForEnterWithoutRerenderingExcel() throws Exception {
+    void shouldAcceptExactlySevenArtifactsForEnterWithoutRerenderingExcel() throws Exception {
         addPublishedArtifacts(
                 ResearchConstants.ARTIFACT_TYPE_STAGE1_RAW_WORKBOOK,
                 ResearchConstants.ARTIFACT_TYPE_STAGE1_EVIDENCE_WORKBOOK,
+                ResearchConstants.ARTIFACT_TYPE_STAGE1_CONCLUSION_REPORT,
                 ResearchConstants.ARTIFACT_TYPE_STAGE2_RAW_WORKBOOK,
                 ResearchConstants.ARTIFACT_TYPE_STAGE2_EVIDENCE_WORKBOOK,
+                ResearchConstants.ARTIFACT_TYPE_STAGE2_CONCLUSION_REPORT,
                 ResearchConstants.ARTIFACT_TYPE_AI_ANALYSIS_REPORT);
         when(artifactDao.listAvailableByJobIds(List.of(JOB_ID)))
                 .thenReturn(List.copyOf(artifacts.values()));
 
         service.finalizeArtifacts(JOB_ID, EXECUTION_TOKEN, ResearchSelectionDecision.ENTER);
 
+        verify(analysisArtifactService).publishStageConclusionPdf(
+                JOB_ID, USER_ID, EvidenceStage.SCREENING);
+        verify(analysisArtifactService).publishStageConclusionPdf(
+                JOB_ID, USER_ID, EvidenceStage.DEEP_DIVE);
         verify(analysisArtifactService).publishFinalMarkdown(JOB_ID, USER_ID);
         verify(rawWorkbookRenderer, never())
                 .render(any(MarketResearchJob.class), any(Path.class), any(EvidenceStage.class));
@@ -117,15 +123,20 @@ class ResearchReportServiceImplTest {
     }
 
     @Test
-    void shouldAcceptExactlyTwoArtifactsForAbandon() throws Exception {
+    void shouldAcceptExactlyThreeArtifactsForAbandon() throws Exception {
         addPublishedArtifacts(
                 ResearchConstants.ARTIFACT_TYPE_STAGE1_RAW_WORKBOOK,
-                ResearchConstants.ARTIFACT_TYPE_STAGE1_EVIDENCE_WORKBOOK);
+                ResearchConstants.ARTIFACT_TYPE_STAGE1_EVIDENCE_WORKBOOK,
+                ResearchConstants.ARTIFACT_TYPE_STAGE1_CONCLUSION_REPORT);
         when(artifactDao.listAvailableByJobIds(List.of(JOB_ID)))
                 .thenReturn(List.copyOf(artifacts.values()));
 
         service.finalizeArtifacts(JOB_ID, EXECUTION_TOKEN, ResearchSelectionDecision.ABANDON);
 
+        verify(analysisArtifactService).publishStageConclusionPdf(
+                JOB_ID, USER_ID, EvidenceStage.SCREENING);
+        verify(analysisArtifactService, never()).publishStageConclusionPdf(
+                JOB_ID, USER_ID, EvidenceStage.DEEP_DIVE);
         verify(analysisArtifactService, never()).publishFinalMarkdown(any(), any());
         verify(rawWorkbookRenderer, never())
                 .render(any(MarketResearchJob.class), any(Path.class), any(EvidenceStage.class));
@@ -138,6 +149,7 @@ class ResearchReportServiceImplTest {
         addPublishedArtifacts(
                 ResearchConstants.ARTIFACT_TYPE_STAGE1_RAW_WORKBOOK,
                 ResearchConstants.ARTIFACT_TYPE_STAGE1_EVIDENCE_WORKBOOK,
+                ResearchConstants.ARTIFACT_TYPE_STAGE1_CONCLUSION_REPORT,
                 "UNEXPECTED_ARTIFACT");
         when(artifactDao.listAvailableByJobIds(List.of(JOB_ID)))
                 .thenReturn(List.copyOf(artifacts.values()));

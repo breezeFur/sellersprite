@@ -11,5 +11,5 @@ public class DashboardActivityVo {
     private String description;
     private Integer success;
     private Long occurredAt;
-    private String trackId;
+    private String traceId;
 }

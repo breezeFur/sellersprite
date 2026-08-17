@@ -65,7 +65,7 @@ public class ResearchAnalysisConversationRecorder {
         promptRecord.setErrorType(EMPTY_STRING);
         promptRecord.setErrorMessage(EMPTY_STRING);
         promptRecord.setCostMs(0L);
-        promptRecord.setTrackId(EMPTY_STRING);
+        promptRecord.setTraceId(EMPTY_STRING);
         if (!promptRecordDao.saveOrUpdate(promptRecord)) {
             throw new IllegalStateException("保存市场调研分析Prompt记录失败");
         }

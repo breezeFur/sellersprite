@@ -1,6 +1,6 @@
 package cyou.yuanbaomao.sellersprite.system.permission.service;
 
-import cyou.yuanbaomao.base.result.PageResult;
+import cyou.yuanbaomao.mybatis.result.YPage;
 import cyou.yuanbaomao.sellersprite.system.permission.model.dto.SysApiCreateRequest;
 import cyou.yuanbaomao.sellersprite.system.permission.model.dto.SysApiPageRequest;
 import cyou.yuanbaomao.sellersprite.system.permission.model.dto.SysApiUpdateRequest;
@@ -31,7 +31,7 @@ public interface PermissionService {
 
     List<SysApiVo> listPublicApis();
 
-    PageResult<SysApiVo> pageApis(SysApiPageRequest request);
+    YPage<SysApiVo> pageApis(YPage<SysApiVo> page, SysApiPageRequest request);
 
     SysApiVo apiDetail(String apiId);
 

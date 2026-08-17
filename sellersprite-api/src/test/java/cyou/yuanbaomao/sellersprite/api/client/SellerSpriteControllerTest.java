@@ -21,8 +21,8 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import cyou.yuanbaomao.sellersprite.api.account.controller.AccountController;
 import cyou.yuanbaomao.sellersprite.api.account.service.AccountService;
 import cyou.yuanbaomao.sellersprite.api.asin.controller.AsinController;
-import cyou.yuanbaomao.sellersprite.api.asin.model.dto.AsinDetailRequest;
 import cyou.yuanbaomao.sellersprite.api.asin.service.AsinService;
+import cyou.yuanbaomao.sellersprite.api.common.enums.SellerSpriteMarketplace;
 import cyou.yuanbaomao.sellersprite.api.keyword.controller.KeywordController;
 import cyou.yuanbaomao.sellersprite.api.keyword.model.dto.KeywordResearchRequest;
 import cyou.yuanbaomao.sellersprite.api.keyword.service.KeywordService;
@@ -110,7 +110,7 @@ class SellerSpriteControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value("00000"));
 
-        verify(service).getAsinDetail(any(AsinDetailRequest.class));
+        verify(service).getAsinDetail(SellerSpriteMarketplace.US, "B0TESTASIN");
     }
 
     @Test

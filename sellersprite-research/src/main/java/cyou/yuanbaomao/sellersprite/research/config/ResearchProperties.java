@@ -64,6 +64,9 @@ public class ResearchProperties {
     /** 生成报告的本地输出目录。 */
     private String outputDirectory = "./data/market-research";
 
+    /** PDF 中文字体路径；为空时使用 server 模块随 JAR 分发的 Noto Sans SC。 */
+    private String pdfFontPath;
+
     /** 主动推送型SSE的回放批次、心跳与连接限制。 */
     @Data
     public static class EventStream {

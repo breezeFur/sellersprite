@@ -200,7 +200,7 @@ class ResearchAnalysisExecutorTest {
                     ResearchEventTypes.SUMMARY, "summary", null, result.getFinalSummary(), result));
             return result;
         });
-        when(reportRenderer.render(result)).thenReturn("# AI分析报告");
+        when(reportRenderer.renderFinal(result)).thenReturn("# AI分析报告");
         when(analysisRunDao.markSucceeded(
                 eq(ANALYSIS_RUN_ID),
                 eq(EXECUTION_OWNER),
@@ -248,6 +248,7 @@ class ResearchAnalysisExecutorTest {
                         ResearchEventTypes.SUMMARY,
                         ResearchEventTypes.DONE,
                         ResearchEventTypes.STAGE_COMPLETED);
+        assertThat(events.get(2).getMessage()).isEqualTo("# AI分析报告");
         assertDoneStatus(events, ResearchAnalysisRunStatus.SUCCEEDED.name());
         assertThat(events).noneMatch(event -> event.getSheetName() != null);
         verify(agent, never()).run(
@@ -296,19 +297,27 @@ class ResearchAnalysisExecutorTest {
         lease = stageLease(ResearchAnalysisRunType.SCREENING);
         persistedRun.setRunType(ResearchAnalysisRunType.SCREENING.name());
         AmazonSelectionReactResult result = successfulResult();
+        String normalizedSummary = """
+                ## US
+
+                - 市场存在进入机会。
+                """;
         when(datasetService.readEvidenceDatasets(JOB_ID, EvidenceStage.SCREENING))
                 .thenReturn(List.of(evidenceDataset));
+        when(reportRenderer.renderScreeningSummary(result)).thenReturn(normalizedSummary);
         whenStageAgentRuns().thenAnswer(invocation -> {
             Consumer<AmazonSelectionReactEvent> eventConsumer = invocation.getArgument(4);
             eventConsumer.accept(event(
                     ResearchEventTypes.SHEET_THINK, "think", "US", "初筛分析完成", "screening-summary"));
+            eventConsumer.accept(event(
+                    ResearchEventTypes.SUMMARY, "summary", null, result.getFinalSummary(), result));
             return result;
         });
         when(analysisRunDao.markSucceeded(
                 eq(ANALYSIS_RUN_ID),
                 eq(EXECUTION_OWNER),
                 eq(EXECUTION_TOKEN),
-                eq(result.getFinalSummary()),
+                eq(normalizedSummary),
                 anyLong()))
                 .thenReturn(true);
 
@@ -316,13 +325,16 @@ class ResearchAnalysisExecutorTest {
 
         verify(datasetService).readEvidenceDatasets(JOB_ID, EvidenceStage.SCREENING);
         verify(datasetService, never()).readEvidenceDatasets(JOB_ID);
-        verifyNoInteractions(reportRenderer, artifactService);
-        List<ResearchEventCommand> events = publishedEvents(3);
+        verify(reportRenderer, org.mockito.Mockito.times(2)).renderScreeningSummary(result);
+        verifyNoInteractions(artifactService);
+        List<ResearchEventCommand> events = publishedEvents(4);
         assertThat(events).extracting(ResearchEventCommand::getEventType)
                 .containsExactly(
                         ResearchEventTypes.SHEET_THINK,
+                        ResearchEventTypes.SUMMARY,
                         ResearchEventTypes.DONE,
                         ResearchEventTypes.STAGE_COMPLETED);
+        assertThat(events.get(1).getMessage()).isEqualTo(normalizedSummary.stripTrailing());
         Map<?, ?> sheetPayload = (Map<?, ?>) events.getFirst().getPayload();
         assertThat(sheetPayload.get("stageCode")).isEqualTo(ResearchStageCode.SCREENING.name());
         assertThat(sheetPayload.get("datasetCode")).isEqualTo("evidence.products");

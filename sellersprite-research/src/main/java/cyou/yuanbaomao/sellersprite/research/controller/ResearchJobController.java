@@ -1,18 +1,22 @@
 package cyou.yuanbaomao.sellersprite.research.controller;
 
-import cyou.yuanbaomao.base.result.PageResult;
+import cyou.yuanbaomao.mybatis.result.YPage;
 import cyou.yuanbaomao.base.result.Result;
+import cyou.yuanbaomao.sellersprite.api.common.enums.SellerSpriteMarketplace;
 import cyou.yuanbaomao.sellersprite.research.model.ResearchDownload;
 import cyou.yuanbaomao.sellersprite.research.model.dto.ResearchJobCreateRequest;
-import cyou.yuanbaomao.sellersprite.research.model.dto.ResearchJobPageRequest;
 import cyou.yuanbaomao.sellersprite.research.model.vo.ResearchJobCreatedVo;
 import cyou.yuanbaomao.sellersprite.research.model.vo.ResearchJobDetailVo;
 import cyou.yuanbaomao.sellersprite.research.model.vo.ResearchJobHistoryVo;
 import cyou.yuanbaomao.sellersprite.research.model.vo.ResearchNodeExecutionVo;
+import cyou.yuanbaomao.sellersprite.research.enums.ResearchJobStatus;
 import cyou.yuanbaomao.sellersprite.research.service.ResearchJobService;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -26,12 +30,15 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 @Tag(name = "市场调研报告")
 @RestController
 @RequiredArgsConstructor
+@Validated
 @RequestMapping("/api/market-research/jobs")
 public class ResearchJobController {
 
@@ -45,8 +52,18 @@ public class ResearchJobController {
 
     @Operation(summary = "分页查询我的全部历史报告")
     @GetMapping
-    public Result<PageResult<ResearchJobHistoryVo>> page(@Valid ResearchJobPageRequest request) {
-        return Result.success(researchJobService.page(request));
+    public Result<YPage<ResearchJobHistoryVo>> page(@Valid YPage<ResearchJobHistoryVo> page,
+            @Parameter(description = "报告名称、调研关键词或任务 ID 关键字")
+            @Size(max = 128, message = "搜索关键字不能超过128个字符")
+            @RequestParam(value = "keyword", required = false) String keyword,
+            @Parameter(description = "任务状态")
+            @RequestParam(value = "status", required = false) ResearchJobStatus status,
+            @Parameter(description = "Amazon 站点")
+            @RequestParam(value = "marketplace", required = false) SellerSpriteMarketplace marketplace,
+            @Parameter(description = "调研月份，yyyy-MM 格式")
+            @Pattern(regexp = "^$|^\\d{4}-(0[1-9]|1[0-2])$", message = "调研月份必须为yyyy-MM格式")
+            @RequestParam(value = "month", required = false) String month) {
+        return Result.success(researchJobService.page(page, keyword, status, marketplace, month));
     }
 
     @Operation(summary = "查询市场调研任务进度")

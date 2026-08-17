@@ -60,7 +60,7 @@ public class TokenAuthInterceptor implements HandlerInterceptor {
 
         RequestContext existingContext = RequestContextHolder.get().orElse(null);
         RequestContextHolder.set(RequestContext.builder()
-                .trackId(existingContext == null ? null : existingContext.getTrackId())
+                .traceId(existingContext == null ? null : existingContext.getTraceId())
                 .userId(user.getUserId())
                 .username(user.getUsername())
                 .build());

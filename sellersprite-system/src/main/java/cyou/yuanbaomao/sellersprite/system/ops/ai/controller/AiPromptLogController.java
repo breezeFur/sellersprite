@@ -1,6 +1,6 @@
 package cyou.yuanbaomao.sellersprite.system.ops.ai.controller;
 
-import cyou.yuanbaomao.base.result.PageResult;
+import cyou.yuanbaomao.mybatis.result.YPage;
 import cyou.yuanbaomao.base.result.Result;
 import cyou.yuanbaomao.sellersprite.system.ops.ai.model.dto.AiPromptLogPageRequest;
 import cyou.yuanbaomao.sellersprite.system.ops.ai.model.vo.AiPromptLogVo;
@@ -24,8 +24,9 @@ public class AiPromptLogController {
 
     @Operation(summary = "分页查询AI Prompt日志")
     @GetMapping
-    public Result<PageResult<AiPromptLogVo>> page(@Valid AiPromptLogPageRequest request) {
-        return Result.success(promptLogService.page(request));
+    public Result<YPage<AiPromptLogVo>> page(@Valid YPage<AiPromptLogVo> page,
+            @Valid AiPromptLogPageRequest request) {
+        return Result.success(promptLogService.page(page, request));
     }
 
     @Operation(summary = "查询AI Prompt日志详情")

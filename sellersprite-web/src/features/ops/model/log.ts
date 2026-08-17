@@ -11,7 +11,7 @@ export interface LoginLog {
   userAgent: string
   deviceName: string
   clientType: string
-  trackId: string
+  traceId: string
   createdAt: number
 }
 
@@ -32,7 +32,7 @@ export interface OperationLog {
   clientIp: string
   userAgent: string
   costMs: number
-  trackId: string
+  traceId: string
   createdAt: number
 }
 
@@ -55,7 +55,7 @@ export interface AiPromptLog {
   errorType: string
   errorMessage: string
   costMs: number
-  trackId: string
+  traceId: string
   createdAt: number
 }
 
@@ -78,7 +78,7 @@ export interface OperationLogQuery {
   moduleName?: string
   operationType?: string
   success?: number
-  trackId?: string
+  traceId?: string
   startTime?: number
   endTime?: number
 }

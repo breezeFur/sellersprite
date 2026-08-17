@@ -2,10 +2,10 @@
 package cyou.yuanbaomao.sellersprite.api.keyword.controller;
 
 import cyou.yuanbaomao.base.result.Result;
+import cyou.yuanbaomao.sellersprite.api.common.enums.SellerSpriteMarketplace;
 import cyou.yuanbaomao.sellersprite.api.keyword.model.dto.AbaKeywordTrendRequest;
 import cyou.yuanbaomao.sellersprite.api.keyword.model.dto.AbaMonthlyResearchRequest;
 import cyou.yuanbaomao.sellersprite.api.keyword.model.dto.AbaWeeklyResearchRequest;
-import cyou.yuanbaomao.sellersprite.api.keyword.model.dto.GoogleTrendRequest;
 import cyou.yuanbaomao.sellersprite.api.keyword.model.dto.KeywordMinerRequest;
 import cyou.yuanbaomao.sellersprite.api.keyword.model.dto.KeywordOrderRequest;
 import cyou.yuanbaomao.sellersprite.api.keyword.model.dto.KeywordResearchRequest;
@@ -21,21 +21,25 @@ import cyou.yuanbaomao.sellersprite.api.keyword.model.vo.KeywordResearchTrendVo;
 import cyou.yuanbaomao.sellersprite.api.keyword.model.vo.KeywordResearchVo;
 import cyou.yuanbaomao.sellersprite.api.keyword.model.vo.TrafficKeywordExtendVo;
 import cyou.yuanbaomao.sellersprite.api.keyword.service.KeywordService;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.annotation.Validated;
 
 @Tag(name = "SellerSprite 关键词研究", description = "SellerSprite 关键词研究分类接口")
 @RestController
 @RequiredArgsConstructor
+@Validated
 @RequestMapping("/api/sellersprite/keywords")
 public class KeywordController {
 
@@ -85,8 +89,16 @@ public class KeywordController {
 
     @Operation(summary = "谷歌趋势", description = "通过统一 SellerSpriteClient 调用 /v1/google/trends")
     @GetMapping("/google-trends")
-    public Result<GoogleTrendVo> getGoogleTrends(@Valid @ModelAttribute GoogleTrendRequest request) {
-        return Result.success(keywordService.getGoogleTrends(request));
+    public Result<GoogleTrendVo> getGoogleTrends(
+            @Parameter(description = "市场，例如 US")
+            @NotNull @RequestParam("marketplace") SellerSpriteMarketplace marketplace,
+            @Parameter(description = "关键词，例如 iphone stand")
+            @RequestParam(value = "keyword", required = false) String keyword,
+            @Parameter(description = "Google 搜索类别")
+            @RequestParam(value = "googleProp", required = false) String googleProp,
+            @Parameter(description = "是否按月返回")
+            @RequestParam(value = "monthly", required = false) Boolean monthly) {
+        return Result.success(keywordService.getGoogleTrends(marketplace, keyword, googleProp, monthly));
     }
 
     @Operation(summary = "出单词反查", description = "通过统一 SellerSpriteClient 调用 /v1/keyword-order")

@@ -2,7 +2,7 @@ export interface ApiResult<T> {
   code: string
   message: string
   data: T
-  trackId?: string
+  traceId?: string
 }
 
 export interface PageResult<T> {

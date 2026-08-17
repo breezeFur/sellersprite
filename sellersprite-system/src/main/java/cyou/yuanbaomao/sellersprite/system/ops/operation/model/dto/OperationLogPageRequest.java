@@ -1,17 +1,14 @@
 package cyou.yuanbaomao.sellersprite.system.ops.operation.model.dto;
 
-import cyou.yuanbaomao.base.result.PageQuery;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 @Data
-@EqualsAndHashCode(callSuper = true)
 @Schema(description = "操作日志分页查询")
-public class OperationLogPageRequest extends PageQuery {
+public class OperationLogPageRequest {
 
     @Size(max = 36, message = "操作人ID不能超过36个字符")
     private String userId;
@@ -29,8 +26,8 @@ public class OperationLogPageRequest extends PageQuery {
     @Max(value = 1, message = "结果只能为0或1")
     private Integer success;
 
-    @Size(max = 64, message = "trackId不能超过64个字符")
-    private String trackId;
+    @Size(max = 64, message = "traceId不能超过64个字符")
+    private String traceId;
 
     private Long startTime;
 

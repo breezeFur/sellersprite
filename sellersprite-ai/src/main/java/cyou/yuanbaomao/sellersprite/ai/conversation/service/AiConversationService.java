@@ -1,7 +1,6 @@
 package cyou.yuanbaomao.sellersprite.ai.conversation.service;
 
-import cyou.yuanbaomao.base.result.PageResult;
-import cyou.yuanbaomao.sellersprite.ai.conversation.model.dto.AiConversationPageRequest;
+import cyou.yuanbaomao.mybatis.result.YPage;
 import cyou.yuanbaomao.sellersprite.ai.conversation.model.dto.AiConversationRenameRequest;
 import cyou.yuanbaomao.sellersprite.ai.conversation.model.dto.AiConversationSettingsRequest;
 import cyou.yuanbaomao.sellersprite.ai.conversation.model.vo.AiConversationDetailVo;
@@ -10,7 +9,7 @@ import cyou.yuanbaomao.sellersprite.ai.conversation.model.vo.AiConversationSetti
 
 public interface AiConversationService {
 
-    PageResult<AiConversationVo> page(AiConversationPageRequest request);
+    YPage<AiConversationVo> page(YPage<AiConversationVo> page, String title);
 
     AiConversationDetailVo detail(String conversationId);
 

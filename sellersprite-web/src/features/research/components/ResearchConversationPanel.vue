@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import {
   ChatDotRound,
+  Finished,
   Promotion,
   RefreshRight,
+  Right,
   VideoPause,
 } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
@@ -73,6 +75,7 @@ const props = withDefaults(defineProps<{
 const emit = defineEmits<{
   resume: []
   followUpRunsChange: [analysisRunIds: string[]]
+  openProductSelection: []
 }>()
 
 const store = useResearchAgentStore()
@@ -100,6 +103,7 @@ const optimisticAnalysisRuns = ref<ResearchAnalysisRun[]>([])
 const analysisRunsLoading = ref(false)
 const analysisRunsError = ref('')
 const timelineElement = ref<HTMLElement>()
+const workspaceStatusHostAvailable = ref(false)
 let analysisRunsRequestVersion = 0
 let refreshedTerminalSignal = ''
 const {
@@ -446,6 +450,9 @@ watch(terminalFollowUpSignal, (signal) => {
 })
 
 onMounted(() => {
+  workspaceStatusHostAvailable.value = Boolean(
+    document.getElementById('research-workspace-stream-status-host'),
+  )
   void scrollTimelineToActivity(true)
 })
 
@@ -523,7 +530,7 @@ async function downloadArtifact(report: ResearchReportDownload) {
     const objectUrl = URL.createObjectURL(content)
     const link = document.createElement('a')
     link.href = objectUrl
-    link.download = report.fileName || `market-research-analysis-${report.artifactId}.md`
+    link.download = report.fileName || `market-research-analysis-${report.artifactId}.pdf`
     document.body.appendChild(link)
     link.click()
     link.remove()
@@ -603,70 +610,73 @@ function errorMessage(error: unknown, fallback: string) {
           plain
           size="small"
           :loading="commandLoading"
-           data-testid="continue-research-analysis"
-           @click="continueAnalysis"
-         >
+          data-testid="continue-research-analysis"
+          @click="continueAnalysis"
+        >
           继续分析
         </ElButton>
       </div>
     </header>
 
-    <header
-      v-else
-      class="research-agent__statusbar"
-      data-testid="research-workspace-stream-status"
+    <Teleport
+      v-if="props.workspace && workspaceStatusHostAvailable"
+      to="#research-workspace-stream-status-host"
     >
-      <div>
-        <span
-          class="research-agent__status-dot"
-          :class="`research-agent__status-dot--${statusType}`"
-          aria-hidden="true"
-        />
-        <p>{{ connectionLabel }}</p>
-        <ElTag
-          :type="statusType"
-          size="small"
-          effect="plain"
-        >
-          {{ analysisState }} · #{{ lastSequence }}
-        </ElTag>
-      </div>
-      <div class="research-agent__actions">
-        <ElButton
-          v-if="connectionError || reconnecting"
-          :icon="RefreshRight"
-          size="small"
-          :loading="connecting"
-          data-testid="reconnect-research-stream"
-          @click="requestReconnect"
-        >
-          立即恢复
-        </ElButton>
-        <ElButton
-          v-if="analysisRunning && activeAnalysisRunId"
-          :icon="VideoPause"
-          size="small"
-          :loading="commandLoading"
-          data-testid="cancel-research-analysis"
-          @click="cancelAnalysis"
-        >
-          取消分析
-        </ElButton>
-        <ElButton
-          v-else-if="analysisState === 'FAILED' && analysisRetryable && activeAnalysisRunId"
-          :icon="RefreshRight"
-          type="primary"
-          plain
-          size="small"
-          :loading="commandLoading"
-           data-testid="continue-research-analysis"
-           @click="continueAnalysis"
-         >
-          继续分析
-        </ElButton>
-      </div>
-    </header>
-
+      <header
+        class="research-agent__statusbar"
+        data-testid="research-workspace-stream-status"
+      >
+        <div>
+          <span
+            class="research-agent__status-dot"
+            :class="`research-agent__status-dot--${statusType}`"
+            aria-hidden="true"
+          />
+          <p>{{ connectionLabel }}</p>
+          <ElTag
+            :type="statusType"
+            size="small"
+            effect="plain"
+          >
+            {{ analysisState }} · #{{ lastSequence }}
+          </ElTag>
+        </div>
+        <div class="research-agent__actions">
+          <ElButton
+            v-if="connectionError || reconnecting"
+            :icon="RefreshRight"
+            size="small"
+            :loading="connecting"
+            data-testid="reconnect-research-stream"
+            @click="requestReconnect"
+          >
+            立即恢复
+          </ElButton>
+          <ElButton
+            v-if="analysisRunning && activeAnalysisRunId"
+            :icon="VideoPause"
+            size="small"
+            :loading="commandLoading"
+            data-testid="cancel-research-analysis"
+            @click="cancelAnalysis"
+          >
+            取消分析
+          </ElButton>
+          <ElButton
+            v-else-if="analysisState === 'FAILED' && analysisRetryable && activeAnalysisRunId"
+            :icon="RefreshRight"
+            type="primary"
+            plain
+            size="small"
+            :loading="commandLoading"
+            data-testid="continue-research-analysis"
+            @click="continueAnalysis"
+          >
+            继续分析
+          </ElButton>
+        </div>
+      </header>
+    </Teleport>
     <ElAlert
       v-if="connectionError"
       class="research-agent__alert"
@@ -746,6 +756,37 @@ function errorMessage(error: unknown, fallback: string) {
           :active-event-id="activeEventId"
           @download="downloadArtifact"
         />
+
+        <section
+          v-if="props.workspace && props.jobStatus === 'WAITING_INPUT'"
+          class="report-next-step"
+          data-testid="research-report-product-selection-cta"
+          aria-labelledby="research-report-product-selection-title"
+        >
+          <div
+            class="report-next-step__icon"
+            aria-hidden="true"
+          >
+            <ElIcon><Finished /></ElIcon>
+          </div>
+          <div class="report-next-step__content">
+            <span>阶段一已完成</span>
+            <h3 id="research-report-product-selection-title">
+              看完结论后，选择值得进入阶段二的商品
+            </h3>
+            <p>先查看候选商品并确认深挖范围；只有提交选择后，任务才会继续执行阶段二。</p>
+          </div>
+          <ElButton
+            class="report-next-step__action"
+            type="primary"
+            size="large"
+            :icon="Right"
+            data-testid="open-product-selection-from-report"
+            @click="emit('openProductSelection')"
+          >
+            去选择候选商品
+          </ElButton>
+        </section>
       </template>
 
       <template v-else>
@@ -1087,6 +1128,7 @@ function errorMessage(error: unknown, fallback: string) {
 }
 
 .research-agent--workspace {
+  position: relative;
   display: flex;
   min-width: 0;
   min-height: 0;
@@ -1161,6 +1203,7 @@ function errorMessage(error: unknown, fallback: string) {
 
 .research-agent--workspace .research-agent__timeline--report > :deep(.official-event-list),
 .research-agent--workspace .report-section,
+.research-agent--workspace .report-next-step,
 .research-agent--workspace .report-follow-up {
   width: min(100%, 980px);
   margin-right: auto;
@@ -1175,6 +1218,65 @@ function errorMessage(error: unknown, fallback: string) {
 .report-section,
 .process-section {
   min-width: 0;
+}
+
+.report-next-step {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: 42px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 14px;
+  margin-top: 22px;
+  padding: 18px;
+  border: 1px solid var(--el-color-warning-light-5);
+  border-radius: var(--radius-lg);
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--el-color-warning-light-9) 86%, var(--color-surface)),
+    var(--color-surface) 72%
+  );
+  box-shadow: var(--shadow-sm);
+}
+
+.report-next-step__icon {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  color: var(--el-color-warning-dark-2);
+  background: var(--el-color-warning-light-8);
+  border-radius: 50%;
+  font-size: 20px;
+}
+
+.report-next-step__content {
+  min-width: 0;
+}
+
+.report-next-step__content > span {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--el-color-warning-dark-2);
+  font-size: 11px;
+  font-weight: 650;
+}
+
+.report-next-step__content h3 {
+  margin: 0;
+  color: var(--color-text);
+  font-size: 15px;
+  line-height: 1.45;
+}
+
+.report-next-step__content p {
+  margin: 5px 0 0;
+  color: var(--color-text-secondary);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.report-next-step__action {
+  flex: 0 0 auto;
 }
 
 .report-follow-up {
@@ -1348,6 +1450,22 @@ function errorMessage(error: unknown, fallback: string) {
 
   .research-agent--workspace .research-agent__composer {
     padding: 10px 12px;
+  }
+
+  .report-next-step {
+    grid-template-columns: 34px minmax(0, 1fr);
+    padding: 14px;
+  }
+
+  .report-next-step__icon {
+    width: 34px;
+    height: 34px;
+    font-size: 17px;
+  }
+
+  .report-next-step__action {
+    width: 100%;
+    grid-column: 1 / -1;
   }
 }
 </style>

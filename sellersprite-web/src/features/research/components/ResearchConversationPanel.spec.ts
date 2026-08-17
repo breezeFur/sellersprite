@@ -339,6 +339,21 @@ describe('ResearchConversationPanel', () => {
     expect(wrapper.get('[data-testid="research-conversation-panel"]').classes())
       .toContain('research-agent--focus')
   })
+
+  it('offers the product-selection decision after the stage-one report', async () => {
+    const { wrapper } = mountPanel([], 'WAITING_INPUT', false, 'report', true)
+    await flushPromises()
+
+    expect(wrapper.get('[data-testid="research-report-product-selection-cta"]').text())
+      .toContain('看完结论后，选择值得进入阶段二的商品')
+
+    await wrapper.get('[data-testid="open-product-selection-from-report"]').trigger('click')
+
+    expect(wrapper.emitted('openProductSelection')).toHaveLength(1)
+
+    await wrapper.setProps({ jobStatus: 'SUCCEEDED' })
+    expect(wrapper.find('[data-testid="research-report-product-selection-cta"]').exists()).toBe(false)
+  })
 })
 
 function mountPanel(

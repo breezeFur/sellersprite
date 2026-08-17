@@ -97,7 +97,7 @@ async function responseError(response: Response) {
     if (typeof result.code === 'string' && typeof result.message === 'string') {
       return new ApiError(result.code, result.message, {
         status: response.status,
-        trackId: result.trackId,
+        traceId: result.traceId,
       })
     }
   } catch {

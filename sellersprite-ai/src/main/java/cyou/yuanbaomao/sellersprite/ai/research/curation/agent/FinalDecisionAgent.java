@@ -6,6 +6,7 @@ import cyou.yuanbaomao.sellersprite.ai.research.curation.prompt.AmazonSelectionP
 import cyou.yuanbaomao.sellersprite.ai.research.curation.tool.AmazonProductAnalysisTools;
 import cyou.yuanbaomao.sellersprite.ai.research.curation.tool.AmazonSelectionToolContext;
 import cyou.yuanbaomao.sellersprite.ai.research.curation.tool.ResearchRawDataTools;
+import cyou.yuanbaomao.sellersprite.ai.research.curation.tool.ResearchReportChartTools;
 import java.util.List;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.api.Advisor;
@@ -39,6 +40,7 @@ public class FinalDecisionAgent extends AmazonSelectionManus {
             AmazonSelectionToolContext toolContext,
             AmazonProductAnalysisTools analysisTools,
             ResearchRawDataTools rawDataTools,
+            ResearchReportChartTools reportChartTools,
             List<Advisor> advisors,
             ModelInputCompactor modelInputCompactor) {
         super(
@@ -51,7 +53,8 @@ public class FinalDecisionAgent extends AmazonSelectionManus {
                 analysisTools,
                 rawDataTools,
                 advisors,
-                modelInputCompactor);
+                modelInputCompactor,
+                reportChartTools);
     }
 
     @Override

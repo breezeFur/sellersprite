@@ -38,13 +38,39 @@ public abstract class AmazonSelectionManus extends SheetDispatchAmazonSelectionA
             ResearchRawDataTools rawDataTools,
             List<Advisor> advisors,
             ModelInputCompactor modelInputCompactor) {
+        this(
+                agentName,
+                systemPrompt,
+                nextStepPrompt,
+                chatClientBuilderProvider,
+                toolCallbackProviderProvider,
+                toolContext,
+                analysisTools,
+                rawDataTools,
+                advisors,
+                modelInputCompactor,
+                new Object[0]);
+    }
+
+    protected AmazonSelectionManus(
+            String agentName,
+            String systemPrompt,
+            String nextStepPrompt,
+            ObjectProvider<ChatClient.Builder> chatClientBuilderProvider,
+            ObjectProvider<ToolCallbackProvider> toolCallbackProviderProvider,
+            AmazonSelectionToolContext toolContext,
+            AmazonProductAnalysisTools analysisTools,
+            ResearchRawDataTools rawDataTools,
+            List<Advisor> advisors,
+            ModelInputCompactor modelInputCompactor,
+            Object... additionalConversationTools) {
         super(
                 toolCallbacks(toolCallbackProviderProvider),
                 null,
                 toolContext,
                 analysisTools,
                 buildCompactChatClient(chatClientBuilderProvider, advisors),
-                rawDataTools);
+                conversationTools(rawDataTools, additionalConversationTools));
         this.modelInputCompactor = modelInputCompactor;
         this.rawDataTools = rawDataTools;
         setName(agentName);
@@ -195,6 +221,14 @@ public abstract class AmazonSelectionManus extends SheetDispatchAmazonSelectionA
     private static ToolCallback[] toolCallbacks(ObjectProvider<ToolCallbackProvider> provider) {
         ToolCallbackProvider toolCallbackProvider = provider.getIfAvailable();
         return toolCallbackProvider == null ? new ToolCallback[0] : toolCallbackProvider.getToolCallbacks();
+    }
+
+    private static Object[] conversationTools(
+            ResearchRawDataTools rawDataTools, Object[] additionalConversationTools) {
+        Object[] tools = new Object[additionalConversationTools.length + 1];
+        tools[0] = rawDataTools;
+        System.arraycopy(additionalConversationTools, 0, tools, 1, additionalConversationTools.length);
+        return tools;
     }
 
     private static ChatClient buildCompactChatClient(

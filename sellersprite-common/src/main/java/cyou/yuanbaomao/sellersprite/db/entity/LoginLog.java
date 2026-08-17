@@ -61,7 +61,7 @@ public class LoginLog extends BaseCreateTime {
     @Schema(description = "客户端类型")
     private String clientType;
 
-    @TableField("track_id")
+    @TableField("trace_id")
     @Schema(description = "链路追踪ID")
-    private String trackId;
+    private String traceId;
 }

@@ -90,7 +90,8 @@ public class ResearchAnalysisExecutor {
             CurationAnalysisProperties properties) {
         this(taskExecutor, heartbeatScheduler, stateService, datasetService, workbookAssembler, agentRouter,
                 taskContextService,
-                reportRenderer, artifactService, conversationRecorder, eventPublisher, properties, System::nanoTime);
+                reportRenderer, artifactService, conversationRecorder, eventPublisher,
+                properties, System::nanoTime);
     }
 
     ResearchAnalysisExecutor(
@@ -237,10 +238,27 @@ public class ResearchAnalysisExecutor {
             }
             assertLeaseExecutable(lease);
             budget.assertExecutionDuration();
-            String markdown = rendersMarkdown(lease) ? reportRenderer.render(result) : null;
-            String persistedSummary = runType(lease) == ResearchAnalysisRunType.FINAL_ANALYSIS
-                    ? markdown
-                    : result.getFinalSummary();
+            String markdown;
+            try {
+                markdown = rendersMarkdown(lease)
+                        ? currentRunType == ResearchAnalysisRunType.FINAL_ANALYSIS
+                                ? reportRenderer.renderFinal(result)
+                                : reportRenderer.render(result)
+                        : null;
+            } catch (IllegalStateException exception) {
+                if (currentRunType == ResearchAnalysisRunType.FINAL_ANALYSIS) {
+                    throw new AmazonSelectionAnalysisException(
+                            AmazonSelectionAnalysisException.ErrorCode.REPORT_STRUCTURE_INVALID,
+                            exception.getMessage(),
+                            exception);
+                }
+                throw exception;
+            }
+            String persistedSummary = switch (currentRunType) {
+                case FINAL_ANALYSIS -> markdown;
+                case SCREENING -> reportRenderer.renderScreeningSummary(result);
+                default -> result.getFinalSummary();
+            };
             stateService.saveFinalSummary(lease, persistedSummary);
             if (publishesArtifact(lease)) {
                 budget.assertExecutionDuration();
@@ -365,13 +383,25 @@ public class ResearchAnalysisExecutor {
                 .eventType(event.getEventType())
                 .phase(event.getPhase())
                 .sheetName(event.getSheetName())
-                .message(event.getMessage() == null ? "" : event.getMessage())
+                .message(agentEventMessage(lease, event))
                 .payload(eventPayload(lease, event))
                 .build());
         incrementRunCounters(lease, 0, 1);
         if (ResearchEventTypes.ERROR.equals(event.getEventType())) {
             agentErrorPersisted.set(true);
         }
+    }
+
+    private String agentEventMessage(ResearchAnalysisLease lease, AmazonSelectionReactEvent event) {
+        if (ResearchEventTypes.SUMMARY.equals(event.getEventType())
+                && event.getData() instanceof AmazonSelectionReactResult result) {
+            return switch (runType(lease)) {
+                case SCREENING -> reportRenderer.renderScreeningSummary(result).stripTrailing();
+                case FINAL_ANALYSIS -> reportRenderer.renderFinal(result).stripTrailing();
+                default -> event.getMessage() == null ? "" : event.getMessage();
+            };
+        }
+        return event.getMessage() == null ? "" : event.getMessage();
     }
 
     private Map<String, Object> eventPayload(

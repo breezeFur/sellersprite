@@ -11,6 +11,7 @@ import cyou.yuanbaomao.sellersprite.api.asin.model.dto.AsinDetailRequest;
 import cyou.yuanbaomao.sellersprite.api.asin.model.vo.AsinDetailVo;
 import cyou.yuanbaomao.sellersprite.api.asin.service.AsinService;
 import cyou.yuanbaomao.sellersprite.api.client.SellerSpriteApiException;
+import cyou.yuanbaomao.sellersprite.api.common.enums.SellerSpriteMarketplace;
 import cyou.yuanbaomao.sellersprite.api.keyword.model.dto.KeywordResearchRequest;
 import cyou.yuanbaomao.sellersprite.api.keyword.model.vo.KeywordResearchVo;
 import cyou.yuanbaomao.sellersprite.api.keyword.service.KeywordService;
@@ -66,13 +67,15 @@ class SellerSpriteAiToolsTest {
     @Test
     void shouldDelegateAsinDetailQuery() {
         AsinDetailRequest request = new AsinDetailRequest();
+        request.setMarketplace(SellerSpriteMarketplace.US);
+        request.setAsin("B08GHW4TBS");
         AsinDetailVo expected = new AsinDetailVo();
-        when(asinService.getAsinDetail(request)).thenReturn(expected);
+        when(asinService.getAsinDetail(request.getMarketplace(), request.getAsin())).thenReturn(expected);
 
         AsinDetailVo result = tools.getAsinDetail(request);
 
         assertThat(result).isSameAs(expected);
-        verify(asinService).getAsinDetail(request);
+        verify(asinService).getAsinDetail(request.getMarketplace(), request.getAsin());
     }
 
     @Test
@@ -114,11 +117,13 @@ class SellerSpriteAiToolsTest {
     @Test
     void shouldPropagateSellerSpriteFailureWithoutFallbackResult() {
         AsinDetailRequest request = new AsinDetailRequest();
+        request.setMarketplace(SellerSpriteMarketplace.US);
+        request.setAsin("B08GHW4TBS");
         SellerSpriteApiException expected = new SellerSpriteApiException(
                 ResultCode.SELLERSPRITE_QUOTA_EXHAUSTED, null, "request-id", null);
-        when(asinService.getAsinDetail(request)).thenThrow(expected);
+        when(asinService.getAsinDetail(request.getMarketplace(), request.getAsin())).thenThrow(expected);
 
         assertThatThrownBy(() -> tools.getAsinDetail(request)).isSameAs(expected);
-        verify(asinService).getAsinDetail(request);
+        verify(asinService).getAsinDetail(request.getMarketplace(), request.getAsin());
     }
 }

@@ -8,6 +8,6 @@ import lombok.Data;
 public class AiStreamErrorVo {
     private String code;
     private String message;
-    private String trackId;
+    private String traceId;
     private Boolean retryable;
 }

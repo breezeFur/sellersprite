@@ -30,7 +30,7 @@ const loginState = reactive<PageState<LoginLog>>(emptyState())
 const operationState = reactive<PageState<OperationLog>>(emptyState())
 const aiState = reactive<PageState<AiPromptLog>>(emptyState())
 const loginFilters = reactive({ username: '', success: null as number | null, loginIp: '', startTime: '', endTime: '' })
-const operationFilters = reactive({ username: '', moduleName: '', operationType: '', success: null as number | null, trackId: '', startTime: '', endTime: '' })
+const operationFilters = reactive({ username: '', moduleName: '', operationType: '', success: null as number | null, traceId: '', startTime: '', endTime: '' })
 const aiFilters = reactive({ conversationId: '', provider: '', model: '', status: '', startTime: '', endTime: '' })
 const detailOpen = ref(false)
 const detailLoading = ref(false)
@@ -77,7 +77,7 @@ const detailFields = computed(() => {
       ['用户', value.username || '--'], ['登录类型', value.loginType || '--'], ['结果', resultText(value.success)],
       ['错误码', value.errorCode || '--'], ['失败原因', value.failureReason || '--'], ['登录 IP', value.loginIp || '--'],
       ['位置', value.loginLocation || '--'], ['设备', value.deviceName || '--'], ['客户端', value.clientType || '--'],
-      ['Track ID', value.trackId || '--'], ['发生时间', formatTime(value.createdAt)],
+      ['Trace ID', value.traceId || '--'], ['发生时间', formatTime(value.createdAt)],
     ]
   }
   if (detailKind.value === 'operation') {
@@ -86,7 +86,7 @@ const detailFields = computed(() => {
       ['操作人', value.username || '--'], ['模块', value.moduleName || '--'], ['操作', value.operationName || '--'],
       ['类型', value.operationType || '--'], ['请求', `${value.httpMethod || '--'} ${value.requestUri || '--'}`],
       ['结果', resultText(value.success)], ['响应状态', String(value.responseStatus ?? '--')], ['耗时', `${value.costMs ?? 0} ms`],
-      ['错误信息', value.errorMessage || '--'], ['客户端 IP', value.clientIp || '--'], ['Track ID', value.trackId || '--'],
+      ['错误信息', value.errorMessage || '--'], ['客户端 IP', value.clientIp || '--'], ['Trace ID', value.traceId || '--'],
       ['发生时间', formatTime(value.createdAt)],
     ]
   }
@@ -96,7 +96,7 @@ const detailFields = computed(() => {
     ['模型', value.model || '--'], ['状态', value.status || '--'], ['结束原因', value.finishReason || '--'],
     ['Token', `${value.promptTokens ?? 0} + ${value.completionTokens ?? 0} = ${value.totalTokens ?? 0}`],
     ['耗时', `${value.costMs ?? 0} ms`], ['错误类型', value.errorType || '--'], ['错误信息', value.errorMessage || '--'],
-    ['Track ID', value.trackId || '--'], ['发生时间', formatTime(value.createdAt)],
+    ['Trace ID', value.traceId || '--'], ['发生时间', formatTime(value.createdAt)],
   ]
 })
 
@@ -152,7 +152,7 @@ async function loadOperation() {
     const page = await pageOperationLogs({
       current: operationState.current, size: operationState.size, username: optional(operationFilters.username),
       moduleName: optional(operationFilters.moduleName), operationType: optional(operationFilters.operationType),
-      success: operationFilters.success ?? undefined, trackId: optional(operationFilters.trackId),
+      success: operationFilters.success ?? undefined, traceId: optional(operationFilters.traceId),
       startTime: timestamp(operationFilters.startTime), endTime: timestamp(operationFilters.endTime),
     })
     Object.assign(operationState, page)
@@ -193,7 +193,7 @@ function search() {
 
 function resetFilters() {
   if (activeTab.value === 'login') Object.assign(loginFilters, { username: '', success: null, loginIp: '', startTime: '', endTime: '' })
-  else if (activeTab.value === 'operation') Object.assign(operationFilters, { username: '', moduleName: '', operationType: '', success: null, trackId: '', startTime: '', endTime: '' })
+  else if (activeTab.value === 'operation') Object.assign(operationFilters, { username: '', moduleName: '', operationType: '', success: null, traceId: '', startTime: '', endTime: '' })
   else Object.assign(aiFilters, { conversationId: '', provider: '', model: '', status: '', startTime: '', endTime: '' })
   search()
 }
@@ -301,8 +301,8 @@ onMounted(() => void loadLogin())
           placeholder="CREATE / UPDATE"
         ></label>
         <label>结果<select v-model="operationFilters.success"><option :value="null">全部</option><option :value="1">成功</option><option :value="0">失败</option></select></label>
-        <label>Track ID<input
-          v-model="operationFilters.trackId"
+        <label>Trace ID<input
+          v-model="operationFilters.traceId"
           placeholder="精确追踪"
         ></label>
       </template>
@@ -357,13 +357,13 @@ onMounted(() => void loadLogin())
       class="table-wrap"
     >
       <table v-if="activeTab === 'login'">
-        <thead><tr><th>时间</th><th>用户 / 类型</th><th>结果</th><th>客户端</th><th>错误</th><th>Track ID</th><th>操作</th></tr></thead>
+        <thead><tr><th>时间</th><th>用户 / 类型</th><th>结果</th><th>客户端</th><th>错误</th><th>Trace ID</th><th>操作</th></tr></thead>
         <tbody>
           <tr
             v-for="log in loginState.records"
             :key="log.loginLogId"
           >
-            <td>{{ formatTime(log.createdAt) }}</td><td><strong>{{ log.username || '--' }}</strong><small>{{ log.loginType }}</small></td><td><span :class="['result', log.success === 1 ? 'success' : 'failure']">{{ resultText(log.success) }}</span></td><td>{{ log.loginIp || '--' }}<small>{{ log.clientType || '--' }}</small></td><td>{{ log.errorCode || '--' }}<small>{{ log.failureReason || '' }}</small></td><td><code>{{ log.trackId || '--' }}</code></td><td>
+            <td>{{ formatTime(log.createdAt) }}</td><td><strong>{{ log.username || '--' }}</strong><small>{{ log.loginType }}</small></td><td><span :class="['result', log.success === 1 ? 'success' : 'failure']">{{ resultText(log.success) }}</span></td><td>{{ log.loginIp || '--' }}<small>{{ log.clientType || '--' }}</small></td><td>{{ log.errorCode || '--' }}<small>{{ log.failureReason || '' }}</small></td><td><code>{{ log.traceId || '--' }}</code></td><td>
               <button
                 type="button"
                 @click="openDetail('login', log.loginLogId)"
@@ -375,13 +375,13 @@ onMounted(() => void loadLogin())
         </tbody>
       </table>
       <table v-else-if="activeTab === 'operation'">
-        <thead><tr><th>时间</th><th>操作人</th><th>模块 / 操作</th><th>请求</th><th>结果 / 耗时</th><th>Track ID</th><th>操作</th></tr></thead>
+        <thead><tr><th>时间</th><th>操作人</th><th>模块 / 操作</th><th>请求</th><th>结果 / 耗时</th><th>Trace ID</th><th>操作</th></tr></thead>
         <tbody>
           <tr
             v-for="log in operationState.records"
             :key="log.operationLogId"
           >
-            <td>{{ formatTime(log.createdAt) }}</td><td>{{ log.username || '--' }}</td><td><strong>{{ log.operationName }}</strong><small>{{ log.moduleName }} · {{ log.operationType }}</small></td><td><span class="method">{{ log.httpMethod }}</span><code>{{ log.requestUri }}</code></td><td><span :class="['result', log.success === 1 ? 'success' : 'failure']">{{ resultText(log.success) }}</span><small>{{ log.costMs }} ms</small></td><td><code>{{ log.trackId || '--' }}</code></td><td>
+            <td>{{ formatTime(log.createdAt) }}</td><td>{{ log.username || '--' }}</td><td><strong>{{ log.operationName }}</strong><small>{{ log.moduleName }} · {{ log.operationType }}</small></td><td><span class="method">{{ log.httpMethod }}</span><code>{{ log.requestUri }}</code></td><td><span :class="['result', log.success === 1 ? 'success' : 'failure']">{{ resultText(log.success) }}</span><small>{{ log.costMs }} ms</small></td><td><code>{{ log.traceId || '--' }}</code></td><td>
               <button
                 type="button"
                 :data-testid="`operation-detail-${log.operationLogId}`"
@@ -394,13 +394,13 @@ onMounted(() => void loadLogin())
         </tbody>
       </table>
       <table v-else>
-        <thead><tr><th>时间</th><th>会话 / 用户</th><th>Provider / 模型</th><th>状态</th><th>Token</th><th>耗时 / Track ID</th><th>操作</th></tr></thead>
+        <thead><tr><th>时间</th><th>会话 / 用户</th><th>Provider / 模型</th><th>状态</th><th>Token</th><th>耗时 / Trace ID</th><th>操作</th></tr></thead>
         <tbody>
           <tr
             v-for="log in aiState.records"
             :key="log.promptRecordId"
           >
-            <td>{{ formatTime(log.createdAt) }}</td><td><code>{{ log.conversationId || '--' }}</code><small>{{ log.userId || '--' }}</small></td><td>{{ log.provider || '--' }}<small>{{ log.model || '--' }}</small></td><td><span :class="['result', log.status === 'SUCCESS' ? 'success' : 'failure']">{{ log.status }}</span></td><td>{{ log.totalTokens ?? 0 }}<small>{{ log.promptTokens ?? 0 }} + {{ log.completionTokens ?? 0 }}</small></td><td>{{ log.costMs }} ms<small><code>{{ log.trackId || '--' }}</code></small></td><td>
+            <td>{{ formatTime(log.createdAt) }}</td><td><code>{{ log.conversationId || '--' }}</code><small>{{ log.userId || '--' }}</small></td><td>{{ log.provider || '--' }}<small>{{ log.model || '--' }}</small></td><td><span :class="['result', log.status === 'SUCCESS' ? 'success' : 'failure']">{{ log.status }}</span></td><td>{{ log.totalTokens ?? 0 }}<small>{{ log.promptTokens ?? 0 }} + {{ log.completionTokens ?? 0 }}</small></td><td>{{ log.costMs }} ms<small><code>{{ log.traceId || '--' }}</code></small></td><td>
               <button
                 type="button"
                 @click="openDetail('ai', log.promptRecordId)"

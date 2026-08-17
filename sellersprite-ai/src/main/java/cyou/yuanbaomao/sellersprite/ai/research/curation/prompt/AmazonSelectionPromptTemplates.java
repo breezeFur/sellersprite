@@ -186,8 +186,8 @@ public final class AmazonSelectionPromptTemplates {
     public static String buildScreeningSheetPrompt(
             String sheetName, String sheetObservation, String userAnalysisGoal) {
         return """
-                你是亚马逊市场初筛分析师，只分析当前阶段一 Sheet 对市场进入和候选商品选择的价值。
-                不调用工具，不使用其他 Sheet，不补充当前 observation 没有的数据。
+                你是亚马逊市场初筛分析师，只分析当前阶段一证据表对市场进入和候选商品选择的价值。
+                不调用工具，不使用其他证据表，不补充当前 observation 没有的数据。
 
                 【用户分析目标】
                 %s
@@ -197,22 +197,22 @@ public final class AmazonSelectionPromptTemplates {
                 评论、VOC、Keywords 和选中 ASIN 的经营趋势属于阶段二，尚未采集不应写成阶段一缺陷。
 
                 【输出格式】
-                ### Sheet 定位
+                ### 证据表定位
                 - 数据类型：
                 - 支持的初筛判断：
                 - 对候选商品选择的价值：
 
                 ### 当前事实
-                只列出当前 Sheet 可见或可直接推导的数字、排名、比例和趋势。
+                只列出当前证据表可见或可直接推导的数字、排名、比例和趋势。
 
                 ### 初筛解读
                 说明这些事实对市场进入、竞争门槛或商品筛选意味着什么。
 
                 ### 可进入阶段一总结的结论
-                输出 3-8 条精炼结论；当前 Sheet 无法支持的维度不要补写。
+                输出 3-8 条精炼结论；当前证据表无法支持的维度不要补写。
 
-                Sheet 名称：%s
-                Sheet observation：
+                证据表名称：%s
+                证据表 observation：
                 %s
                 """.formatted(
                 analysisGoal(userAnalysisGoal), defaultText(sheetName), defaultText(sheetObservation));
@@ -262,7 +262,7 @@ public final class AmazonSelectionPromptTemplates {
             String rawFieldCatalog,
             String userAnalysisGoal) {
         return """
-                你是阶段一 ScreeningAnalysisAgent。请基于七张阶段一证据表的 Sheet 富摘要，判断市场是否值得进入，并帮助用户从默认 Top20 候选商品中选择进入阶段二的 ASIN。
+                你是阶段一 ScreeningAnalysisAgent。请基于七张阶段一证据表的分析摘要，判断市场是否值得进入，并帮助用户从默认 Top20 候选商品中选择进入阶段二的 ASIN。
                 可以按需调用原始数据工具核查字段目录中尚未被证据映射的关键字段，但不要读取与当前阶段无关的数据。
 
                 【分析运行 ID】%s
@@ -271,18 +271,28 @@ public final class AmazonSelectionPromptTemplates {
                 %s
 
                 【阶段一报告结构】
-                1. 市场进入结论（值得继续/谨慎继续/暂不进入）
-                2. 市场规模与销售/需求趋势
-                3. 细分机会、竞争结构、品牌与商品集中度
-                4. Top20 候选商品的选择标准与优先级信号
-                5. 主要风险、数据事实和进入阶段二前的判断
+                - 评分速览后严格按以下顺序使用七个二级标题，标题只写真实表名，不加数字编号、序号或“Sheet”字样：
+                  `## US`
+                  `## 行业销售趋势`
+                  `## 行业需求及趋势`
+                  `## 细分市场现状`
+                  `## 细分市场退货率`
+                  `## 竞品品牌`
+                  `## 商品集中度`
+                - 每章直接写 1-3 条结论、风险或建议，不再设置“当前事实”“数据事实”等数据罗列小节。
+                - 除综合评分和维度评分外，正文不要列数字、排名、比例、逐月数据或 Markdown 数据表；完整数据由证据数据模块承载。
+                - 行业销售趋势和行业需求及趋势只解释系统通过 SSE 展示的 Mermaid 趋势图，不在正文重复图中数值。
+                - 用户可见报告中禁止出现 `Sheet 一`、`Sheet一`、`Sheet 1`、`第一个 Sheet` 或其他工作簿内部编号。
+                - `## 行业销售趋势` 标题后必须调用 `generateResearchReportChart`，参数 `sectionCode` 使用 `market-sales-trend`，把返回的 Mermaid Markdown 原样放在结论前。
+                - `## 行业需求及趋势` 标题后必须调用同一工具，参数 `sectionCode` 使用 `market-demand-trend`，把返回内容原样放在结论前。
 
                 【强制边界】
                 - 只分析阶段一已有的七张证据表和当前阶段允许查询的原始数据。
                 - 不要求评论、VOC、Keywords 或选中 ASIN 深挖数据已经存在。
                 - 所有数字、趋势和商品建议必须能由当前输入支持；不确定时标记为待核查。
+                - Mermaid 只能来自 `generateResearchReportChart` 的工具结果；不得自行编写、修改或补充图表源码和图表数值。
 
-                【七张证据表富摘要】
+                【七张证据表分析摘要】
                 %s
 
                 【阶段一字段目录】
@@ -315,6 +325,7 @@ public final class AmazonSelectionPromptTemplates {
                 3. Keywords 的宣传获客成本信号、竞争强度和投放难度
                 4. 所选 ASIN 的销量、价格、BSR、评分和卖家竞争变化
                 5. 产品改进、进入策略和需要交给最终决策的结论
+                - 分析 Keywords 时必须调用 `generateResearchReportChart`，参数 `sectionCode` 使用 `keywords`，把返回的 Mermaid Markdown 原样放在关键词结论前。
 
                 【强制边界】
                 - 只分析当前五张证据表和当前阶段允许查询的原始数据。
@@ -322,6 +333,7 @@ public final class AmazonSelectionPromptTemplates {
                 - 所选 ASIN 趋势用于判断样本商品，不能外推为全市场表现。
                 - 必须读取任务采集上下文中的评论星级/类型筛选；定向星级样本不得外推总体差评率、平均星级或满意度。
                 - 不编造证据中不存在的数字或用户反馈。
+                - Mermaid 只能来自 `generateResearchReportChart` 的工具结果；不得自行编写、修改或补充图表源码和图表数值。
 
                 【五张证据表富摘要】
                 %s
@@ -351,16 +363,32 @@ public final class AmazonSelectionPromptTemplates {
                 %s
 
                 【最终报告结构】
-                1. 是否值得进入及核心依据
-                2. 市场规模、销售和需求趋势
-                3. 细分机会、竞争、品牌和商品集中度
-                4. 评价与 VOC 的用户需求、产品风险和退货风险
-                5. Keywords 的宣传获客成本信号、竞争强度和投放难度
-                6. 所选 ASIN 的销量、价格、BSR、评分和卖家竞争趋势
-                7. 进入策略、主要门槛、验证项和最终建议
+                以下为破坏性新契约，旧的七段式报告不再兼容：
+                - 评分速览之后必须严格按以下顺序输出十二个二级标题，标题文字不得改名、合并、拆分或遗漏：
+                  `## 1. US`
+                  `## 2. 行业销售趋势`
+                  `## 3. 行业需求及趋势`
+                  `## 4. 细分市场现状`
+                  `## 5. 细分市场退货率`
+                  `## 6. 竞品品牌`
+                  `## 7. 商品集中度`
+                  `## 8. 评价`
+                  `## 9. VOC`
+                  `## 10. Keywords`
+                  `## 11. ASIN销售趋势`
+                  `## 12. ASIN运营趋势`
+                - 每章标题后第一行固定写成：`**章节评分：{0-100 的整数/100 或 证据不足}｜判断：{一句话}｜置信度：{高/中/低}**`。
+                - 每章只保留 `### 核心结论`、`### 主要风险`、`### 决策建议` 三部分，每部分 1-3 条短句；不要复述证据表、不要输出数据清单或 Markdown 数据表。
+                - 市场规模、销售和需求趋势相关章节只解释趋势图代表的方向、拐点、季节性和风险，不再逐月列数；行业销售趋势必须围绕销量图，不用销售额替代销量。
+                - 除综合评分、维度评分和章节评分外，正文不要列数字、排名、比例或逐月明细；所有证据数字留在证据数据模块和 Mermaid 图中。
+                - Keywords 章必须综合所有已选择 ASIN 的“竞品反查词”，优先说明跨 ASIN 覆盖频率最高的关键词、共同卖点、竞争意图和差异化机会；同一 ASIN 的同一规范化关键词只能计一次。
+                - `## 2. 行业销售趋势` 的章节评分后，必须调用 `generateResearchReportChart`，参数 `sectionCode` 使用 `market-sales-trend`，并把工具返回的 Mermaid Markdown 原样放在 `### 核心结论` 前。
+                - `## 3. 行业需求及趋势` 的章节评分后，必须调用同一工具，参数 `sectionCode` 使用 `market-demand-trend`，并把返回内容原样放在 `### 核心结论` 前。
+                - `## 10. Keywords` 的章节评分后，必须调用同一工具，参数 `sectionCode` 使用 `keywords`，并把返回内容原样放在 `### 核心结论` 前。
 
                 【强制边界】
                 - 最终判断必须能由十二张证据表、阶段结论或工具结果支持。
+                - Mermaid 只能来自 `generateResearchReportChart` 的工具结果；不得自行编写、修改或补充图表源码和图表数值。
                 - Keywords 竞价不能直接等同实际广告成本；缺少实际花费和转化时禁止推算预算、ACOS、ROI。
                 - 所选 ASIN 趋势不能外推为全市场表现。
                 - 评论设置了星级或类型筛选时必须按该抽样口径解释，不能把定向样本外推为评论总体。

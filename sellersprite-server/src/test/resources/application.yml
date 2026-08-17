@@ -36,12 +36,6 @@ mybatis-plus:
   global-config:
     banner: false
 
-ybm:
-  mybatis:
-    mapper:
-      base-packages:
-        - cyou.yuanbaomao.sellersprite.db.mapper
-
 sellersprite:
   research:
     dispatcher-enabled: false

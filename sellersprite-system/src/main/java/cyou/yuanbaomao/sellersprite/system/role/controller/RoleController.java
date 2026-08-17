@@ -1,18 +1,17 @@
 package cyou.yuanbaomao.sellersprite.system.role.controller;
 
-import cyou.yuanbaomao.base.result.PageResult;
+import cyou.yuanbaomao.mybatis.result.YPage;
 import cyou.yuanbaomao.base.result.Result;
 import cyou.yuanbaomao.sellersprite.system.role.model.dto.RoleCreateRequest;
-import cyou.yuanbaomao.sellersprite.system.role.model.dto.RolePageRequest;
 import cyou.yuanbaomao.sellersprite.system.role.model.dto.RolePermissionReplaceRequest;
 import cyou.yuanbaomao.sellersprite.system.role.model.dto.RoleStatusUpdateRequest;
 import cyou.yuanbaomao.sellersprite.system.role.model.dto.RoleUpdateRequest;
-import cyou.yuanbaomao.sellersprite.system.role.model.dto.RoleUserPageRequest;
 import cyou.yuanbaomao.sellersprite.system.role.model.dto.UserRoleBindRequest;
 import cyou.yuanbaomao.sellersprite.system.role.model.vo.RolePermissionVo;
 import cyou.yuanbaomao.sellersprite.system.role.model.vo.RoleVo;
 import cyou.yuanbaomao.sellersprite.system.role.service.RoleService;
 import cyou.yuanbaomao.sellersprite.system.user.model.vo.UserDetailVo;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -24,6 +23,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -43,8 +43,12 @@ public class RoleController {
 
     @Operation(summary = "分页查询角色")
     @GetMapping
-    public Result<PageResult<RoleVo>> page(@Valid RolePageRequest request) {
-        return Result.success(roleService.page(request));
+    public Result<YPage<RoleVo>> page(@Valid YPage<RoleVo> page,
+            @Parameter(description = "角色名称，支持模糊查询")
+            @RequestParam(value = "roleName", required = false) String roleName,
+            @Parameter(description = "角色状态：1 启用，0 禁用")
+            @RequestParam(value = "status", required = false) Integer status) {
+        return Result.success(roleService.page(page, roleName, status));
     }
 
     @Operation(summary = "查询启用角色选项")
@@ -75,9 +79,12 @@ public class RoleController {
 
     @Operation(summary = "分页查询角色用户")
     @GetMapping("/{roleId}/users")
-    public Result<PageResult<UserDetailVo>> listUsers(@PathVariable String roleId,
-            @Valid RoleUserPageRequest request) {
-        return Result.success(roleService.listUsers(roleId, request));
+    public Result<YPage<UserDetailVo>> listUsers(
+            @Parameter(description = "角色 ID") @PathVariable String roleId,
+            @Valid YPage<UserDetailVo> page,
+            @Parameter(description = "用户名，支持模糊查询")
+            @RequestParam(value = "username", required = false) String username) {
+        return Result.success(roleService.listUsers(roleId, page, username));
     }
 
     @Operation(summary = "解除用户角色绑定")

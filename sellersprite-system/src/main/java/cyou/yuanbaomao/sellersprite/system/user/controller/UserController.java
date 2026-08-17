@@ -1,15 +1,15 @@
 package cyou.yuanbaomao.sellersprite.system.user.controller;
 
-import cyou.yuanbaomao.base.result.PageResult;
+import cyou.yuanbaomao.mybatis.result.YPage;
 import cyou.yuanbaomao.base.result.Result;
 import cyou.yuanbaomao.sellersprite.system.user.model.dto.UserCreateRequest;
-import cyou.yuanbaomao.sellersprite.system.user.model.dto.UserPageRequest;
 import cyou.yuanbaomao.sellersprite.system.user.model.dto.UserPasswordResetRequest;
 import cyou.yuanbaomao.sellersprite.system.user.model.dto.UserRoleReplaceRequest;
 import cyou.yuanbaomao.sellersprite.system.user.model.dto.UserStatusUpdateRequest;
 import cyou.yuanbaomao.sellersprite.system.user.model.dto.UserUpdateRequest;
 import cyou.yuanbaomao.sellersprite.system.user.model.vo.UserDetailVo;
 import cyou.yuanbaomao.sellersprite.system.user.service.UserService;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -45,8 +46,12 @@ public class UserController {
 
     @Operation(summary = "分页查询用户")
     @GetMapping
-    public Result<PageResult<UserDetailVo>> page(@Valid UserPageRequest request) {
-        return Result.success(userService.page(request));
+    public Result<YPage<UserDetailVo>> page(@Valid YPage<UserDetailVo> page,
+            @Parameter(description = "用户名，支持模糊查询")
+            @RequestParam(value = "username", required = false) String username,
+            @Parameter(description = "用户状态：1 启用，0 禁用")
+            @RequestParam(value = "status", required = false) Integer status) {
+        return Result.success(userService.page(page, username, status));
     }
 
     @Operation(summary = "编辑用户")

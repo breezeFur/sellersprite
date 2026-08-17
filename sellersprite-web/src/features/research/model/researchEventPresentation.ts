@@ -3,6 +3,7 @@ import type { ResearchStreamRecord } from './researchStream'
 const OFFICIAL_EVENT_TYPES = new Set([
   'summary',
   'report',
+  'report_chart',
   'download',
   'error',
   'product_selection_required',
@@ -56,6 +57,7 @@ export const RESEARCH_EVENT_TYPE_LABELS: Record<string, string> = {
   summary_prepare: '总结准备',
   summary: '分析结论',
   report: '生成分析报告',
+  report_chart: '报告图表',
   download: '分析报告附件',
   done: '本轮分析完成',
   error: '本轮分析失败',
@@ -91,9 +93,11 @@ export function researchPhaseLabel(phase?: string) {
 }
 
 export function isResearchOfficialEvent(
-  event: Pick<ResearchStreamRecord, 'eventType' | 'streaming'>,
+  event: Pick<ResearchStreamRecord, 'eventType' | 'streaming' | 'stageCode'>,
 ) {
-  if (event.eventType === 'summary' && event.streaming) return false
+  if (event.eventType === 'summary' && event.streaming && event.stageCode !== 'FINAL_ANALYSIS') {
+    return false
+  }
   return !isResearchHiddenEvent(event) && OFFICIAL_EVENT_TYPES.has(event.eventType)
 }
 
@@ -112,10 +116,10 @@ export function isResearchHiddenEvent(event: Pick<ResearchStreamRecord, 'eventTy
 }
 
 export function isResearchWorkspaceReportEvent(
-  event: Pick<ResearchStreamRecord, 'eventType' | 'streaming'>,
+  event: Pick<ResearchStreamRecord, 'eventType' | 'streaming' | 'stageCode'>,
 ) {
-  if (event.eventType === 'summary') return !event.streaming
-  return ['report', 'download'].includes(event.eventType)
+  if (event.eventType === 'summary') return !event.streaming || event.stageCode === 'FINAL_ANALYSIS'
+  return ['report', 'report_chart', 'download'].includes(event.eventType)
 }
 
 export function researchWorkspaceIntent(
@@ -138,8 +142,10 @@ export function researchWorkspaceIntent(
   if (isResearchUserEvent(event)) {
     return { mode: 'workspace' }
   }
-  if (event.eventType === 'summary' || event.eventType === 'report') {
-    if (event.streaming) return { mode: 'workspace', section: 'process' }
+  if (event.eventType === 'summary' || ['report', 'report_chart'].includes(event.eventType)) {
+    if (event.streaming && event.stageCode !== 'FINAL_ANALYSIS') {
+      return { mode: 'workspace', section: 'process' }
+    }
     return { mode: 'workspace', section: 'report' }
   }
   if (event.eventType === 'download') {

@@ -1,12 +1,12 @@
 # sellersprite-service
 
-SellerSprite Open API 全栈集成服务。项目已同步 `D:\develop\scaffold` 当前脚手架能力，后端基于 JDK 21、Spring Boot 4.1、Spring AI 2.0 和 Maven 多模块，前端基于 Vue 3、TypeScript、Vite 与 Element Plus。
+SellerSprite Open API 全栈集成服务。项目已同步 `D:\develop\yuanbaomao-scaffold-vendored` 的 0.2.0 脚手架能力，后端基于 JDK 21、Spring Boot 4.1、Spring AI 2.0 和 Maven 多模块，前端基于 Vue 3、TypeScript、Vite 与 Element Plus。
 
 项目通过内部 `/api/sellersprite/**` 代理封装卖家精灵当前公开的 44 个业务接口和 1 个次数查询接口，并提供带权限控制的 API 调试工作台；AI 聊天同时注册 5 个只读 SellerSprite `@Tool`。
 
 ## 主要能力
 
-- 统一响应、异常处理、分页、MDC `trackId`、UUIDv7、MyBatis-Plus 审计字段和操作日志。
+- 统一响应、异常处理、分页、MDC `traceId`、UUIDv7、MyBatis-Plus 审计字段和操作日志。
 - 内存访问令牌、HttpOnly 刷新 Cookie、令牌轮换与复用检测，以及功能/接口两级 RBAC。
 - 用户、部门、角色、菜单、接口资源、字典、缓存、登录日志、操作日志和 AI 调用日志管理。
 - AI 多轮对话、SSE 流式输出、JDBC Chat Memory、会话设置、失败重试和 Prompt 审计。
@@ -51,12 +51,19 @@ mysql -uroot -p -e "source sql/schema.sql"
 ```
 
 默认数据库名为 `sellersprite_service`。脚本会创建初始管理员 `admin / 123456`，首次登录后必须立即修改密码。
+脚本同时初始化 SellerSprite 接口所需的站点、尺寸、排序、流量类型和重量单位等系统字典。
 
 > 警告：不要对已有数据库重复执行 `schema.sql`。它会把 `admin` 密码重置为 `123456`。
 
 ### 已有数据库
 
-项目只保留一份最终结构脚本，不再维护按日期拆分的增量迁移。已有数据库升级前必须先备份，并在维护窗口内对照 `sql/schema.sql` 手工生成差异 SQL；不要直接重复执行整份脚本。
+项目保留最终结构脚本和必要的增量迁移。已有数据库升级前必须先备份。升级到 0.2.0 前，按以下顺序执行迁移，再启动新版应用：
+
+1. `sql/migrations/20260815_rename_track_id_to_trace_id.sql`：重命名链路标识列和索引，不修改已有数据。
+2. `sql/migrations/20260815_seed_sellersprite_dictionaries.sql`：补充 SellerSprite 系统字典，可重复执行。
+3. `sql/migrations/20260815_add_market_research_dataset_lookup_index.sql`：补充市场调研数据集查询索引，可重复执行。
+
+其他结构差异应在维护窗口内对照 `sql/schema.sql` 手工生成差异 SQL，不要直接重复执行整份脚本。
 
 市场调研由 Spring AI Alibaba Graph 编排，官方 `GRAPH_THREAD`、`GRAPH_CHECKPOINT` 表负责控制流恢复。业务表中，`market_research_job`、`market_research_node_execution`、`market_research_dataset` 和 `market_research_artifact` 保存数据任务、节点审计、不可变证据和附件；`market_research_analysis_run` 与 `market_research_event` 保存独立的 Curation 分析生命周期和可重放事件。系统不再依赖 Spring Batch 元数据表。
 
@@ -98,6 +105,10 @@ sellersprite:
 阶段一只采集商品、市场销售趋势、需求趋势和细分市场数据，形成 `US`、`行业销售趋势`、`行业需求及趋势`、`细分市场现状`、`细分市场退货率`、`竞品品牌`、`商品集中度` 七张证据表。每张表的确定性统计、AI 简析和阶段一总结都会持久化并通过 SSE 推送；Top20 商品按阶段一 `evidence.products` 的默认顺序固化为不可变候选，用户可选择一个或多个 ASIN 进入阶段二，也可直接放弃市场。
 
 阶段二针对选中 ASIN 采集评论、关键词、销量趋势和 Keepa 经营趋势，形成 `评价`、`VOC`、`Keywords`、`ASIN销售趋势`、`ASIN运营趋势` 五张证据表并输出逐表分析和阶段总结。Keywords 用于判断宣传获客成本、竞争强度和投放难度，不会在缺少证据时虚构预算、ACOS 或 ROI。阶段三只读取已持久化的十二张证据表及前两阶段结论，生成一份最终 Markdown，不再次采集或逐表重跑模型。
+
+最终报告采用破坏性的十二章新契约：按上述十二张证据表固定顺序逐章输出章节评分、置信度、核心结论、主要风险和决策建议，不再附带 Sheet 行数、会话信息或重复数据表。阶段一报告同样直接使用七张证据表的真实表名，不显示“Sheet 一”等内部编号。完整数字留在证据数据模块；行业销售趋势以销量折线图展示，需求趋势和所选竞品 ASIN 高频关键词也由服务端从持久化证据确定性计算。报告 Agent 在生成对应章节时调用 `generateResearchReportChart` 工具，把工具返回的 Mermaid Markdown 原样写入同一份 `summary_delta/summary` 在线报告，通用 Markdown 组件直接渲染为图；不再由执行器预先推送独立 `report_chart` 事件。断线客户端仍按 `sequenceNo` 恢复同一份报告增量，PDF 使用同一图表规格生成静态快照，AI 只解释图表，不生成或修改图表数值。
+
+SellerSprite 接口入参定义在 `sellersprite-api` 各业务包的 `model.dto`，响应字段定义在 `model.vo`；证据表并不是 DTO/VO，而由 `ResearchEvidenceCatalog` 固定中文表头、`ResearchEvidenceService` 完成原始字段映射和确定性派生。正式事实表只接纳可追溯原始字段及可复算的份额、差值、环比、累计占比和波动率；AI 用户画像、场景、动机和机会判断继续保存在逐表分析与阶段总结中，不伪装成原始事实列。
 
 跨任务 SellerSprite 响应以 operation 和完整有效请求哈希写入 Redis，键前缀为 `sellersprite:research:source:v1:`。历史类目统计不设置过期时间，当前月市场数据和 ASIN 趋势默认缓存 24 小时；创建页的产品类目树与搜索结果默认缓存 7 天，并在过期后的首次读取时懒刷新。应用启动后会按活跃 REMOTE 任务去重检查过去 24 个完整月份的市场销售趋势缓存，只串行回源缺失月份，检查结束前暂缓 Graph Dispatcher 抢占任务。`sellersprite.research.source-cache.enabled=false` 时完全绕过 Redis；Redis 故障也只按缓存 miss 处理并直接回源。
 
@@ -236,8 +247,10 @@ SellerSprite 常用环境变量：
 启动后端：
 
 ```bash
-mvn -pl sellersprite-server -am spring-boot:run
+mvn -pl sellersprite-server -am spring-boot:run -Dspring-boot.run.arguments="--spring.config.additional-location=optional:file:../config/"
 ```
+
+命令会加载项目根目录下的 `config/application.yml` 及对应 profile 配置；请先按“本地配置”章节准备 `config/application-local.yml` 或所需环境变量。
 
 启动前端：
 
@@ -250,10 +263,40 @@ npm run dev
 默认地址：
 
 - 前端：`http://localhost:5173`
-- 后端：`http://localhost:8089`
-- 健康检查：`http://localhost:8089/actuator/health`
+- 后端：`http://localhost:8092`
+- 健康检查：`http://localhost:8092/actuator/health`
 
-Vite 默认将 `/api` 代理到 `http://localhost:8089`，可通过 `SELLERSPRITE_API_TARGET` 覆盖。浏览器只调用内部固定代理路径，不接收上游 URL 或 `secret-key`。
+Vite 默认将 `/api` 代理到 `http://localhost:8092`，可通过 `SELLERSPRITE_API_TARGET` 覆盖。浏览器只调用内部固定代理路径，不接收上游 URL 或 `secret-key`。
+
+## Docker 部署
+
+先在项目根目录手动打包后端可执行 JAR：
+
+```bash
+./mvnw -B -ntp -pl sellersprite-server -am clean package -DskipTests
+```
+
+当前产物为 `sellersprite-server/target/sellersprite-server-0.2.0.jar`。项目根目录的 `Dockerfile` 使用 Eclipse Temurin 21 JRE Alpine 镜像，并直接复制该产物构建运行镜像：
+
+```bash
+docker build -t sellersprite-server:latest .
+```
+
+宿主机的配置目录挂载到容器 `/app/config`，日志目录挂载到 `/app/logs`：
+
+```bash
+docker run -d \
+  --name sellersprite-server \
+  --restart unless-stopped \
+  --memory=1g \
+  -p 8092:8092 \
+  -v /opt/sellersprite/config:/app/config:ro \
+  -v /opt/sellersprite/logs:/app/logs \
+  -e SPRING_PROFILES_ACTIVE=server \
+  sellersprite-server:latest
+```
+
+`/opt/sellersprite/config` 应包含完整的部署配置，例如 `application.yml` 和 `application-server.yml`。生产环境的数据源、Redis、模型密钥和 SellerSprite API 密钥仍应通过环境变量或配置中心注入。
 
 ## 鉴权与权限同步
 
@@ -271,7 +314,7 @@ Authorization: Bearer <access-token>
 
 - 九域与 45 个固定操作的检索、选择和示例参数
 - GET Query、JSON Body、multipart 数组和显式文件字段转换
-- 请求防重复提交、参数错误、业务错误码、`trackId`、耗时和完成时间
+- 请求防重复提交、参数错误、业务错误码、`traceId`、耗时和完成时间
 - 成功、空响应、失败状态和格式化 JSON 复制
 
 完整请求/响应模型以 Controller、DTO/VO 和 `docs/sellersprite-api-contract.json` 为准。外部 Client 统一发送官方要求的 `secret-key`、`Content-Type` 和唯一 `x-request-id`；不会臆造 HMAC、摘要或响应验签。
@@ -325,12 +368,12 @@ npm run test:e2e
 
 `maven-repository` 使用标准 Maven 2 布局，只收录当前应用实际依赖的私有二进制闭包：
 
-- `yuanbaomao-base:0.1.1`
-- `yuanbaomao-web-starter:0.1.2-SNAPSHOT`
-- `yuanbaomao-mybatis-starter:0.1.1`
-- `yuanbaomao-cache-starter:0.1.1`
-- `yuanbaomao-log-starter:0.1.2-SNAPSHOT`
-- `yuanbaomao-dict-starter:0.1.1`
+- `yuanbaomao-base:0.2.0`
+- `yuanbaomao-web-starter:0.2.0`
+- `yuanbaomao-mybatis-starter:0.2.0`
+- `yuanbaomao-cache-starter:0.2.0`
+- `yuanbaomao-log-starter:0.2.0`
+- `yuanbaomao-dict-starter:0.2.0`
 
 根 `pom.xml` 不再继承私有 `yuanbaomao-scaffold-parent`，而是通过 `file://${maven.multiModuleProjectDirectory}/maven-repository` 解析上述构件。第三方开源依赖仍从 Maven Central 或团队镜像下载，因此该方案不是完全离线构建。
 

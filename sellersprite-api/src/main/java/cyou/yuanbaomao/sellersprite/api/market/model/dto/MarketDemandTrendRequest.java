@@ -29,10 +29,6 @@ public class MarketDemandTrendRequest {
     @Schema(description = "选市场-商品需求趋势请求参数：头部Listing数量；10")
     private Integer topN;
 
-    /** 选市场-商品需求趋势请求参数：新品定义；6 */
-    @Schema(description = "选市场-商品需求趋势请求参数：新品定义；6")
-    private Integer newProduct;
-
     /** 选市场-商品需求趋势请求参数：节点 id 路径字符串；1064954:1069242:1069784:1069820:1069838:1069828 */
     @NotBlank
     @Schema(description = "选市场-商品需求趋势请求参数：节点 id 路径字符串；1064954:1069242:1069784:1069820:1069838:1069828")

@@ -1,6 +1,7 @@
 // Generated from SellerSprite official documentation on 2026-07-10.
 package cyou.yuanbaomao.sellersprite.api.product.service.impl;
 
+import cyou.yuanbaomao.sellersprite.api.common.enums.SellerSpriteMarketplace;
 import cyou.yuanbaomao.sellersprite.api.client.SellerSpriteClient;
 import cyou.yuanbaomao.sellersprite.api.client.SellerSpriteOperation;
 import cyou.yuanbaomao.sellersprite.api.client.SellerSpriteRequestEncoder;
@@ -43,7 +44,13 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<ProductNodeVo> listProductNodes(ProductNodeRequest request) {
+    public List<ProductNodeVo> listProductNodes(SellerSpriteMarketplace marketplace, String nodeIdPath,
+            String keyword, String month) {
+        ProductNodeRequest request = new ProductNodeRequest();
+        request.setMarketplace(marketplace);
+        request.setNodeIdPath(nodeIdPath);
+        request.setKeyword(keyword);
+        request.setMonth(month);
         return client.get(SellerSpriteOperation.PRODUCT_NODE,
                 Map.of(), SellerSpriteRequestEncoder.toQuery(request, Set.of()),
                 new ParameterizedTypeReference<SellerSpriteResponse<List<ProductNodeVo>>>() {

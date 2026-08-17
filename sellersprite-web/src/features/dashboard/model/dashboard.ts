@@ -11,7 +11,7 @@ export interface DashboardActivity {
   description: string
   success: number
   occurredAt: number
-  trackId: string
+  traceId: string
 }
 
 export interface DashboardOverview {

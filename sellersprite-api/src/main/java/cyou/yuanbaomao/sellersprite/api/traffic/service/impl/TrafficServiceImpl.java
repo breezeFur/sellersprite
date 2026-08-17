@@ -1,6 +1,7 @@
 // Generated from SellerSprite official documentation on 2026-07-10.
 package cyou.yuanbaomao.sellersprite.api.traffic.service.impl;
 
+import cyou.yuanbaomao.sellersprite.api.common.enums.SellerSpriteMarketplace;
 import cyou.yuanbaomao.sellersprite.api.client.SellerSpriteClient;
 import cyou.yuanbaomao.sellersprite.api.client.SellerSpriteOperation;
 import cyou.yuanbaomao.sellersprite.api.client.SellerSpriteRequestEncoder;
@@ -17,6 +18,7 @@ import cyou.yuanbaomao.sellersprite.api.traffic.model.vo.TrafficListingStatVo;
 import cyou.yuanbaomao.sellersprite.api.traffic.model.vo.TrafficSourceVo;
 import cyou.yuanbaomao.sellersprite.api.traffic.service.TrafficService;
 import java.util.Map;
+import java.util.List;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.ParameterizedTypeReference;
@@ -46,7 +48,11 @@ public class TrafficServiceImpl implements TrafficService {
     }
 
     @Override
-    public TrafficKeywordStatVo getKeywordStats(TrafficKeywordStatRequest request) {
+    public TrafficKeywordStatVo getKeywordStats(SellerSpriteMarketplace marketplace, String asin, String month) {
+        TrafficKeywordStatRequest request = new TrafficKeywordStatRequest();
+        request.setMarketplace(marketplace);
+        request.setAsin(asin);
+        request.setMonth(month);
         return client.get(SellerSpriteOperation.TRAFFIC_KEYWORD_STAT,
                 Map.of("marketplace", SellerSpriteRequestEncoder.pathValue(request.getMarketplace()), "asin", SellerSpriteRequestEncoder.pathValue(request.getAsin())), SellerSpriteRequestEncoder.toQuery(request, Set.of("marketplace", "asin")),
                 new ParameterizedTypeReference<SellerSpriteResponse<TrafficKeywordStatVo>>() {
@@ -54,7 +60,12 @@ public class TrafficServiceImpl implements TrafficService {
     }
 
     @Override
-    public TrafficListingStatVo getListingStats(TrafficListingStatRequest request) {
+    public TrafficListingStatVo getListingStats(String asin, SellerSpriteMarketplace marketplace,
+            List<String> asinList) {
+        TrafficListingStatRequest request = new TrafficListingStatRequest();
+        request.setAsin(asin);
+        request.setMarketplace(marketplace);
+        request.setAsinList(asinList);
         return client.get(SellerSpriteOperation.TRAFFIC_LISTING_STAT,
                 Map.of("marketplace", SellerSpriteRequestEncoder.pathValue(request.getMarketplace()), "asin", SellerSpriteRequestEncoder.pathValue(request.getAsin())), SellerSpriteRequestEncoder.toQuery(request, Set.of("marketplace", "asin")),
                 new ParameterizedTypeReference<SellerSpriteResponse<TrafficListingStatVo>>() {

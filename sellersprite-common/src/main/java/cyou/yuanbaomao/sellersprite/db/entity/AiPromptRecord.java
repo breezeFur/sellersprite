@@ -85,7 +85,7 @@ public class AiPromptRecord extends BaseAudit {
     @Schema(description = "调用耗时毫秒")
     private Long costMs;
 
-    @TableField("track_id")
+    @TableField("trace_id")
     @Schema(description = "链路追踪ID")
-    private String trackId;
+    private String traceId;
 }

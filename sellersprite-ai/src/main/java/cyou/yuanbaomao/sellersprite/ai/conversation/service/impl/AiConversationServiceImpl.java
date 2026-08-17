@@ -2,10 +2,9 @@ package cyou.yuanbaomao.sellersprite.ai.conversation.service.impl;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import cyou.yuanbaomao.base.exception.BizException;
-import cyou.yuanbaomao.base.result.PageResult;
+import cyou.yuanbaomao.mybatis.result.YPage;
 import cyou.yuanbaomao.sellersprite.ai.context.AiCurrentUser;
 import cyou.yuanbaomao.sellersprite.ai.conversation.convert.AiConversationConverter;
-import cyou.yuanbaomao.sellersprite.ai.conversation.model.dto.AiConversationPageRequest;
 import cyou.yuanbaomao.sellersprite.ai.conversation.model.dto.AiConversationRenameRequest;
 import cyou.yuanbaomao.sellersprite.ai.conversation.model.dto.AiConversationSettingsRequest;
 import cyou.yuanbaomao.sellersprite.ai.conversation.model.vo.AiConversationDetailVo;
@@ -33,13 +32,15 @@ public class AiConversationServiceImpl implements AiConversationService {
     private final AiCurrentUser currentUser;
 
     @Override
-    public PageResult<AiConversationVo> page(AiConversationPageRequest request) {
-        Page<AiConversation> page = conversationDao.pageByUserId(currentUser.requireUserId(), request.getTitle(),
-                request.getCurrent(), request.getSize());
-        List<AiConversationVo> records = page.getRecords().stream()
+    public YPage<AiConversationVo> page(YPage<AiConversationVo> page, String title) {
+        Page<AiConversation> entityPage = conversationDao.pageByUserId(currentUser.requireUserId(),
+                title, page.getCurrent(), page.getSize());
+        List<AiConversationVo> records = entityPage.getRecords().stream()
                 .map(AiConversationConverter::toConversationVo)
                 .toList();
-        return PageResult.of(page.getCurrent(), page.getSize(), page.getTotal(), records);
+        page.setTotal(entityPage.getTotal());
+        page.setRecords(records);
+        return page;
     }
 
     @Override

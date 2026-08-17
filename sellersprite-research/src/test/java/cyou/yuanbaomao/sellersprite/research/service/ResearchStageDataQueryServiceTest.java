@@ -1,6 +1,8 @@
 package cyou.yuanbaomao.sellersprite.research.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import cyou.yuanbaomao.base.context.RequestContext;
@@ -9,6 +11,7 @@ import cyou.yuanbaomao.sellersprite.db.dao.MarketResearchJobDao;
 import cyou.yuanbaomao.sellersprite.db.entity.MarketResearchDataset;
 import cyou.yuanbaomao.sellersprite.db.entity.MarketResearchJob;
 import cyou.yuanbaomao.sellersprite.research.evidence.EvidenceStage;
+import cyou.yuanbaomao.sellersprite.research.evidence.ResearchEvidenceCatalog;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.AfterEach;
@@ -55,8 +58,17 @@ class ResearchStageDataQueryServiceTest {
         var items = payload.putArray("items");
         items.addObject().put("ASIN", "B0ONE");
         items.addObject().put("ASIN", "B0TWO");
+        List<String> screeningDatasetCodes = ResearchEvidenceCatalog
+                .definitions(EvidenceStage.SCREENING)
+                .stream()
+                .map(ResearchEvidenceCatalog.Definition::datasetCode)
+                .toList();
         when(jobDao.findByIdAndUserId("job-1", "user-1")).thenReturn(Optional.of(job));
-        when(datasetService.listByJobId("job-1")).thenReturn(List.of(dataset));
+        when(datasetService.listMetadataByJobIdAndDatasetCodes(
+                        "job-1", screeningDatasetCodes))
+                .thenReturn(List.of(dataset));
+        when(datasetService.findPayloadByJobIdAndDatasetCode("job-1", "evidence.products"))
+                .thenReturn(Optional.of(dataset));
         when(datasetService.readPayload(dataset)).thenReturn(payload);
 
         var catalog = service.listEvidence("job-1", EvidenceStage.SCREENING);
@@ -68,5 +80,6 @@ class ResearchStageDataQueryServiceTest {
         assertThat(page.getTotal()).isEqualTo(2);
         assertThat(page.getRecords()).singleElement()
                 .satisfies(row -> assertThat(row.path("ASIN").asText()).isEqualTo("B0TWO"));
+        verify(datasetService, never()).listByJobId("job-1");
     }
 }

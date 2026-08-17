@@ -32,11 +32,11 @@ public class MarketDemandTrendVo {
 
     /** 选市场-商品需求趋势响应参数：搜索购买比，千分比；3.17875 */
     @Schema(description = "选市场-商品需求趋势响应参数：搜索购买比，千分比；3.17875")
-    private List<String> searchToPurchaseRatio;
+    private BigDecimal searchToPurchaseRatio;
 
     /** 选市场-商品需求趋势响应参数：类目平均退货率，百分比；2.72 */
     @Schema(description = "选市场-商品需求趋势响应参数：类目平均退货率，百分比；2.72")
-    private Integer avgReturnRatio;
+    private BigDecimal avgReturnRatio;
 
     /** 选市场-商品需求趋势响应参数：类目平均搜索购买比，千分比；2.6 */
     @Schema(description = "选市场-商品需求趋势响应参数：类目平均搜索购买比，千分比；2.6")

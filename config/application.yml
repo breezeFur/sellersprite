@@ -49,6 +49,9 @@ mybatis-plus:
     map-underscore-to-camel-case: true
     # 禁用 MyBatis 二级缓存，数据库始终作为业务持久化事实源。
     cache-enabled: false
+    # 将 SQL、参数和执行结果交给 SLF4J，由 Logback 统一输出到控制台和文件。
+#    log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
+    log-impl: org.apache.ibatis.logging.nologging.NoLoggingImpl
   global-config:
     # 关闭 MyBatis-Plus 启动 Banner，减少无关日志。
     banner: false
@@ -61,11 +64,6 @@ mybatis-plus:
       logic-not-delete-value: 0
 
 ybm:
-  mybatis:
-    mapper:
-      base-packages:
-        # 扫描项目数据库 Mapper 接口。
-        - cyou.yuanbaomao.sellersprite.db.mapper
   cache:
     # 框架通用缓存默认使用进程内实现；local Profile 可按环境覆盖为 Redis。
     type: redis

@@ -38,15 +38,14 @@ class LoginLogServiceImplTest {
         request.setLoginIp("127.0.0.1");
         request.setStartTime(100L);
         request.setEndTime(200L);
-        request.setCurrent(2L);
-        request.setSize(10L);
         LoginLog log = loginLog();
         Page<LoginLog> page = Page.of(2, 10, 1);
         page.setRecords(List.of(log));
         when(loginLogDao.page("user-1", "yuanbao", 0, "127.0.0.1", 100L, 200L, 2L, 10L))
                 .thenReturn(page);
 
-        cyou.yuanbaomao.base.result.PageResult<LoginLogVo> result = loginLogService.page(request);
+        cyou.yuanbaomao.mybatis.result.YPage<LoginLogVo> result = loginLogService.page(
+                cyou.yuanbaomao.mybatis.result.YPage.of(2L, 10L), request);
 
         assertThat(result.getTotal()).isEqualTo(1L);
         assertThat(result.getRecords()).extracting(LoginLogVo::getLoginLogId)
@@ -60,7 +59,7 @@ class LoginLogServiceImplTest {
         when(loginLogDao.findById("missing")).thenReturn(Optional.empty());
 
         cyou.yuanbaomao.sellersprite.system.ops.login.model.vo.LoginLogVo detail = loginLogService.detail("login-1");
-        assertThat(detail.getTrackId()).isEqualTo("track-1");
+        assertThat(detail.getTraceId()).isEqualTo("trace-1");
         assertThat(detail.getFailureReason()).contains("[REDACTED]").doesNotContain("secret");
         assertThatThrownBy(() -> loginLogService.detail("missing"))
                 .isInstanceOfSatisfying(BizException.class,
@@ -74,7 +73,8 @@ class LoginLogServiceImplTest {
         request.setStartTime(200L);
         request.setEndTime(100L);
 
-        assertThatThrownBy(() -> loginLogService.page(request))
+        assertThatThrownBy(() -> loginLogService.page(
+                cyou.yuanbaomao.mybatis.result.YPage.of(1L, 20L), request))
                 .isInstanceOfSatisfying(BizException.class,
                         exception -> assertThat(exception.getCode())
                                 .isEqualTo(ResultCode.PARAM_INVALID.getCode()));
@@ -92,7 +92,7 @@ class LoginLogServiceImplTest {
         log.setLoginIp("127.0.0.1");
         log.setUserAgent("JUnit");
         log.setClientType("WEB");
-        log.setTrackId("track-1");
+        log.setTraceId("trace-1");
         log.setCreatedAt(150L);
         return log;
     }

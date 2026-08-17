@@ -10,7 +10,7 @@ import sql from 'highlight.js/lib/languages/sql'
 import typescript from 'highlight.js/lib/languages/typescript'
 import xml from 'highlight.js/lib/languages/xml'
 import { marked } from 'marked'
-import { computed } from 'vue'
+import { ref, useId, watch } from 'vue'
 
 const props = defineProps<{
   content: string
@@ -26,9 +26,31 @@ hljs.registerLanguage('ts', typescript)
 hljs.registerLanguage('typescript', typescript)
 hljs.registerLanguage('xml', xml)
 
+let mermaidInitialized = false
+let mermaidRenderSequence = 0
+let renderVersion = 0
+const XY_CHART_MIN_WIDTH_PX = 720
+const XY_CHART_AXIS_SPACE_PX = 160
+const XY_CHART_POINT_WIDTH_PX = 96
+const XY_CHART_HEIGHT_PX = 500
+const HORIZONTAL_BAR_WIDTH_PX = 960
+const HORIZONTAL_BAR_BASE_HEIGHT_PX = 170
+const HORIZONTAL_BAR_ROW_HEIGHT_PX = 48
+const mermaidIdPrefix = `safe-markdown-mermaid-${useId().replace(/[^A-Za-z0-9_-]/g, '')}`
+const rendered = ref('')
+
+interface MermaidChartLayout {
+  width: number
+  height: number
+  horizontalBar: boolean
+}
+
 const renderer = new marked.Renderer()
 renderer.code = ({ text, lang }) => {
   const requestedLanguage = lang?.trim().toLowerCase() ?? ''
+  if (requestedLanguage === 'mermaid') {
+    return `<div class="mermaid-diagram" data-mermaid-source="${encodeURIComponent(text)}">正在生成图表…</div>`
+  }
   const language = requestedLanguage && hljs.getLanguage(requestedLanguage) ? requestedLanguage : 'plaintext'
   const highlighted = language === 'plaintext'
     ? escapeHtml(text)
@@ -37,7 +59,10 @@ renderer.code = ({ text, lang }) => {
   return `<pre><code class="hljs${languageClass}">${highlighted}</code></pre>`
 }
 
-const rendered = computed(() => {
+watch(() => props.content, () => void renderMarkdown(), { immediate: true })
+
+async function renderMarkdown() {
+  const version = ++renderVersion
   const raw = marked.parse(props.content, {
     async: false,
     breaks: true,
@@ -46,6 +71,7 @@ const rendered = computed(() => {
   })
   const sanitized = DOMPurify.sanitize(raw, {
     USE_PROFILES: { html: true },
+    ADD_ATTR: ['data-mermaid-source'],
   })
   const container = document.createElement('div')
   container.innerHTML = sanitized
@@ -53,8 +79,117 @@ const rendered = computed(() => {
     link.setAttribute('target', '_blank')
     link.setAttribute('rel', 'noopener noreferrer')
   })
-  return container.innerHTML
-})
+  const diagrams = [...container.querySelectorAll<HTMLElement>('[data-mermaid-source]')]
+  if (diagrams.length > 0) {
+    await renderMermaidDiagrams(diagrams, version)
+  }
+  if (version === renderVersion) rendered.value = container.innerHTML
+}
+
+async function renderMermaidDiagrams(diagrams: HTMLElement[], version: number) {
+  try {
+    const mermaid = (await import('mermaid')).default
+    if (!mermaidInitialized) {
+      mermaid.initialize({
+        startOnLoad: false,
+        securityLevel: 'strict',
+        theme: 'base',
+        htmlLabels: false,
+        themeVariables: {
+          xyChart: {
+            plotColorPalette: '#2563EB,#DC2626,#059669,#7C3AED,#C2410C',
+            dataLabelColor: '#FFFFFF',
+          },
+        },
+      })
+      mermaidInitialized = true
+    }
+    for (const diagram of diagrams) {
+      if (version !== renderVersion) return
+      const source = decodeURIComponent(diagram.dataset.mermaidSource ?? '')
+      const layout = xyChartLayout(source)
+      const renderSource = layout === null ? source : xyChartSourceWithLayout(source, layout)
+      const renderId = `${mermaidIdPrefix}-${++mermaidRenderSequence}`
+      const { svg } = await mermaid.render(renderId, renderSource)
+      diagram.removeAttribute('data-mermaid-source')
+      diagram.innerHTML = DOMPurify.sanitize(svg, {
+        USE_PROFILES: { svg: true, svgFilters: true },
+      })
+      applyMermaidChartLayout(diagram, layout)
+      if (layout?.horizontalBar) applyCategoryTooltips(diagram, source)
+    }
+  } catch {
+    diagrams.forEach((diagram) => {
+      diagram.removeAttribute('data-mermaid-source')
+      diagram.textContent = '图表暂时无法渲染'
+      diagram.classList.add('mermaid-diagram--error')
+    })
+  }
+}
+
+function applyMermaidChartLayout(diagram: HTMLElement, layout: MermaidChartLayout | null) {
+  const svg = diagram.querySelector<SVGSVGElement>('svg')
+  if (layout === null || !svg) return
+
+  svg.style.width = `${layout.width}px`
+  svg.style.minWidth = layout.horizontalBar ? `${XY_CHART_MIN_WIDTH_PX}px` : `${layout.width}px`
+  svg.style.maxWidth = 'none'
+  diagram.classList.add(layout.horizontalBar
+    ? 'mermaid-diagram--horizontal-bar'
+    : 'mermaid-diagram--scrollable')
+}
+
+function xyChartSourceWithLayout(source: string, layout: MermaidChartLayout) {
+  const configuration = [
+    '---',
+    'config:',
+    '  xyChart:',
+    `    width: ${layout.width}`,
+    `    height: ${layout.height}`,
+  ]
+  if (layout.horizontalBar) configuration.push('    showDataLabel: true')
+  return [...configuration, '---', source].join('\n')
+}
+
+function xyChartLayout(source: string): MermaidChartLayout | null {
+  if (source.trimStart().startsWith('---') || !/^\s*xychart(?:-beta)?\b/im.test(source)) {
+    return null
+  }
+
+  const seriesPointCounts = [...source.matchAll(/^\s*(?:line|bar)\s*\[([^\]]*)]/gim)]
+    .map((match) => match[1]?.split(',').filter((value) => value.trim()).length ?? 0)
+  const pointCount = Math.max(0, ...seriesPointCounts)
+  const horizontalBar = /^\s*xychart(?:-beta)?\s+horizontal\b/im.test(source)
+  if (horizontalBar) {
+    return {
+      width: HORIZONTAL_BAR_WIDTH_PX,
+      height: Math.max(XY_CHART_HEIGHT_PX, HORIZONTAL_BAR_BASE_HEIGHT_PX + pointCount * HORIZONTAL_BAR_ROW_HEIGHT_PX),
+      horizontalBar: true,
+    }
+  }
+  return {
+    width: Math.max(
+      XY_CHART_MIN_WIDTH_PX,
+      XY_CHART_AXIS_SPACE_PX + pointCount * XY_CHART_POINT_WIDTH_PX,
+    ),
+    height: XY_CHART_HEIGHT_PX,
+    horizontalBar: false,
+  }
+}
+
+function applyCategoryTooltips(diagram: HTMLElement, source: string) {
+  const axis = source.match(/^\s*x-axis(?:\s+"[^"]*")?\s+\[([^\]]*)]/im)?.[1] ?? ''
+  const categories = [...axis.matchAll(/"([^"]*)"/g)].map((match) => match[1] ?? '')
+  const labels = [...diagram.querySelectorAll<SVGTextElement>('text')]
+  categories.forEach((category) => {
+    const label = labels.find((candidate) => candidate.textContent?.trim() === category)
+    if (!label || label.querySelector('title')) return
+    const title = document.createElementNS('http://www.w3.org/2000/svg', 'title')
+    title.textContent = category
+    label.prepend(title)
+    label.style.cursor = 'help'
+  })
+}
 
 function escapeHtml(value: string) {
   return value
@@ -175,5 +310,36 @@ function escapeHtml(value: string) {
 
 .safe-markdown :deep(.hljs-comment) {
   color: #94a3b8;
+}
+
+.safe-markdown :deep(.mermaid-diagram) {
+  width: 100%;
+  margin: var(--space-3) 0;
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  scrollbar-gutter: stable;
+}
+
+.safe-markdown :deep(.mermaid-diagram svg) {
+  display: block;
+  min-width: 560px;
+  height: auto;
+  margin: 0 auto;
+}
+
+.safe-markdown :deep(.mermaid-diagram svg .plot [class*='line-plot-'] path) {
+  stroke-width: 3.5;
+}
+
+.safe-markdown :deep(.mermaid-diagram--horizontal-bar svg) {
+  margin-inline: auto;
+}
+
+.safe-markdown :deep(.mermaid-diagram--error) {
+  color: var(--el-color-danger);
 }
 </style>

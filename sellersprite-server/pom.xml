@@ -7,7 +7,7 @@
     <parent>
         <groupId>cyou.yuanbaomao</groupId>
         <artifactId>sellersprite-service</artifactId>
-        <version>0.1.0-SNAPSHOT</version>
+        <version>0.2.0</version>
     </parent>
 
     <artifactId>sellersprite-server</artifactId>
@@ -73,6 +73,7 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
                     <mainClass>cyou.yuanbaomao.sellersprite.server.SellerSpriteServiceApplication</mainClass>
+                    <skip>false</skip>
                 </configuration>
                 <executions>
                     <execution>

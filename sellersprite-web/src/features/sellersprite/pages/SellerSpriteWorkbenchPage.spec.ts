@@ -105,9 +105,9 @@ describe('SellerSpriteWorkbenchPage', () => {
     expect(wrapper.get('[aria-label="SellerSprite 响应"]').text()).toContain('remaining')
   })
 
-  it('keeps stable business error details and trackId', async () => {
+  it('keeps stable business error details and traceId', async () => {
     vi.mocked(sellerSpriteApi.executeSellerSpriteOperation).mockRejectedValue(
-      new ApiError('S429', 'SellerSprite 接口可用次数已耗尽', { trackId: 'track-seller-1' }),
+      new ApiError('S429', 'SellerSprite 接口可用次数已耗尽', { traceId: 'trace-seller-1' }),
     )
     const wrapper = await mountDebugWorkbench()
 
@@ -116,7 +116,7 @@ describe('SellerSpriteWorkbenchPage', () => {
 
     expect(wrapper.text()).toContain('S429')
     expect(wrapper.text()).toContain('SellerSprite 接口可用次数已耗尽')
-    expect(wrapper.text()).toContain('track-seller-1')
+    expect(wrapper.text()).toContain('trace-seller-1')
   })
 
   it('exports the latest successful API debugger response', async () => {

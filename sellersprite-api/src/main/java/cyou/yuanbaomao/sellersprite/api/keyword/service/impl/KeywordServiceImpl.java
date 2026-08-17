@@ -1,6 +1,7 @@
 // Generated from SellerSprite official documentation on 2026-07-10.
 package cyou.yuanbaomao.sellersprite.api.keyword.service.impl;
 
+import cyou.yuanbaomao.sellersprite.api.common.enums.SellerSpriteMarketplace;
 import cyou.yuanbaomao.sellersprite.api.client.SellerSpriteClient;
 import cyou.yuanbaomao.sellersprite.api.client.SellerSpriteOperation;
 import cyou.yuanbaomao.sellersprite.api.client.SellerSpriteRequestEncoder;
@@ -90,7 +91,13 @@ public class KeywordServiceImpl implements KeywordService {
     }
 
     @Override
-    public GoogleTrendVo getGoogleTrends(GoogleTrendRequest request) {
+    public GoogleTrendVo getGoogleTrends(SellerSpriteMarketplace marketplace, String keyword,
+            String googleProp, Boolean monthly) {
+        GoogleTrendRequest request = new GoogleTrendRequest();
+        request.setMarketplace(marketplace);
+        request.setKeyword(keyword);
+        request.setGoogleProp(googleProp);
+        request.setMonthly(monthly);
         return client.get(SellerSpriteOperation.GOOGLE_TRENDS,
                 Map.of(), SellerSpriteRequestEncoder.toQuery(request, Set.of()),
                 new ParameterizedTypeReference<SellerSpriteResponse<GoogleTrendVo>>() {

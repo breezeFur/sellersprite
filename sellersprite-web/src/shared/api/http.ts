@@ -60,7 +60,7 @@ export function configureHttpAuth(hooks: HttpAuthHooks) {
 
 export function parseApiResult<T>(result: ApiResult<T>): T {
   if (result.code !== SUCCESS_CODE) {
-    throw new ApiError(result.code, result.message, { trackId: result.trackId })
+    throw new ApiError(result.code, result.message, { traceId: result.traceId })
   }
   return result.data
 }
@@ -151,7 +151,7 @@ export function createApiClient(options: ApiClientOptions = {}): RawApiClient {
         return response
       }
       const apiError = new ApiError(result.code, result.message, {
-        trackId: result.trackId,
+        traceId: result.traceId,
         status: response.status,
       })
       if (result.code === UNAUTHORIZED_CODE) {
@@ -185,7 +185,7 @@ export function createApiClient(options: ApiClientOptions = {}): RawApiClient {
       if (rawApiResult) {
         if (rawApiResult.code !== SUCCESS_CODE) {
           throw new ApiError(rawApiResult.code, rawApiResult.message, {
-            trackId: rawApiResult.trackId,
+            traceId: rawApiResult.traceId,
             status: response.status,
           })
         }

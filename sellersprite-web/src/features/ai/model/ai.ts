@@ -61,4 +61,4 @@ export type AiStreamEvent =
   | { event: 'conversation'; data: { conversationId: string; userMessageId: string } }
   | { event: 'delta'; data: { content: string } }
   | { event: 'done'; data: { chat: AiChatResult } }
-  | { event: 'error'; data: { code: string; message: string; trackId: string; retryable: boolean } }
+  | { event: 'error'; data: { code: string; message: string; traceId: string; retryable: boolean } }

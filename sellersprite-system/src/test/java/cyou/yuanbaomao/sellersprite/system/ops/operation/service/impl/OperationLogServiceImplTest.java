@@ -37,22 +37,21 @@ class OperationLogServiceImplTest {
         request.setModuleName("系统管理");
         request.setOperationType("UPDATE");
         request.setSuccess(0);
-        request.setTrackId("track-1");
+        request.setTraceId("trace-1");
         request.setStartTime(100L);
         request.setEndTime(200L);
-        request.setCurrent(2L);
-        request.setSize(10L);
         Page<OperationLogEntity> page = Page.of(2, 10, 1);
         page.setRecords(List.of(operationLog()));
         when(operationLogQueryDao.page("user-1", "yuanbao", "系统管理", "UPDATE", 0,
-                "track-1", 100L, 200L, 2L, 10L)).thenReturn(page);
+                "trace-1", 100L, 200L, 2L, 10L)).thenReturn(page);
 
-        cyou.yuanbaomao.base.result.PageResult<OperationLogVo> result = operationLogService.page(request);
+        cyou.yuanbaomao.mybatis.result.YPage<OperationLogVo> result = operationLogService.page(
+                cyou.yuanbaomao.mybatis.result.YPage.of(2L, 10L), request);
 
         assertThat(result.getRecords()).extracting(OperationLogVo::getOperationLogId)
                 .containsExactly("operation-1");
         verify(operationLogQueryDao).page("user-1", "yuanbao", "系统管理", "UPDATE", 0,
-                "track-1", 100L, 200L, 2L, 10L);
+                "trace-1", 100L, 200L, 2L, 10L);
     }
 
     @Test
@@ -84,7 +83,7 @@ class OperationLogServiceImplTest {
         log.setResponsePayload(" token=secret ");
         log.setSuccess(0);
         log.setCostMs(12L);
-        log.setTrackId("track-1");
+        log.setTraceId("trace-1");
         log.setCreatedAt(150L);
         return log;
     }

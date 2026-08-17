@@ -33,6 +33,14 @@ import tools.jackson.databind.node.ObjectNode;
 public class ResearchEvidenceService {
 
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE;
+    private static final int DECIMAL_SCALE = 4;
+    private static final int SALES_ROLLING_MONTHS = 3;
+    private static final BigDecimal HIGH_RETURN_RISK_THRESHOLD = new BigDecimal("0.20");
+    private static final BigDecimal LOW_RETURN_RISK_THRESHOLD = new BigDecimal("-0.20");
+    private static final Set<String> RANKED_CONCENTRATION_DATASET_CODES = Set.of(
+            "market.goods-concentration",
+            "market.brand-concentration",
+            "market.seller-concentration");
 
     private final ResearchDatasetService datasetService;
     private final ObjectMapper objectMapper;
@@ -329,6 +337,17 @@ public class ResearchEvidenceService {
                 average = first(demand, "avgReturnRatio");
             }
             putNode(row, "类目平均退货率", average);
+            BigDecimal returnValue = decimalOrNull(returnRatio);
+            BigDecimal averageValue = decimalOrNull(average);
+            if (returnValue != null && averageValue != null) {
+                BigDecimal difference = returnValue.subtract(averageValue);
+                putDecimal(row, "退货率差值", difference);
+                BigDecimal relativeDifference = ratio(difference, averageValue);
+                putDecimal(row, "相对类目均值", relativeDifference);
+                if (relativeDifference != null) {
+                    row.put("风险等级", returnRiskLevel(relativeDifference));
+                }
+            }
             rows.add(row);
         }
         return evidence(rows);
@@ -345,7 +364,51 @@ public class ResearchEvidenceService {
             }
             grouped.computeIfAbsent(brand, BrandAggregate::new).add(source);
         }
+        MarketResearchDataset brandDataset = findDataset(datasets, "market.brand-concentration");
+        List<SourceRecord> brandRecords = brandDataset == null ? List.of() : sourceRecords(brandDataset);
+        if (!brandRecords.isEmpty()) {
+            List<ObjectNode> rows = new ArrayList<>();
+            for (int index = 0; index < brandRecords.size(); index++) {
+                JsonNode item = brandRecords.get(index).item();
+                String brandName = text(item, "brand");
+                BrandAggregate aggregate = grouped.get(brandName);
+                ObjectNode row = objectMapper.createObjectNode();
+                copyOrPut(row, "排名", item, index + 1, "ranking");
+                row.put("品牌", brandName);
+                String representativeAsin = firstArrayText(item, "asins");
+                if (!StringUtils.hasText(representativeAsin) && aggregate != null) {
+                    representativeAsin = aggregate.representativeAsin();
+                }
+                row.put("代表ASIN", representativeAsin);
+                JsonNode asins = item.get("asins");
+                row.put("ASIN数", asins != null && asins.isArray()
+                        ? asins.size() : aggregate == null ? 0 : aggregate.asinCount());
+                JsonNode productCount = first(item, "products", "productCount", "count");
+                if (missing(productCount) && aggregate != null) {
+                    row.put("商品数", aggregate.products);
+                } else {
+                    putNode(row, "商品数", productCount);
+                }
+                copy(row, "新品数", item, "newProducts");
+                copy(row, "月销量", item, "totalUnits", "units", "sales");
+                copy(row, "月销售额($)", item, "totalRevenue", "revenue");
+                copy(row, "平均价格($)", item, "avgPrice", "price");
+                copy(row, "平均评分", item, "rating", "avgRating");
+                copy(row, "平均评分数", item, "ratings", "avgRatings");
+                appendBrandSampleFields(row, aggregate);
+                copy(row, "销量份额", item,
+                        "totalUnitsRatio", "proportion", "ratio", "percentage");
+                copy(row, "销售额份额", item, "totalRevenueRatio");
+                copy(row, "新品销量占比", item, "newUnitsRatio");
+                copy(row, "新品销售额占比", item, "newRevenueRatio");
+                rows.add(row);
+            }
+            return evidence(rows);
+        }
         double totalUnits = grouped.values().stream().mapToDouble(BrandAggregate::units).sum();
+        BigDecimal totalRevenue = grouped.values().stream()
+                .map(BrandAggregate::revenue)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
         List<BrandAggregate> sorted = grouped.values().stream()
                 .sorted(Comparator.comparingDouble(BrandAggregate::units).reversed())
                 .toList();
@@ -355,21 +418,32 @@ public class ResearchEvidenceService {
             ObjectNode row = objectMapper.createObjectNode();
             row.put("排名", index + 1);
             row.put("品牌", brand.brand);
-            row.put("代表ASIN", brand.asins.stream().findFirst().orElse(""));
-            row.put("样本商品数", brand.products);
+            row.put("代表ASIN", brand.representativeAsin());
+            row.put("ASIN数", brand.asinCount());
+            row.put("商品数", brand.products);
             row.put("月销量", brand.units);
             row.put("月销售额($)", brand.revenue);
             row.put("平均价格($)", brand.averagePrice());
             row.put("平均评分", brand.averageRating());
             row.put("平均评分数", brand.averageRatings());
-            row.put("平均变体数", brand.averageVariations());
-            row.put("主要卖家所属地", brand.mainSellerNation());
-            row.put("FBA商品占比", brand.products == 0 ? 0D : (double) brand.fbaProducts / brand.products);
-            row.put("样本销量份额", totalUnits == 0D ? 0D : brand.units / totalUnits);
-            row.put("产品线线索", String.join(" | ", brand.titles.stream().limit(3).toList()));
+            appendBrandSampleFields(row, brand);
+            putDecimal(row, "销量份额", totalUnits == 0D
+                    ? null : BigDecimal.valueOf(brand.units / totalUnits));
+            putDecimal(row, "销售额份额", ratio(brand.revenue, totalRevenue));
             rows.add(row);
         }
         return evidence(rows);
+    }
+
+    private void appendBrandSampleFields(ObjectNode row, BrandAggregate aggregate) {
+        if (aggregate == null) {
+            return;
+        }
+        row.put("平均变体数", aggregate.averageVariations());
+        row.put("主要卖家所属地", aggregate.mainSellerNation());
+        putDecimal(row, "FBA商品占比", aggregate.products == 0
+                ? null : BigDecimal.valueOf((double) aggregate.fbaProducts / aggregate.products));
+        row.put("产品线线索", aggregate.productLineClues());
     }
 
     private EvidenceRows concentrationEvidence(List<MarketResearchDataset> datasets) {
@@ -389,21 +463,47 @@ public class ResearchEvidenceService {
         List<ObjectNode> rows = new ArrayList<>();
         int rank = 1;
         List<SourceRecord> products = sourceRecords(productsDataset);
-        for (int index = 0; index < Math.min(products.size(), 20); index++) {
-            SourceRecord source = products.get(index);
-            JsonNode product = source.item();
-            ObjectNode row = objectMapper.createObjectNode();
-            row.put("排名", rank++);
-            row.put("集中维度", "头部商品");
-            copy(row, "对象/区间", product, "title", "asin");
-            copy(row, "ASIN", product, "asin");
-            copy(row, "品牌/卖家", product, "brand", "sellerName");
-            row.put("商品数", 1);
-            copy(row, "月销量", product, "units", "monthlyUnits", "amzUnit");
-            copy(row, "月销售额($)", product, "revenue", "monthlyRevenue", "amzSales");
-            copy(row, "平均评分", product, "rating");
-            copy(row, "平均价格($)", product, "price", "averagePrice");
-            rows.add(row);
+        MarketResearchDataset goodsDataset = findDataset(datasets, "market.goods-concentration");
+        List<SourceRecord> goodsRecords = goodsDataset == null ? List.of() : sourceRecords(goodsDataset);
+        if (goodsRecords.isEmpty()) {
+            BigDecimal sampledUnits = products.stream()
+                    .map(source -> decimalValue(source.item(), "units", "monthlyUnits", "amzUnit"))
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+            BigDecimal sampledRevenue = products.stream()
+                    .map(source -> decimalValue(source.item(), "revenue", "monthlyRevenue", "amzSales"))
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+            BigDecimal cumulativeUnitsRatio = BigDecimal.ZERO;
+            BigDecimal cumulativeRevenueRatio = BigDecimal.ZERO;
+            for (int index = 0; index < Math.min(products.size(), 20); index++) {
+                SourceRecord source = products.get(index);
+                JsonNode product = source.item();
+                ObjectNode row = objectMapper.createObjectNode();
+                row.put("排名", rank++);
+                row.put("集中维度", "商品集中度（样本）");
+                copy(row, "对象/区间", product, "title", "asin");
+                copy(row, "ASIN", product, "asin");
+                copy(row, "品牌/卖家", product, "brand", "sellerName");
+                row.put("商品数", 1);
+                copy(row, "月销量", product, "units", "monthlyUnits", "amzUnit");
+                copy(row, "月销售额($)", product, "revenue", "monthlyRevenue", "amzSales");
+                BigDecimal unitsRatio = ratio(
+                        decimalOrNull(product, "units", "monthlyUnits", "amzUnit"), sampledUnits);
+                BigDecimal revenueRatio = ratio(
+                        decimalOrNull(product, "revenue", "monthlyRevenue", "amzSales"), sampledRevenue);
+                putDecimal(row, "占比", unitsRatio);
+                putDecimal(row, "销售额占比", revenueRatio);
+                if (unitsRatio != null) {
+                    cumulativeUnitsRatio = cumulativeUnitsRatio.add(unitsRatio);
+                    putDecimal(row, "累计销量占比", cumulativeUnitsRatio);
+                }
+                if (revenueRatio != null) {
+                    cumulativeRevenueRatio = cumulativeRevenueRatio.add(revenueRatio);
+                    putDecimal(row, "累计销售额占比", cumulativeRevenueRatio);
+                }
+                copy(row, "平均评分", product, "rating");
+                copy(row, "平均价格($)", product, "price", "averagePrice");
+                rows.add(row);
+            }
         }
         for (String code : distributionCodes) {
             MarketResearchDataset distribution = findDataset(datasets, code);
@@ -411,10 +511,14 @@ public class ResearchEvidenceService {
                 continue;
             }
             int distributionRank = 1;
-            for (SourceRecord source : sourceRecords(distribution)) {
+            BigDecimal cumulativeUnitsRatio = BigDecimal.ZERO;
+            BigDecimal cumulativeRevenueRatio = BigDecimal.ZERO;
+            List<SourceRecord> distributionRecords = "market.goods-concentration".equals(code)
+                    ? goodsRecords : sourceRecords(distribution);
+            for (SourceRecord source : distributionRecords) {
                 JsonNode item = source.item();
                 ObjectNode row = objectMapper.createObjectNode();
-                row.put("排名", distributionRank++);
+                copyOrPut(row, "排名", item, distributionRank++, "ranking");
                 row.put("集中维度", concentrationDimension(code));
                 copy(row, "对象/区间", item,
                         "label", "range", "asin", "brand", "sellerName", "sellerNationLabel", "month");
@@ -423,7 +527,21 @@ public class ResearchEvidenceService {
                 copy(row, "商品数", item, "productCount", "products", "count");
                 copy(row, "月销量", item, "units", "sales", "totalUnits");
                 copy(row, "月销售额($)", item, "revenue", "totalRevenue");
-                copy(row, "占比", item, "proportion", "ratio", "percentage");
+                copy(row, "占比", item,
+                        "totalUnitsRatio", "proportion", "ratio", "percentage");
+                copy(row, "销售额占比", item, "totalRevenueRatio");
+                if (RANKED_CONCENTRATION_DATASET_CODES.contains(code)) {
+                    BigDecimal unitsRatio = decimalOrNull(item, "totalUnitsRatio");
+                    BigDecimal revenueRatio = decimalOrNull(item, "totalRevenueRatio");
+                    if (unitsRatio != null) {
+                        cumulativeUnitsRatio = cumulativeUnitsRatio.add(unitsRatio);
+                        putDecimal(row, "累计销量占比", cumulativeUnitsRatio);
+                    }
+                    if (revenueRatio != null) {
+                        cumulativeRevenueRatio = cumulativeRevenueRatio.add(revenueRatio);
+                        putDecimal(row, "累计销售额占比", cumulativeRevenueRatio);
+                    }
+                }
                 copy(row, "平均评分", item, "rating", "avgRating");
                 copy(row, "平均价格($)", item, "price", "avgPrice");
                 rows.add(row);
@@ -488,9 +606,16 @@ public class ResearchEvidenceService {
             ObjectNode row = objectMapper.createObjectNode();
             row.put("ASIN", aggregate.asin);
             row.put("评论样本数", aggregate.count);
-            row.put("平均星级", aggregate.count == 0 ? 0D : aggregate.starTotal / aggregate.count);
+            putDecimal(row, "平均星级", aggregate.averageStar());
             row.put("正向样本数", aggregate.positiveCount);
+            putDecimal(row, "正向占比", aggregate.sampleRatio(aggregate.positiveCount));
+            row.put("中性样本数", aggregate.neutralCount);
+            putDecimal(row, "中性占比", aggregate.sampleRatio(aggregate.neutralCount));
             row.put("负向样本数", aggregate.negativeCount);
+            putDecimal(row, "负向占比", aggregate.sampleRatio(aggregate.negativeCount));
+            putDecimal(row, "VP评论占比", aggregate.sampleRatio(aggregate.verifiedCount));
+            putDecimal(row, "带图或视频评论占比", aggregate.sampleRatio(aggregate.mediaCount));
+            putDecimal(row, "平均赞同数", aggregate.averageLikes());
             row.put("代表正向评价", aggregate.positiveSample);
             row.put("代表负向评价", aggregate.negativeSample);
             rows.add(row);
@@ -555,7 +680,11 @@ public class ResearchEvidenceService {
             if (!points.isArray()) {
                 continue;
             }
-            for (JsonNode point : points) {
+            List<JsonNode> orderedPoints = arrayValues(points).stream()
+                    .sorted(Comparator.comparing(point -> normalizeMonth(text(point, "month"))))
+                    .toList();
+            for (int index = 0; index < orderedPoints.size(); index++) {
+                JsonNode point = orderedPoints.get(index);
                 ObjectNode row = objectMapper.createObjectNode();
                 row.put("ASIN", StringUtils.hasText(responseAsin) ? responseAsin : sourceAsin);
                 copy(row, "品牌", asin, "brand");
@@ -563,6 +692,21 @@ public class ResearchEvidenceService {
                 copy(row, "月份", point, "month");
                 copy(row, "父体销量", point, "parentUnitSales");
                 copy(row, "子体销量", point, "childUnitSales");
+                BigDecimal parentUnits = decimalOrNull(point, "parentUnitSales");
+                BigDecimal childUnits = decimalOrNull(point, "childUnitSales");
+                if (index > 0) {
+                    JsonNode previous = orderedPoints.get(index - 1);
+                    putDecimal(row, "父体销量环比", relativeChange(
+                            parentUnits, decimalOrNull(previous, "parentUnitSales")));
+                    putDecimal(row, "子体销量环比", relativeChange(
+                            childUnits, decimalOrNull(previous, "childUnitSales")));
+                }
+                putDecimal(row, "子体销量贡献率", ratio(childUnits, parentUnits));
+                SalesWindowStats windowStats = salesWindowStats(orderedPoints, index);
+                if (windowStats != null) {
+                    putDecimal(row, "近3月子体月均销量", windowStats.average());
+                    putDecimal(row, "近3月子体销量波动率", windowStats.coefficientOfVariation());
+                }
                 copy(row, "父体销售额($)", point, "parentSalesRevenue");
                 copy(row, "子体销售额($)", point, "childSalesRevenue");
                 copy(row, "标价($)", point, "price");
@@ -575,16 +719,16 @@ public class ResearchEvidenceService {
 
     private EvidenceRows asinOperationTrendEvidence(List<MarketResearchDataset> datasets) {
         List<MetricDefinition> metrics = List.of(
-                new MetricDefinition("price", "价格"),
-                new MetricDefinition("dealPrice", "成交价"),
-                new MetricDefinition("buyBox", "黄金购物车价格"),
-                new MetricDefinition("priceList", "划线价格"),
-                new MetricDefinition("bsr", "大类BSR"),
-                new MetricDefinition("reviews", "评分数"),
-                new MetricDefinition("rating", "评分"),
-                new MetricDefinition("sellers", "卖家数"),
-                new MetricDefinition("salesRankReferenceHistory", "排名类目"),
-                new MetricDefinition("buyBoxSellerIdHistory", "黄金购物车卖家"));
+                new MetricDefinition("price", "价格", true),
+                new MetricDefinition("dealPrice", "成交价", true),
+                new MetricDefinition("buyBox", "黄金购物车价格", true),
+                new MetricDefinition("priceList", "划线价格", true),
+                new MetricDefinition("bsr", "大类BSR", true),
+                new MetricDefinition("reviews", "评分数", true),
+                new MetricDefinition("rating", "评分", true),
+                new MetricDefinition("sellers", "卖家数", true),
+                new MetricDefinition("salesRankReferenceHistory", "排名类目", false),
+                new MetricDefinition("buyBoxSellerIdHistory", "黄金购物车卖家", false));
         List<ObjectNode> rows = new ArrayList<>();
         for (MarketResearchDataset dataset : datasetsByPrefix(
                 datasets, ResearchConstants.ASIN_KEEPA_TREND_DATASET_CODE_PREFIX)) {
@@ -596,7 +740,12 @@ public class ResearchEvidenceService {
                 if (!points.isArray()) {
                     continue;
                 }
-                for (JsonNode point : points) {
+                List<JsonNode> orderedPoints = arrayValues(points).stream()
+                        .sorted(Comparator.comparingLong(point -> longValue(point, "timePoint")))
+                        .toList();
+                NumericRange range = metric.numeric() ? numericRange(orderedPoints) : null;
+                for (int index = 0; index < orderedPoints.size(); index++) {
+                    JsonNode point = orderedPoints.get(index);
                     ObjectNode row = objectMapper.createObjectNode();
                     row.put("ASIN", StringUtils.hasText(text(payload, "asin"))
                             ? text(payload, "asin") : sourceAsin);
@@ -608,6 +757,19 @@ public class ResearchEvidenceService {
                     row.put("指标", metric.label());
                     putDate(row, "时间", first(point, "timePoint"));
                     copy(row, "数值", point, "value");
+                    JsonNode previousValue = index == 0
+                            ? null : first(orderedPoints.get(index - 1), "value");
+                    putNode(row, "前值", previousValue);
+                    BigDecimal currentNumeric = metric.numeric() ? decimalOrNull(point, "value") : null;
+                    BigDecimal previousNumeric = metric.numeric() ? decimalOrNull(previousValue) : null;
+                    if (currentNumeric != null && previousNumeric != null) {
+                        putDecimal(row, "变化量", currentNumeric.subtract(previousNumeric));
+                        putDecimal(row, "变化率", relativeChange(currentNumeric, previousNumeric));
+                    }
+                    if (range != null) {
+                        putDecimal(row, "区间最小值", range.minimum());
+                        putDecimal(row, "区间最大值", range.maximum());
+                    }
                     rows.add(row);
                 }
             }
@@ -843,6 +1005,99 @@ public class ResearchEvidenceService {
         }
     }
 
+    private BigDecimal decimalOrNull(JsonNode source, String... fields) {
+        return decimalOrNull(first(source, fields));
+    }
+
+    private BigDecimal decimalOrNull(JsonNode value) {
+        if (missing(value)) {
+            return null;
+        }
+        try {
+            return value.isNumber() ? value.decimalValue() : new BigDecimal(value.asText());
+        } catch (NumberFormatException ignored) {
+            return null;
+        }
+    }
+
+    private void putDecimal(ObjectNode target, String field, BigDecimal value) {
+        if (value != null) {
+            target.put(field, value.setScale(DECIMAL_SCALE, RoundingMode.HALF_UP));
+        }
+    }
+
+    private BigDecimal ratio(BigDecimal numerator, BigDecimal denominator) {
+        if (numerator == null || denominator == null || denominator.compareTo(BigDecimal.ZERO) == 0) {
+            return null;
+        }
+        return numerator.divide(denominator, DECIMAL_SCALE, RoundingMode.HALF_UP);
+    }
+
+    private BigDecimal relativeChange(BigDecimal current, BigDecimal previous) {
+        if (current == null || previous == null) {
+            return null;
+        }
+        return ratio(current.subtract(previous), previous);
+    }
+
+    private String returnRiskLevel(BigDecimal relativeDifference) {
+        if (relativeDifference.compareTo(HIGH_RETURN_RISK_THRESHOLD) >= 0) {
+            return "高";
+        }
+        if (relativeDifference.compareTo(LOW_RETURN_RISK_THRESHOLD) <= 0) {
+            return "低";
+        }
+        return "中";
+    }
+
+    private String firstArrayText(JsonNode source, String field) {
+        JsonNode values = source == null ? null : source.get(field);
+        if (values == null || !values.isArray() || values.isEmpty()) {
+            return "";
+        }
+        return values.get(0).asText("");
+    }
+
+    private SalesWindowStats salesWindowStats(List<JsonNode> points, int currentIndex) {
+        if (currentIndex + 1 < SALES_ROLLING_MONTHS) {
+            return null;
+        }
+        List<BigDecimal> values = new ArrayList<>(SALES_ROLLING_MONTHS);
+        for (int index = currentIndex - SALES_ROLLING_MONTHS + 1; index <= currentIndex; index++) {
+            BigDecimal value = decimalOrNull(points.get(index), "childUnitSales");
+            if (value == null) {
+                return null;
+            }
+            values.add(value);
+        }
+        BigDecimal average = values.stream()
+                .reduce(BigDecimal.ZERO, BigDecimal::add)
+                .divide(BigDecimal.valueOf(SALES_ROLLING_MONTHS), DECIMAL_SCALE, RoundingMode.HALF_UP);
+        if (average.compareTo(BigDecimal.ZERO) == 0) {
+            return new SalesWindowStats(average, null);
+        }
+        BigDecimal variance = values.stream()
+                .map(value -> value.subtract(average).pow(2))
+                .reduce(BigDecimal.ZERO, BigDecimal::add)
+                .divide(BigDecimal.valueOf(SALES_ROLLING_MONTHS), 12, RoundingMode.HALF_UP);
+        BigDecimal standardDeviation = BigDecimal.valueOf(Math.sqrt(variance.doubleValue()));
+        return new SalesWindowStats(average, ratio(standardDeviation, average));
+    }
+
+    private NumericRange numericRange(List<JsonNode> points) {
+        BigDecimal minimum = null;
+        BigDecimal maximum = null;
+        for (JsonNode point : points) {
+            BigDecimal value = decimalOrNull(point, "value");
+            if (value == null) {
+                continue;
+            }
+            minimum = minimum == null || value.compareTo(minimum) < 0 ? value : minimum;
+            maximum = maximum == null || value.compareTo(maximum) > 0 ? value : maximum;
+        }
+        return minimum == null ? null : new NumericRange(minimum, maximum);
+    }
+
     private void putDate(ObjectNode target, String field, JsonNode value) {
         if (missing(value)) {
             return;
@@ -904,7 +1159,13 @@ public class ResearchEvidenceService {
     private record SourceRecord(JsonNode item) {
     }
 
-    private record MetricDefinition(String field, String label) {
+    private record MetricDefinition(String field, String label, boolean numeric) {
+    }
+
+    private record SalesWindowStats(BigDecimal average, BigDecimal coefficientOfVariation) {
+    }
+
+    private record NumericRange(BigDecimal minimum, BigDecimal maximum) {
     }
 
     private final class BrandAggregate {
@@ -972,6 +1233,22 @@ public class ResearchEvidenceService {
             return units;
         }
 
+        private BigDecimal revenue() {
+            return revenue;
+        }
+
+        private String representativeAsin() {
+            return asins.stream().findFirst().orElse("");
+        }
+
+        private int asinCount() {
+            return asins.size();
+        }
+
+        private String productLineClues() {
+            return String.join(" | ", titles.stream().limit(3).toList());
+        }
+
         private BigDecimal averagePrice() {
             return priceCount == 0
                     ? BigDecimal.ZERO
@@ -1019,7 +1296,12 @@ public class ResearchEvidenceService {
         private int count;
         private double starTotal;
         private int positiveCount;
+        private int neutralCount;
         private int negativeCount;
+        private int verifiedCount;
+        private int mediaCount;
+        private long likesTotal;
+        private int starCount;
         private String positiveSample = "";
         private String negativeSample = "";
 
@@ -1031,19 +1313,59 @@ public class ResearchEvidenceService {
             JsonNode review = source.item();
             count++;
             double star = decimalValue(review, "star", "rating").doubleValue();
-            starTotal += star;
+            if (star > 0D) {
+                starTotal += star;
+                starCount++;
+            }
             String sample = String.join(" | ", List.of(text(review, "title"), text(review, "content"))).trim();
             if (star >= 4D) {
                 positiveCount++;
                 if (positiveSample.isBlank()) {
                     positiveSample = sample;
                 }
+            } else if (star == 3D) {
+                neutralCount++;
             } else if (star > 0D && star <= 2D) {
                 negativeCount++;
                 if (negativeSample.isBlank()) {
                     negativeSample = sample;
                 }
             }
+            if (booleanValue(review, "verified")) {
+                verifiedCount++;
+            }
+            if (hasMedia(review)) {
+                mediaCount++;
+            }
+            likesTotal += longValue(review, "likes");
         }
+
+        private BigDecimal averageStar() {
+            return starCount == 0 ? null : BigDecimal.valueOf(starTotal)
+                    .divide(BigDecimal.valueOf(starCount), DECIMAL_SCALE, RoundingMode.HALF_UP);
+        }
+
+        private BigDecimal sampleRatio(int sampleCount) {
+            return ratio(BigDecimal.valueOf(sampleCount), BigDecimal.valueOf(count));
+        }
+
+        private BigDecimal averageLikes() {
+            return count == 0 ? null : BigDecimal.valueOf(likesTotal)
+                    .divide(BigDecimal.valueOf(count), DECIMAL_SCALE, RoundingMode.HALF_UP);
+        }
+    }
+
+    private boolean booleanValue(JsonNode source, String field) {
+        JsonNode value = first(source, field);
+        return !missing(value) && (value.isBoolean() ? value.booleanValue() : Boolean.parseBoolean(value.asText()));
+    }
+
+    private boolean hasMedia(JsonNode review) {
+        JsonNode images = review.get("images");
+        JsonNode videos = review.get("videos");
+        return (images != null && images.isArray() && !images.isEmpty())
+                || (videos != null && videos.isArray() && !videos.isEmpty())
+                || booleanValue(review, "image")
+                || booleanValue(review, "video");
     }
 }

@@ -12,7 +12,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import cyou.yuanbaomao.base.result.PageResult;
+import cyou.yuanbaomao.mybatis.result.YPage;
 import cyou.yuanbaomao.sellersprite.system.permission.model.dto.SysApiPageRequest;
 import cyou.yuanbaomao.sellersprite.system.permission.model.dto.SysApiUpdateRequest;
 import cyou.yuanbaomao.sellersprite.system.permission.model.dto.SysFunctionUpdateRequest;
@@ -47,8 +47,8 @@ class PermissionControllerTest {
         when(permissionService.updateFunction(eq("function-1"), any(SysFunctionUpdateRequest.class)))
                 .thenReturn(function);
         when(permissionService.getFunctionApiIds("function-1")).thenReturn(List.of("api-1"));
-        when(permissionService.pageApis(any(SysApiPageRequest.class)))
-                .thenReturn(PageResult.of(1, 20, 1, List.of(api)));
+        when(permissionService.pageApis(any(YPage.class), any(SysApiPageRequest.class)))
+                .thenReturn(YPage.of(1, 20, 1, List.of(api)));
         when(permissionService.apiDetail("api-1")).thenReturn(api);
         when(permissionService.updateApi(eq("api-1"), any(SysApiUpdateRequest.class))).thenReturn(api);
 

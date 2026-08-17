@@ -216,7 +216,7 @@ test('executes SellerSprite success and failure flows across responsive layouts'
         json: {
           code: 'S429',
           message: 'SellerSprite 接口可用次数已耗尽',
-          trackId: 'browser-track-id',
+          traceId: 'browser-trace-id',
           data: null,
         },
       })
@@ -324,7 +324,7 @@ test('executes SellerSprite success and failure flows across responsive layouts'
   returnBusinessError = true
   await page.getByLabel('发送 SellerSprite 请求').click()
   await expect(page.getByRole('alert')).toContainText('S429')
-  await expect(page.getByRole('alert')).toContainText('browser-track-id')
+  await expect(page.getByRole('alert')).toContainText('browser-trace-id')
 
   await page.setViewportSize({ width: 768, height: 900 })
   await expect(page.getByLabel('SellerSprite 请求 JSON')).toBeVisible()

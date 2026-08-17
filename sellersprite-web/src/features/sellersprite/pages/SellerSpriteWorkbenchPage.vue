@@ -36,7 +36,7 @@ import {
 interface WorkbenchError {
   code: string
   message: string
-  trackId?: string
+  traceId?: string
 }
 
 type WorkbenchMode = 'guided' | 'debug'
@@ -215,7 +215,7 @@ function isEmptyResult(value: unknown) {
 
 function normalizeExecutionError(error: unknown): WorkbenchError {
   if (error instanceof ApiError) {
-    return { code: error.code, message: error.message, trackId: error.trackId }
+    return { code: error.code, message: error.message, traceId: error.traceId }
   }
   if (error instanceof Error) {
     return { code: 'REQUEST_FAILED', message: error.message || '请求失败，请稍后重试。' }
@@ -474,8 +474,8 @@ function normalizeExecutionError(error: unknown): WorkbenchError {
           <div>
             <span>{{ executionError.code }}</span>
             <h3>{{ executionError.message }}</h3>
-            <p v-if="executionError.trackId">
-              trackId: <code>{{ executionError.trackId }}</code>
+            <p v-if="executionError.traceId">
+              traceId: <code>{{ executionError.traceId }}</code>
             </p>
           </div>
         </div>

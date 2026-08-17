@@ -1,4 +1,5 @@
 import { mount, type VueWrapper } from '@vue/test-utils'
+import { createPinia } from 'pinia'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { nextTick } from 'vue'
 
@@ -25,6 +26,10 @@ describe('ResearchReportWorkspace', () => {
     wrapper = mountWorkspace()
     const tabButtons = wrapper.findAll('[role="tab"]')
 
+    expect(wrapper.get('[data-testid="research-workspace-chrome-toggle"]')
+      .attributes('aria-expanded')).toBe('false')
+    expect(wrapper.find('[data-testid="research-workspace-stream-status-host"]').exists()).toBe(true)
+
     expect(tabButtons.map((tab) => tab.text())).toEqual(tabs.map((tab) => tab.label))
     expect(tabButtons[0].attributes('aria-selected')).toBe('true')
     expect(tabButtons[0].attributes('tabindex')).toBe('0')
@@ -38,6 +43,18 @@ describe('ResearchReportWorkspace', () => {
     }
 
     expect(wrapper.emitted('select')).toEqual(tabs.map((tab) => [tab.section]))
+  })
+
+  it('opens the compact workspace chrome by click and closes it with Escape', async () => {
+    wrapper = mountWorkspace()
+    const toggle = wrapper.get<HTMLButtonElement>('[data-testid="research-workspace-chrome-toggle"]')
+
+    await toggle.trigger('click')
+    expect(toggle.attributes('aria-expanded')).toBe('true')
+
+    await wrapper.get('[data-testid="research-workspace-chrome"]').trigger('keydown', { key: 'Escape' })
+    expect(toggle.attributes('aria-expanded')).toBe('false')
+    expect(document.activeElement).toBe(toggle.element)
   })
 
   it('adds a dedicated product-selection tab when the workflow exposes a selection review', async () => {
@@ -105,6 +122,7 @@ describe('ResearchReportWorkspace', () => {
   ) {
     return mount(ResearchReportWorkspace, {
       attachTo: document.body,
+      global: { plugins: [createPinia()] },
       props: {
         activeSection,
         title: '美国站美容仪市场调研',

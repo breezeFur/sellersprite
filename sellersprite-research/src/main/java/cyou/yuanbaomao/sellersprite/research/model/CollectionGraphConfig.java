@@ -1,5 +1,6 @@
 package cyou.yuanbaomao.sellersprite.research.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import cyou.yuanbaomao.sellersprite.api.keyword.model.dto.KeywordMinerRequest;
 import cyou.yuanbaomao.sellersprite.api.keyword.model.dto.KeywordResearchRequest;
 import cyou.yuanbaomao.sellersprite.api.asin.model.dto.KeepaTrendRequest;
@@ -109,14 +110,12 @@ public class CollectionGraphConfig {
     }
 
     @Data
+    @JsonIgnoreProperties("newProduct")
     @Schema(description = "关键词需求趋势采集参数")
     public static class KeywordDemandTrendCollectionConfig {
 
         @Schema(description = "市场需求趋势样本数量", example = "100")
         private Integer topN = DEFAULT_TOP_N;
-
-        @Schema(description = "新品定义月数", example = "6")
-        private Integer newProduct = DEFAULT_NEW_PRODUCT_MONTHS;
     }
 
     @Data

@@ -1,6 +1,6 @@
 package cyou.yuanbaomao.sellersprite.system.ops.login.controller;
 
-import cyou.yuanbaomao.base.result.PageResult;
+import cyou.yuanbaomao.mybatis.result.YPage;
 import cyou.yuanbaomao.base.result.Result;
 import cyou.yuanbaomao.sellersprite.system.ops.login.model.dto.LoginLogPageRequest;
 import cyou.yuanbaomao.sellersprite.system.ops.login.model.vo.LoginLogVo;
@@ -24,8 +24,9 @@ public class LoginLogController {
 
     @Operation(summary = "分页查询登录日志")
     @GetMapping
-    public Result<PageResult<LoginLogVo>> page(@Valid LoginLogPageRequest request) {
-        return Result.success(loginLogService.page(request));
+    public Result<YPage<LoginLogVo>> page(@Valid YPage<LoginLogVo> page,
+            @Valid LoginLogPageRequest request) {
+        return Result.success(loginLogService.page(page, request));
     }
 
     @Operation(summary = "查询登录日志详情")

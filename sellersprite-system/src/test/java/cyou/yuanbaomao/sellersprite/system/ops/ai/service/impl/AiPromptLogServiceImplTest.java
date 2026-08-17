@@ -39,14 +39,13 @@ class AiPromptLogServiceImplTest {
         request.setStatus("FAILED");
         request.setStartTime(100L);
         request.setEndTime(200L);
-        request.setCurrent(2L);
-        request.setSize(10L);
         Page<AiPromptRecord> page = Page.of(2, 10, 1);
         page.setRecords(List.of(promptRecord()));
         when(promptRecordDao.page("user-1", "conversation-1", "openai", "gpt-5.5", "FAILED",
                 100L, 200L, 2L, 10L)).thenReturn(page);
 
-        cyou.yuanbaomao.base.result.PageResult<AiPromptLogVo> result = promptLogService.page(request);
+        cyou.yuanbaomao.mybatis.result.YPage<AiPromptLogVo> result = promptLogService.page(
+                cyou.yuanbaomao.mybatis.result.YPage.of(2L, 10L), request);
 
         assertThat(result.getRecords()).extracting(AiPromptLogVo::getPromptRecordId)
                 .containsExactly("prompt-1");
@@ -92,7 +91,7 @@ class AiPromptLogServiceImplTest {
         record.setTotalTokens(15);
         record.setStatus("FAILED");
         record.setCostMs(12L);
-        record.setTrackId("track-1");
+        record.setTraceId("trace-1");
         record.setCreatedAt(150L);
         return record;
     }

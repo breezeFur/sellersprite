@@ -78,9 +78,14 @@ public class ResearchReportServiceImpl
         jobStateService.assertExecutable(jobId, parentExecutionToken);
         MarketResearchJob job = jobStateService.requireJob(jobId);
         renderAndPublishStage(jobId, EvidenceStage.SCREENING);
+        analysisArtifactService.publishStageConclusionPdf(
+                jobId, job.getUserId(), EvidenceStage.SCREENING);
         if (decision == ResearchSelectionDecision.ENTER) {
             jobStateService.assertExecutable(jobId, parentExecutionToken);
             renderAndPublishStage(jobId, EvidenceStage.DEEP_DIVE);
+            jobStateService.assertExecutable(jobId, parentExecutionToken);
+            analysisArtifactService.publishStageConclusionPdf(
+                    jobId, job.getUserId(), EvidenceStage.DEEP_DIVE);
             jobStateService.assertExecutable(jobId, parentExecutionToken);
             analysisArtifactService.publishFinalMarkdown(jobId, job.getUserId());
         }
@@ -236,12 +241,15 @@ public class ResearchReportServiceImpl
                 ? List.of(
                         ResearchConstants.ARTIFACT_TYPE_STAGE1_RAW_WORKBOOK,
                         ResearchConstants.ARTIFACT_TYPE_STAGE1_EVIDENCE_WORKBOOK,
+                        ResearchConstants.ARTIFACT_TYPE_STAGE1_CONCLUSION_REPORT,
                         ResearchConstants.ARTIFACT_TYPE_STAGE2_RAW_WORKBOOK,
                         ResearchConstants.ARTIFACT_TYPE_STAGE2_EVIDENCE_WORKBOOK,
+                        ResearchConstants.ARTIFACT_TYPE_STAGE2_CONCLUSION_REPORT,
                         ResearchConstants.ARTIFACT_TYPE_AI_ANALYSIS_REPORT)
                 : List.of(
                         ResearchConstants.ARTIFACT_TYPE_STAGE1_RAW_WORKBOOK,
-                        ResearchConstants.ARTIFACT_TYPE_STAGE1_EVIDENCE_WORKBOOK);
+                        ResearchConstants.ARTIFACT_TYPE_STAGE1_EVIDENCE_WORKBOOK,
+                        ResearchConstants.ARTIFACT_TYPE_STAGE1_CONCLUSION_REPORT);
         List<String> actual = artifactDao.listAvailableByJobIds(List.of(jobId)).stream()
                 .filter(this::isPublishedFileAvailable)
                 .map(MarketResearchArtifact::getArtifactType)

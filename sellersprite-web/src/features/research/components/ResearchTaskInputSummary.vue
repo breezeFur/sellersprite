@@ -107,7 +107,7 @@ function collectionConfigAvailable(
         </div>
         <div>
           <dt>需求趋势</dt>
-          <dd>样本 {{ value(['collectKeywordDemandTrend', 'topN']) }}，新品 {{ value(['collectKeywordDemandTrend', 'newProduct']) }} 个月</dd>
+          <dd>样本 {{ value(['collectKeywordDemandTrend', 'topN']) }}</dd>
         </div>
         <div>
           <dt>细分市场</dt>

@@ -3,6 +3,7 @@ import { createPinia, setActivePinia } from 'pinia'
 import { beforeEach, describe, expect, it } from 'vitest'
 
 import AppShell from './AppShell.vue'
+import { useLayoutStore } from './useLayoutStore'
 
 describe('AppShell', () => {
   beforeEach(() => {
@@ -37,6 +38,16 @@ describe('AppShell', () => {
     expect(wrapper.get('[aria-label="打开导航"]').attributes('aria-expanded')).toBe('true')
     await wrapper.get('.app-shell__mobile-close').trigger('click')
     expect(wrapper.classes()).not.toContain('is-mobile-open')
+  })
+
+  it('marks the shell as focused workspace while keeping a reachable top trigger', () => {
+    const pinia = createPinia()
+    const layoutStore = useLayoutStore(pinia)
+    layoutStore.setWorkspaceFocusMode(true)
+    const wrapper = mount(AppShell, { global: { plugins: [pinia] } })
+
+    expect(wrapper.classes()).toContain('is-workspace-focus')
+    expect(wrapper.get('.app-shell__header')).toBeTruthy()
   })
 
   it('closes the mobile drawer when the viewport crosses into desktop width', async () => {

@@ -10330,13 +10330,6 @@ export const officialSellerSpriteOperationContracts = [
         "description": "10"
       },
       {
-        "field": "newProduct",
-        "type": "Integer",
-        "required": false,
-        "name": "新品定义",
-        "description": "6"
-      },
-      {
         "field": "nodeIdPath",
         "type": "String",
         "required": true,
@@ -10361,14 +10354,14 @@ export const officialSellerSpriteOperationContracts = [
       },
       {
         "field": "searchToPurchaseRatio",
-        "type": "List",
+        "type": "BigDecimal",
         "required": false,
         "name": "搜索购买比，千分比",
         "description": "3.17875"
       },
       {
         "field": "avgReturnRatio",
-        "type": "Integer",
+        "type": "BigDecimal",
         "required": false,
         "name": "类目平均退货率，百分比",
         "description": "2.72"

@@ -8,7 +8,6 @@ import static org.mockito.Mockito.when;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import cyou.yuanbaomao.base.exception.BizException;
 import cyou.yuanbaomao.sellersprite.ai.context.AiCurrentUser;
-import cyou.yuanbaomao.sellersprite.ai.conversation.model.dto.AiConversationPageRequest;
 import cyou.yuanbaomao.sellersprite.ai.conversation.model.dto.AiConversationRenameRequest;
 import cyou.yuanbaomao.sellersprite.ai.conversation.model.dto.AiConversationSettingsRequest;
 import cyou.yuanbaomao.sellersprite.ai.conversation.model.vo.AiConversationDetailVo;
@@ -51,16 +50,13 @@ class AiConversationServiceImplTest {
 
     @Test
     void shouldPageOnlyCurrentUsersConversations() {
-        AiConversationPageRequest request = new AiConversationPageRequest();
-        request.setTitle("测试");
-        request.setCurrent(2L);
-        request.setSize(10L);
         Page<AiConversation> page = Page.of(2, 10, 1);
         page.setRecords(List.of(conversation()));
         when(currentUser.requireUserId()).thenReturn(USER_ID);
         when(conversationDao.pageByUserId(USER_ID, "测试", 2L, 10L)).thenReturn(page);
 
-        cyou.yuanbaomao.base.result.PageResult<AiConversationVo> result = conversationService.page(request);
+        cyou.yuanbaomao.mybatis.result.YPage<AiConversationVo> result = conversationService.page(
+                cyou.yuanbaomao.mybatis.result.YPage.of(2L, 10L), "测试");
 
         assertThat(result.getCurrent()).isEqualTo(2L);
         assertThat(result.getTotal()).isEqualTo(1L);

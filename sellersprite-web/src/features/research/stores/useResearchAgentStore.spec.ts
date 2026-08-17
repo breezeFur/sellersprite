@@ -118,6 +118,34 @@ describe('useResearchAgentStore', () => {
     expect(store.events[0].streaming).toBeUndefined()
   })
 
+  it('aggregates replayable report charts by run and chart code', () => {
+    const store = useResearchAgentStore()
+    store.startJob('job-1')
+    const chart = {
+      chartCode: 'market-sales-volume',
+      sectionCode: 'market-sales-trend',
+      sectionTitle: '行业销售趋势',
+      type: 'LINE',
+      title: '行业月销量趋势',
+      categories: ['2026-01', '2026-02'],
+      series: [{ name: '销量', values: [1200, 1500] }],
+    }
+
+    store.appendEvent(event(6, 'report_chart', {
+      scope: 'analysis',
+      analysisRunId: 'run-1',
+      payload: { data: chart },
+    }))
+    store.appendEvent(event(7, 'report_chart', {
+      scope: 'analysis',
+      analysisRunId: 'run-1',
+      payload: { data: { ...chart, series: [{ name: '销量', values: [1200, 1600] }] } },
+    }))
+
+    expect(store.reportChartList).toHaveLength(1)
+    expect(store.reportChartList[0]?.series[0]?.values).toEqual([1200, 1600])
+  })
+
   it('unwraps persisted Agent delta content from payload data', () => {
     const store = useResearchAgentStore()
     store.startJob('job-1')

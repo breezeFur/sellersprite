@@ -7,7 +7,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import cyou.yuanbaomao.base.result.PageResult;
+import cyou.yuanbaomao.mybatis.result.YPage;
 import cyou.yuanbaomao.sellersprite.system.ops.operation.model.dto.OperationLogPageRequest;
 import cyou.yuanbaomao.sellersprite.system.ops.operation.model.vo.OperationLogVo;
 import cyou.yuanbaomao.sellersprite.system.ops.operation.service.OperationLogService;
@@ -24,8 +24,8 @@ class OperationLogControllerTest {
         OperationLogVo log = new OperationLogVo();
         log.setOperationLogId("operation-1");
         log.setOperationName("更新用户");
-        when(service.page(any(OperationLogPageRequest.class)))
-                .thenReturn(PageResult.of(1, 20, 1, List.of(log)));
+        when(service.page(any(YPage.class), any(OperationLogPageRequest.class)))
+                .thenReturn(YPage.of(1, 20, 1, List.of(log)));
         when(service.detail("operation-1")).thenReturn(log);
         MockMvc mockMvc = MockMvcBuilders.standaloneSetup(new OperationLogController(service)).build();
 

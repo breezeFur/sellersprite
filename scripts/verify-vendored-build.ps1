@@ -20,12 +20,12 @@ $artifacts = @(
     'yuanbaomao-dict-starter'
 )
 $artifactVersions = @{
-    'yuanbaomao-base' = '0.1.1'
-    'yuanbaomao-web-starter' = '0.1.2-SNAPSHOT'
-    'yuanbaomao-mybatis-starter' = '0.1.1'
-    'yuanbaomao-cache-starter' = '0.1.1'
-    'yuanbaomao-log-starter' = '0.1.2-SNAPSHOT'
-    'yuanbaomao-dict-starter' = '0.1.1'
+    'yuanbaomao-base' = '0.2.0'
+    'yuanbaomao-web-starter' = '0.2.0'
+    'yuanbaomao-mybatis-starter' = '0.2.0'
+    'yuanbaomao-cache-starter' = '0.2.0'
+    'yuanbaomao-log-starter' = '0.2.0'
+    'yuanbaomao-dict-starter' = '0.2.0'
 }
 
 function Remove-RunRoot {
@@ -36,8 +36,23 @@ function Remove-RunRoot {
         -not $runName.StartsWith('sellersprite-vendored-', [StringComparison]::Ordinal)) {
         throw "Refusing to delete a directory outside the verified boundary: $resolvedRunRoot"
     }
-    if ([IO.Directory]::Exists($resolvedRunRoot)) {
-        [IO.Directory]::Delete($resolvedRunRoot, $true)
+    $longRunRoot = '\\?\' + $resolvedRunRoot
+
+    for ($attempt = 1; $attempt -le 5; $attempt++) {
+        if (-not [IO.Directory]::Exists($longRunRoot)) {
+            return
+        }
+        try {
+            [IO.Directory]::Delete($longRunRoot, $true)
+            return
+        } catch [IO.DirectoryNotFoundException] {
+            return
+        } catch {
+            if ($attempt -eq 5) {
+                throw
+            }
+            Start-Sleep -Milliseconds 200
+        }
     }
 }
 

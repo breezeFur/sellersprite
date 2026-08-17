@@ -7,7 +7,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import cyou.yuanbaomao.base.result.PageResult;
+import cyou.yuanbaomao.mybatis.result.YPage;
 import cyou.yuanbaomao.sellersprite.system.ops.ai.model.dto.AiPromptLogPageRequest;
 import cyou.yuanbaomao.sellersprite.system.ops.ai.model.vo.AiPromptLogVo;
 import cyou.yuanbaomao.sellersprite.system.ops.ai.service.AiPromptLogService;
@@ -24,8 +24,8 @@ class AiPromptLogControllerTest {
         AiPromptLogVo log = new AiPromptLogVo();
         log.setPromptRecordId("prompt-1");
         log.setModel("gpt-5.5");
-        when(service.page(any(AiPromptLogPageRequest.class)))
-                .thenReturn(PageResult.of(1, 20, 1, List.of(log)));
+        when(service.page(any(YPage.class), any(AiPromptLogPageRequest.class)))
+                .thenReturn(YPage.of(1, 20, 1, List.of(log)));
         when(service.detail("prompt-1")).thenReturn(log);
         MockMvc mockMvc = MockMvcBuilders.standaloneSetup(new AiPromptLogController(service)).build();
 

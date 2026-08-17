@@ -1,7 +1,7 @@
 package cyou.yuanbaomao.sellersprite.system.permission.service.impl;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import cyou.yuanbaomao.base.result.PageResult;
+import cyou.yuanbaomao.mybatis.result.YPage;
 import cyou.yuanbaomao.sellersprite.common.result.ResultCode;
 import cyou.yuanbaomao.sellersprite.db.dao.SysApiDao;
 import cyou.yuanbaomao.sellersprite.db.dao.FunctionApiDao;
@@ -146,11 +146,13 @@ public class PermissionServiceImpl implements PermissionService {
     }
 
     @Override
-    public PageResult<SysApiVo> pageApis(SysApiPageRequest request) {
+    public YPage<SysApiVo> pageApis(YPage<SysApiVo> page, SysApiPageRequest request) {
         String method = request.getHttpMethod() == null ? null : request.getHttpMethod().toUpperCase(Locale.ROOT);
-        Page<SysApi> page = sysApiDao.pageApis(request.getKeyword(), request.getApiType(), method, request.getModuleName(),
-                request.getStatus(), request.getCurrent(), request.getSize());
-        return PageResult.of(page.getCurrent(), page.getSize(), page.getTotal(), page.getRecords().stream().map(SystemConverter::toSysApiVo).toList());
+        Page<SysApi> entityPage = sysApiDao.pageApis(request.getKeyword(), request.getApiType(), method,
+                request.getModuleName(), request.getStatus(), page.getCurrent(), page.getSize());
+        page.setTotal(entityPage.getTotal());
+        page.setRecords(entityPage.getRecords().stream().map(SystemConverter::toSysApiVo).toList());
+        return page;
     }
 
     @Override

@@ -1,20 +1,17 @@
 package cyou.yuanbaomao.sellersprite.system.dict.service.impl;
 
 import cyou.yuanbaomao.base.exception.BizException;
-import cyou.yuanbaomao.base.result.PageResult;
+import cyou.yuanbaomao.mybatis.result.YPage;
 import cyou.yuanbaomao.dict.core.DictTemplate;
 import cyou.yuanbaomao.dict.model.DictDataPageQuery;
-import cyou.yuanbaomao.dict.model.DictTypePageQuery;
 import cyou.yuanbaomao.dict.mybatis.entity.DictDataEntity;
 import cyou.yuanbaomao.dict.mybatis.entity.DictTypeEntity;
 import cyou.yuanbaomao.sellersprite.common.result.ResultCode;
 import cyou.yuanbaomao.sellersprite.system.constants.SystemBusinessConstants;
 import cyou.yuanbaomao.sellersprite.system.convert.SystemConverter;
 import cyou.yuanbaomao.sellersprite.system.dict.model.dto.DictItemCreateRequest;
-import cyou.yuanbaomao.sellersprite.system.dict.model.dto.DictItemPageRequest;
 import cyou.yuanbaomao.sellersprite.system.dict.model.dto.DictItemUpdateRequest;
 import cyou.yuanbaomao.sellersprite.system.dict.model.dto.DictTypeCreateRequest;
-import cyou.yuanbaomao.sellersprite.system.dict.model.dto.DictTypePageRequest;
 import cyou.yuanbaomao.sellersprite.system.dict.model.dto.DictTypeUpdateRequest;
 import cyou.yuanbaomao.sellersprite.system.dict.model.vo.DictItemVo;
 import cyou.yuanbaomao.sellersprite.system.dict.model.vo.DictTypeVo;
@@ -44,17 +41,14 @@ public class DictServiceImpl implements DictService {
     }
 
     @Override
-    public PageResult<DictTypeVo> pageTypes(DictTypePageRequest request) {
-        DictTypePageQuery query = new DictTypePageQuery();
-        query.setCurrent(request.getCurrent());
-        query.setSize(request.getSize());
-        query.setDictType(request.getDictType());
-        query.setDictTypeName(request.getDictName());
-        query.setStatus(request.getStatus());
-        PageResult<DictTypeEntity> page = dictTemplate.pageTypes(query);
-        return PageResult.of(page.getCurrent(), page.getSize(), page.getTotal(), page.getRecords().stream()
+    public YPage<DictTypeVo> pageTypes(YPage<DictTypeVo> page, String dictType, String dictName, Integer status) {
+        YPage<DictTypeEntity> entityPage = YPage.of(page.getCurrent(), page.getSize());
+        dictTemplate.pageTypes(entityPage, dictType, dictName, status, DictTypeEntity.class);
+        page.setTotal(entityPage.getTotal());
+        page.setRecords(entityPage.getRecords().stream()
                 .map(entity -> SystemConverter.toDictTypeVo(entity, List.of()))
                 .toList());
+        return page;
     }
 
     @Override
@@ -111,19 +105,21 @@ public class DictServiceImpl implements DictService {
     }
 
     @Override
-    public PageResult<DictItemVo> pageItems(String dictType, DictItemPageRequest request) {
+    public YPage<DictItemVo> pageItems(String dictType, YPage<DictItemVo> page,
+            String dictLabel, String dictName, String dictValue, Integer status) {
         DictDataPageQuery query = new DictDataPageQuery();
-        query.setCurrent(request.getCurrent());
-        query.setSize(request.getSize());
         query.setDictType(dictType);
-        query.setDictLabel(request.getDictLabel());
-        query.setDictName(request.getDictName());
-        query.setDictValue(request.getDictValue());
-        query.setStatus(request.getStatus());
-        PageResult<DictDataEntity> page = dictTemplate.pageData(query);
-        return PageResult.of(page.getCurrent(), page.getSize(), page.getTotal(), page.getRecords().stream()
+        query.setDictLabel(dictLabel);
+        query.setDictName(dictName);
+        query.setDictValue(dictValue);
+        query.setStatus(status);
+        YPage<DictDataEntity> entityPage = YPage.of(page.getCurrent(), page.getSize());
+        dictTemplate.pageData(entityPage, query, DictDataEntity.class);
+        page.setTotal(entityPage.getTotal());
+        page.setRecords(entityPage.getRecords().stream()
                 .map(SystemConverter::toDictItemVo)
                 .toList());
+        return page;
     }
 
     @Override

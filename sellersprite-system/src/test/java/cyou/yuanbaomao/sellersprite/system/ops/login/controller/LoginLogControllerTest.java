@@ -7,7 +7,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import cyou.yuanbaomao.base.result.PageResult;
+import cyou.yuanbaomao.mybatis.result.YPage;
 import cyou.yuanbaomao.sellersprite.system.ops.login.model.dto.LoginLogPageRequest;
 import cyou.yuanbaomao.sellersprite.system.ops.login.model.vo.LoginLogVo;
 import cyou.yuanbaomao.sellersprite.system.ops.login.service.LoginLogService;
@@ -24,8 +24,8 @@ class LoginLogControllerTest {
         LoginLogVo log = new LoginLogVo();
         log.setLoginLogId("login-1");
         log.setUsername("yuanbao");
-        when(service.page(any(LoginLogPageRequest.class)))
-                .thenReturn(PageResult.of(1, 20, 1, List.of(log)));
+        when(service.page(any(YPage.class), any(LoginLogPageRequest.class)))
+                .thenReturn(YPage.of(1, 20, 1, List.of(log)));
         when(service.detail("login-1")).thenReturn(log);
         MockMvc mockMvc = MockMvcBuilders.standaloneSetup(new LoginLogController(service)).build();
 

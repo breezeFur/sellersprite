@@ -11,10 +11,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import cyou.yuanbaomao.base.result.PageResult;
-import cyou.yuanbaomao.sellersprite.system.dict.model.dto.DictItemPageRequest;
+import cyou.yuanbaomao.mybatis.result.YPage;
 import cyou.yuanbaomao.sellersprite.system.dict.model.dto.DictItemUpdateRequest;
-import cyou.yuanbaomao.sellersprite.system.dict.model.dto.DictTypePageRequest;
 import cyou.yuanbaomao.sellersprite.system.dict.model.dto.DictTypeUpdateRequest;
 import cyou.yuanbaomao.sellersprite.system.dict.model.vo.DictItemVo;
 import cyou.yuanbaomao.sellersprite.system.dict.model.vo.DictTypeVo;
@@ -38,12 +36,15 @@ class DictControllerTest {
         DictItemVo item = new DictItemVo();
         item.setDictDataId("item-1");
         item.setDictLabel("MARKET_US");
-        when(dictService.pageTypes(any(DictTypePageRequest.class)))
-                .thenReturn(PageResult.of(1, 20, 1, List.of(type)));
+        when(dictService.pageTypes(any(YPage.class), org.mockito.ArgumentMatchers.<String>isNull(),
+                org.mockito.ArgumentMatchers.<String>isNull(), org.mockito.ArgumentMatchers.<Integer>isNull()))
+                .thenReturn(YPage.of(1, 20, 1, List.of(type)));
         when(dictService.detailType("type-1")).thenReturn(type);
         when(dictService.updateType(eq("type-1"), any(DictTypeUpdateRequest.class))).thenReturn(type);
-        when(dictService.pageItems(eq("type-1"), any(DictItemPageRequest.class)))
-                .thenReturn(PageResult.of(1, 20, 1, List.of(item)));
+        when(dictService.pageItems(eq("type-1"), any(YPage.class),
+                org.mockito.ArgumentMatchers.<String>isNull(), org.mockito.ArgumentMatchers.<String>isNull(),
+                org.mockito.ArgumentMatchers.<String>isNull(), org.mockito.ArgumentMatchers.<Integer>isNull()))
+                .thenReturn(YPage.of(1, 20, 1, List.of(item)));
         when(dictService.detailItem("item-1")).thenReturn(item);
         when(dictService.updateItem(eq("item-1"), any(DictItemUpdateRequest.class))).thenReturn(item);
 

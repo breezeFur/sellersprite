@@ -256,7 +256,7 @@ onMounted(loadOverview)
           >
             <li
               v-for="activity in overview.recentActivities"
-              :key="`${activity.type}-${activity.trackId}-${activity.occurredAt}`"
+              :key="`${activity.type}-${activity.traceId}-${activity.occurredAt}`"
               class="activity-list__item"
             >
               <span
@@ -270,7 +270,7 @@ onMounted(loadOverview)
                   <span>{{ activityTypeLabel(activity) }}</span>
                 </div>
                 <p>{{ activityDescription(activity) }}</p>
-                <code v-if="activity.trackId">{{ activity.trackId }}</code>
+                <code v-if="activity.traceId">{{ activity.traceId }}</code>
               </div>
               <time :datetime="new Date(activity.occurredAt).toISOString()">
                 {{ formatTime(activity.occurredAt) }}

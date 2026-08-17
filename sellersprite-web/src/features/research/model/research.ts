@@ -237,7 +237,6 @@ export interface CollectionGraphConfig {
   }
   collectKeywordDemandTrend: {
     topN: number
-    newProduct: number
   }
   collectSegmentOpportunity: {
     marketResearch: MarketResearchRequestConfig
@@ -280,7 +279,7 @@ export function createDefaultCollectionGraphConfig(): CollectionGraphConfig {
       enrichmentAsinLimit: 5,
     },
     collectMarketSalesTrend: { monthCount: 12 },
-    collectKeywordDemandTrend: { topN: 100, newProduct: 6 },
+    collectKeywordDemandTrend: { topN: 100 },
     collectSegmentOpportunity: {
       marketResearch: {},
       pagination: { startPage: 1, pageSize: 50, targetCount: 50 },
@@ -542,8 +541,10 @@ export interface ResearchProductSelectionRequest {
 export const researchArtifactTypes = [
   'STAGE1_RAW_WORKBOOK',
   'STAGE1_EVIDENCE_WORKBOOK',
+  'STAGE1_CONCLUSION_REPORT',
   'STAGE2_RAW_WORKBOOK',
   'STAGE2_EVIDENCE_WORKBOOK',
+  'STAGE2_CONCLUSION_REPORT',
   'AI_ANALYSIS_REPORT',
 ] as const
 
@@ -552,15 +553,19 @@ export type ResearchArtifactType = (typeof researchArtifactTypes)[number]
 export const researchArtifactLabels: Record<ResearchArtifactType, string> = {
   STAGE1_RAW_WORKBOOK: '阶段一原始数据 Excel',
   STAGE1_EVIDENCE_WORKBOOK: '阶段一证据数据 Excel',
+  STAGE1_CONCLUSION_REPORT: '阶段一结论表 PDF',
   STAGE2_RAW_WORKBOOK: '阶段二原始数据 Excel',
   STAGE2_EVIDENCE_WORKBOOK: '阶段二证据数据 Excel',
+  STAGE2_CONCLUSION_REPORT: '阶段二结论表 PDF',
   AI_ANALYSIS_REPORT: 'AI 分析报告',
 }
 
 export const researchArtifactGraph: Record<ResearchArtifactType, ResearchGraphCode> = {
   STAGE1_RAW_WORKBOOK: 'collection',
   STAGE1_EVIDENCE_WORKBOOK: 'evidence',
+  STAGE1_CONCLUSION_REPORT: 'evidence',
   STAGE2_RAW_WORKBOOK: 'collection',
   STAGE2_EVIDENCE_WORKBOOK: 'evidence',
+  STAGE2_CONCLUSION_REPORT: 'evidence',
   AI_ANALYSIS_REPORT: 'report',
 }

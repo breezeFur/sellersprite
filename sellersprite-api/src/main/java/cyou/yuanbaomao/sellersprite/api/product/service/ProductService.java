@@ -1,8 +1,8 @@
 // Generated from SellerSprite official documentation on 2026-07-10.
 package cyou.yuanbaomao.sellersprite.api.product.service;
 
+import cyou.yuanbaomao.sellersprite.api.common.enums.SellerSpriteMarketplace;
 import cyou.yuanbaomao.sellersprite.api.product.model.dto.CompetitorLookupRequest;
-import cyou.yuanbaomao.sellersprite.api.product.model.dto.ProductNodeRequest;
 import cyou.yuanbaomao.sellersprite.api.product.model.dto.ProductResearchRequest;
 import cyou.yuanbaomao.sellersprite.api.product.model.vo.CompetitorLookupVo;
 import cyou.yuanbaomao.sellersprite.api.product.model.vo.ProductNodeVo;
@@ -39,6 +39,7 @@ public interface ProductService {
      * @param request 查产品类目的强类型请求参数
      * @return 查产品类目的强类型响应数据
      */
-    List<ProductNodeVo> listProductNodes(ProductNodeRequest request);
+    List<ProductNodeVo> listProductNodes(SellerSpriteMarketplace marketplace, String nodeIdPath,
+            String keyword, String month);
 
 }

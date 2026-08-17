@@ -1,6 +1,6 @@
 package cyou.yuanbaomao.sellersprite.system.permission.controller;
 
-import cyou.yuanbaomao.base.result.PageResult;
+import cyou.yuanbaomao.mybatis.result.YPage;
 import cyou.yuanbaomao.base.result.Result;
 import cyou.yuanbaomao.sellersprite.system.permission.model.dto.FunctionApiReplaceRequest;
 import cyou.yuanbaomao.sellersprite.system.permission.model.dto.MenuApiBindingSyncRequest;
@@ -92,7 +92,9 @@ public class PermissionController {
     }
 
     @GetMapping("/apis")
-    public Result<PageResult<SysApiVo>> pageApis(@Valid SysApiPageRequest request) { return Result.success(permissionService.pageApis(request)); }
+    public Result<YPage<SysApiVo>> pageApis(@Valid YPage<SysApiVo> page, @Valid SysApiPageRequest request) {
+        return Result.success(permissionService.pageApis(page, request));
+    }
 
     @GetMapping("/apis/{apiId}")
     public Result<SysApiVo> apiDetail(@PathVariable String apiId) { return Result.success(permissionService.apiDetail(apiId)); }

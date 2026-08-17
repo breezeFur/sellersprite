@@ -25,8 +25,6 @@ import org.mockito.ArgumentCaptor;
 
 import cyou.yuanbaomao.sellersprite.api.account.model.vo.VisitsVo;
 import cyou.yuanbaomao.sellersprite.api.account.service.AccountService;
-import cyou.yuanbaomao.sellersprite.api.asin.model.dto.AsinDetailRequest;
-import cyou.yuanbaomao.sellersprite.api.asin.model.dto.AsinSalesTrendRequest;
 import cyou.yuanbaomao.sellersprite.api.asin.model.vo.AsinDetailVo;
 import cyou.yuanbaomao.sellersprite.api.asin.model.vo.AsinSalesTrendVo;
 import cyou.yuanbaomao.sellersprite.api.asin.service.AsinService;
@@ -130,7 +128,6 @@ class RemoteResearchDataProviderTest {
         CollectionGraphConfig config = input.getCollectionConfig();
         config.getCollectProducts().getProductResearch().setMinUnits(33);
         config.getCollectKeywordDemandTrend().setTopN(77);
-        config.getCollectKeywordDemandTrend().setNewProduct(4);
         config.getCollectSegmentOpportunity().getMarketResearch().setMinGoodsCount(12);
         config.getCollectSegmentOpportunity().getDistribution().setTopN(88);
         config.getCollectSegmentOpportunity().getDistribution().setNewProduct(3);
@@ -140,8 +137,10 @@ class RemoteResearchDataProviderTest {
         products.setItems(List.of(first));
         when(productService.researchProducts(any(ProductResearchRequest.class))).thenReturn(products);
         stubMarketResponses();
-        when(asinService.getAsinDetail(any(AsinDetailRequest.class))).thenReturn(new AsinDetailVo());
-        when(asinService.getSalesTrend(any(AsinSalesTrendRequest.class))).thenReturn(new AsinSalesTrendVo());
+        when(asinService.getAsinDetail(SellerSpriteMarketplace.US, "B0TEST0001"))
+                .thenReturn(new AsinDetailVo());
+        when(asinService.getSalesTrend(SellerSpriteMarketplace.US, "B0TEST0001"))
+                .thenReturn(new AsinSalesTrendVo());
 
         List<ResearchDataset> productDatasets = provider.collectProducts(input);
         List<ResearchDataset> salesTrendDatasets =
@@ -191,8 +190,7 @@ class RemoteResearchDataProviderTest {
 
         verify(marketService).getDemandTrend(argThat(request -> hasGlobalMarketContext(
                 request.getMarketplace(), request.getMonth(), request.getNodeIdPath())
-                && request.getTopN() == 77
-                && request.getNewProduct() == 4));
+                && request.getTopN() == 77));
         verify(marketService).getShelfTimeDistribution(argThat(request -> hasGlobalMarketContext(
                 request.getMarketplace(), request.getMonth(), request.getNodeIdPath())));
         verify(marketService).getShelfTrendDistribution(argThat(request -> hasGlobalMarketContext(
@@ -217,10 +215,8 @@ class RemoteResearchDataProviderTest {
         verify(marketService).getEbcDistribution(argThat(request -> hasGlobalMarketContext(
                 request.getMarketplace(), request.getMonth(), request.getNodeIdPath())));
 
-        ArgumentCaptor<AsinDetailRequest> detailRequest = ArgumentCaptor.forClass(AsinDetailRequest.class);
-        verify(asinService).getAsinDetail(detailRequest.capture());
-        assertThat(detailRequest.getValue().getAsin()).isEqualTo("B0TEST0001");
-        verify(asinService).getSalesTrend(any(AsinSalesTrendRequest.class));
+        verify(asinService).getAsinDetail(SellerSpriteMarketplace.US, "B0TEST0001");
+        verify(asinService).getSalesTrend(SellerSpriteMarketplace.US, "B0TEST0001");
 
         assertThat(datasets)
                 .extracting(ResearchDataset::getDatasetCode)

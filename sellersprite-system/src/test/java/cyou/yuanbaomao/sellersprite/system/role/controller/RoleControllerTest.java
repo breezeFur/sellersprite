@@ -11,11 +11,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import cyou.yuanbaomao.base.result.PageResult;
-import cyou.yuanbaomao.sellersprite.system.role.model.dto.RolePageRequest;
+import cyou.yuanbaomao.mybatis.result.YPage;
 import cyou.yuanbaomao.sellersprite.system.role.model.dto.RolePermissionReplaceRequest;
 import cyou.yuanbaomao.sellersprite.system.role.model.dto.RoleUpdateRequest;
-import cyou.yuanbaomao.sellersprite.system.role.model.dto.RoleUserPageRequest;
 import cyou.yuanbaomao.sellersprite.system.role.model.vo.RolePermissionVo;
 import cyou.yuanbaomao.sellersprite.system.role.model.vo.RoleVo;
 import cyou.yuanbaomao.sellersprite.system.role.service.RoleService;
@@ -38,12 +36,13 @@ class RoleControllerTest {
         role.setRoleName("管理员");
         RolePermissionVo permission = new RolePermissionVo();
         permission.setRoleId("role-1");
-        when(roleService.page(any(RolePageRequest.class)))
-                .thenReturn(PageResult.of(1, 20, 1, List.of(role)));
+        when(roleService.page(any(YPage.class), org.mockito.ArgumentMatchers.<String>isNull(),
+                org.mockito.ArgumentMatchers.<Integer>isNull()))
+                .thenReturn(YPage.of(1, 20, 1, List.of(role)));
         when(roleService.detail("role-1")).thenReturn(role);
         when(roleService.update(eq("role-1"), any(RoleUpdateRequest.class))).thenReturn(role);
-        when(roleService.listUsers(eq("role-1"), any(RoleUserPageRequest.class)))
-                .thenReturn(PageResult.of(1, 20, 0, List.<UserDetailVo>of()));
+        when(roleService.listUsers(eq("role-1"), any(YPage.class), eq("yuanbao")))
+                .thenReturn(YPage.of(1, 20, 0, List.<UserDetailVo>of()));
         when(roleService.getPermissions("role-1")).thenReturn(permission);
         when(roleService.replacePermissions(eq("role-1"), any(RolePermissionReplaceRequest.class)))
                 .thenReturn(permission);

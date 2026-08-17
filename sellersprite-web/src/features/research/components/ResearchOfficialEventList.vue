@@ -21,6 +21,15 @@ const emit = defineEmits<{
 }>()
 
 const hasEvents = computed(() => props.events.length > 0)
+const SCREENING_SECTION_TITLES = [
+  'US',
+  '行业销售趋势',
+  '行业需求及趋势',
+  '细分市场现状',
+  '细分市场退货率',
+  '竞品品牌',
+  '商品集中度',
+]
 
 function reportDownload(event: ResearchStreamRecord): ResearchReportDownload | undefined {
   const data = event.data
@@ -40,6 +49,28 @@ function eventIcon(eventType: string) {
   if (['error', 'workflow_failed', 'workflow_cancelled'].includes(eventType)) return WarningFilled
   if (eventType === 'download') return Document
   return MagicStick
+}
+
+function reportMarkdown(event: ResearchStreamRecord) {
+  if (!event.streaming || event.eventType !== 'summary' || event.stageCode !== 'SCREENING') {
+    return event.message
+  }
+
+  let screeningSectionIndex = 0
+  return event.message.split('\n').map((line) => {
+    const matchedTitle = SCREENING_SECTION_TITLES.find((title) => line.includes(title))
+    if (/^\s*#{2,6}\s+/.test(line) && matchedTitle) {
+      screeningSectionIndex = Math.max(
+        screeningSectionIndex,
+        SCREENING_SECTION_TITLES.indexOf(matchedTitle) + 1,
+      )
+      return `## ${matchedTitle}`
+    }
+    if (/^\s*#{2,6}\s+.*sheet/i.test(line) && screeningSectionIndex < SCREENING_SECTION_TITLES.length) {
+      return `## ${SCREENING_SECTION_TITLES[screeningSectionIndex++]}`
+    }
+    return line.replace(/sheet/gi, '证据表')
+  }).join('\n')
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -74,7 +105,7 @@ function isRecord(value: unknown): value is Record<string, unknown> {
         </div>
         <SafeMarkdown
           class="official-event__body"
-          :content="event.message"
+          :content="reportMarkdown(event)"
         />
         <ElButton
           v-if="reportDownload(event)"

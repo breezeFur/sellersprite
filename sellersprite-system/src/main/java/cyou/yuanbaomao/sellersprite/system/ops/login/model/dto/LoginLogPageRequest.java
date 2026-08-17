@@ -1,17 +1,14 @@
 package cyou.yuanbaomao.sellersprite.system.ops.login.model.dto;
 
-import cyou.yuanbaomao.base.result.PageQuery;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 @Data
-@EqualsAndHashCode(callSuper = true)
 @Schema(description = "登录日志分页查询")
-public class LoginLogPageRequest extends PageQuery {
+public class LoginLogPageRequest {
 
     @Size(max = 36, message = "用户ID不能超过36个字符")
     @Schema(description = "用户ID")

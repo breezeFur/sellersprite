@@ -30,7 +30,7 @@ const overview = {
       description: 'admin',
       success: 1,
       occurredAt: 1_783_702_800_000,
-      trackId: 'track-login',
+      traceId: 'trace-login',
     },
   ],
 }

@@ -38,7 +38,10 @@ public class TrademarkServiceImpl implements TrademarkService {
     }
 
     @Override
-    public TrademarkDetailVo getBrandDetail(TrademarkDetailRequest request) {
+    public TrademarkDetailVo getBrandDetail(String office, String brandId) {
+        TrademarkDetailRequest request = new TrademarkDetailRequest();
+        request.setOffice(office);
+        request.setBrandId(brandId);
         return client.get(SellerSpriteOperation.GLOBAL_BRAND_DETAIL,
                 Map.of(), SellerSpriteRequestEncoder.toQuery(request, Set.of()),
                 new ParameterizedTypeReference<SellerSpriteResponse<TrademarkDetailVo>>() {

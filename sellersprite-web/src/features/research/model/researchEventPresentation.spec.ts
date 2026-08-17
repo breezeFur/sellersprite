@@ -70,6 +70,16 @@ describe('researchEventPresentation', () => {
     expect(isResearchOfficialEvent(streamingSummary)).toBe(false)
     expect(isResearchProcessEvent(streamingSummary)).toBe(true)
     expect(isResearchWorkspaceReportEvent(streamingSummary)).toBe(false)
+    const streamingFinalReport = record('summary', {
+      streaming: true,
+      stageCode: 'FINAL_ANALYSIS',
+    })
+    expect(isResearchOfficialEvent(streamingFinalReport)).toBe(true)
+    expect(isResearchWorkspaceReportEvent(streamingFinalReport)).toBe(true)
+    expect(researchWorkspaceIntent(streamingFinalReport)).toEqual({
+      mode: 'workspace',
+      section: 'report',
+    })
     expect(isResearchOfficialEvent(persistedReport)).toBe(true)
     expect(isResearchWorkspaceReportEvent(persistedReport)).toBe(true)
   })

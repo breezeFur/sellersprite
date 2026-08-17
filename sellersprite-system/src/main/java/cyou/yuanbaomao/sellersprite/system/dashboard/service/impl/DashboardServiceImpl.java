@@ -1,8 +1,9 @@
 package cyou.yuanbaomao.sellersprite.system.dashboard.service.impl;
 
 import cyou.yuanbaomao.dict.core.DictTemplate;
-import cyou.yuanbaomao.dict.model.DictTypePageQuery;
+import cyou.yuanbaomao.dict.mybatis.entity.DictTypeEntity;
 import cyou.yuanbaomao.log.mybatis.entity.OperationLogEntity;
+import cyou.yuanbaomao.mybatis.result.YPage;
 import cyou.yuanbaomao.sellersprite.db.dao.AiConversationDao;
 import cyou.yuanbaomao.sellersprite.db.dao.AiPromptRecordDao;
 import cyou.yuanbaomao.sellersprite.db.dao.DeptDao;
@@ -60,10 +61,8 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     private long dictTypeCount() {
-        DictTypePageQuery query = new DictTypePageQuery();
-        query.setCurrent(1);
-        query.setSize(1);
-        return dictTemplate.pageTypes(query).getTotal();
+        YPage<DictTypeEntity> page = YPage.of(1, 1);
+        return dictTemplate.pageTypes(page, null, null, null, DictTypeEntity.class).getTotal();
     }
 
     private long failedOperationCount(long startTime, long endTime) {
@@ -111,7 +110,7 @@ public class DashboardServiceImpl implements DashboardService {
         activity.setDescription(log.getUsername());
         activity.setSuccess(log.getSuccess());
         activity.setOccurredAt(log.getCreatedAt());
-        activity.setTrackId(log.getTrackId());
+        activity.setTraceId(log.getTraceId());
         return activity;
     }
 
@@ -122,7 +121,7 @@ public class DashboardServiceImpl implements DashboardService {
         activity.setDescription(log.getModuleName());
         activity.setSuccess(log.getSuccess());
         activity.setOccurredAt(log.getCreatedAt());
-        activity.setTrackId(log.getTrackId());
+        activity.setTraceId(log.getTraceId());
         return activity;
     }
 

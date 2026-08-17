@@ -1,11 +1,9 @@
 package cyou.yuanbaomao.sellersprite.system.role.service;
 
-import cyou.yuanbaomao.base.result.PageResult;
+import cyou.yuanbaomao.mybatis.result.YPage;
 import cyou.yuanbaomao.sellersprite.system.role.model.dto.RoleCreateRequest;
-import cyou.yuanbaomao.sellersprite.system.role.model.dto.RolePageRequest;
 import cyou.yuanbaomao.sellersprite.system.role.model.dto.RolePermissionReplaceRequest;
 import cyou.yuanbaomao.sellersprite.system.role.model.dto.RoleUpdateRequest;
-import cyou.yuanbaomao.sellersprite.system.role.model.dto.RoleUserPageRequest;
 import cyou.yuanbaomao.sellersprite.system.role.model.dto.UserRoleBindRequest;
 import cyou.yuanbaomao.sellersprite.system.role.model.vo.RolePermissionVo;
 import cyou.yuanbaomao.sellersprite.system.role.model.vo.RoleVo;
@@ -18,7 +16,7 @@ public interface RoleService {
 
     void bindUserRole(UserRoleBindRequest request);
 
-    PageResult<RoleVo> page(RolePageRequest request);
+    YPage<RoleVo> page(YPage<RoleVo> page, String roleName, Integer status);
 
     List<RoleVo> listEnabled();
 
@@ -28,7 +26,7 @@ public interface RoleService {
 
     void updateStatus(String roleId, Integer status);
 
-    PageResult<UserDetailVo> listUsers(String roleId, RoleUserPageRequest request);
+    YPage<UserDetailVo> listUsers(String roleId, YPage<UserDetailVo> page, String username);
 
     void unbindUser(String roleId, String userId);
 

@@ -55,7 +55,7 @@ public class AiPromptRecordServiceImpl implements AiPromptRecordService {
         record.setErrorType(EMPTY_STRING);
         record.setErrorMessage(EMPTY_STRING);
         record.setCostMs(0L);
-        record.setTrackId(defaultString(RequestContextHolder.currentTrackId()));
+        record.setTraceId(defaultString(RequestContextHolder.currentTraceId()));
         record.setRemark(EMPTY_STRING);
         promptRecordDao.save(record);
         return record.getPromptRecordId();

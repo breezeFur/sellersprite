@@ -1,6 +1,7 @@
 package cyou.yuanbaomao.sellersprite.research.service;
 
 import cyou.yuanbaomao.sellersprite.api.client.SellerSpriteOperation;
+import cyou.yuanbaomao.sellersprite.api.common.enums.SellerSpriteMarketplace;
 import cyou.yuanbaomao.sellersprite.api.product.model.dto.ProductNodeRequest;
 import cyou.yuanbaomao.sellersprite.api.product.model.vo.ProductNodeVo;
 import cyou.yuanbaomao.sellersprite.api.product.service.ProductService;
@@ -24,12 +25,19 @@ public class ResearchCategoryService {
     private final ResearchSourceCacheService sourceCacheService;
     private final ObjectMapper objectMapper;
 
-    public List<ProductNodeVo> listProductNodes(ProductNodeRequest request) {
+    public List<ProductNodeVo> listProductNodes(SellerSpriteMarketplace marketplace, String nodeIdPath,
+            String keyword, String month) {
+        ProductNodeRequest request = new ProductNodeRequest();
+        request.setMarketplace(marketplace);
+        request.setNodeIdPath(nodeIdPath);
+        request.setKeyword(keyword);
+        request.setMonth(month);
         CachedPayload cached = sourceCacheService.getOrLoad(
                 SellerSpriteOperation.PRODUCT_NODE,
                 request,
                 sourceCacheService.productNodePolicy(),
-                () -> objectMapper.valueToTree(productService.listProductNodes(request)));
+                () -> objectMapper.valueToTree(productService.listProductNodes(
+                        marketplace, nodeIdPath, keyword, month)));
         List<ProductNodeVo> nodes = objectMapper.convertValue(cached.payload(), PRODUCT_NODE_LIST_TYPE);
         return nodes == null ? List.of() : List.copyOf(nodes);
     }

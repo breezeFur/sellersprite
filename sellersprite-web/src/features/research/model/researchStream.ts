@@ -85,3 +85,22 @@ export interface ResearchReportDownload {
   analysisRunId?: string
   downloadUrl?: string
 }
+
+export type ResearchReportChartType = 'LINE' | 'BAR'
+
+export interface ResearchReportChartSeries {
+  name: string
+  values: number[]
+}
+
+export interface ResearchReportChart {
+  chartCode: string
+  sectionCode: string
+  sectionTitle: string
+  type: ResearchReportChartType
+  title: string
+  categories: string[]
+  series: ResearchReportChartSeries[]
+  unit?: string
+  methodology?: string
+}

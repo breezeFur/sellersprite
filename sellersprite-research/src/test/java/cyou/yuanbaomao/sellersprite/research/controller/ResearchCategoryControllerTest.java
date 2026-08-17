@@ -1,6 +1,7 @@
 package cyou.yuanbaomao.sellersprite.research.controller;
 
-import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -23,10 +24,7 @@ class ResearchCategoryControllerTest {
         ProductNodeVo node = new ProductNodeVo();
         node.setNodeIdPath("3760911:11062741");
         node.setNodeLabelPath("Beauty & Personal Care:Tools & Accessories");
-        when(service.listProductNodes(argThat(request ->
-                        request.getMarketplace() == SellerSpriteMarketplace.US
-                                && "202607".equals(request.getMonth())
-                                && "facial".equals(request.getKeyword()))))
+        when(service.listProductNodes(eq(SellerSpriteMarketplace.US), isNull(), eq("facial"), eq("202607")))
                 .thenReturn(List.of(node));
         MockMvc mockMvc = MockMvcBuilders
                 .standaloneSetup(new ResearchCategoryController(service))

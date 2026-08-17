@@ -1,7 +1,6 @@
 // Generated from SellerSprite official documentation on 2026-07-10.
 package cyou.yuanbaomao.sellersprite.api.trademark.service;
 
-import cyou.yuanbaomao.sellersprite.api.trademark.model.dto.TrademarkDetailRequest;
 import cyou.yuanbaomao.sellersprite.api.trademark.model.dto.TrademarkListRequest;
 import cyou.yuanbaomao.sellersprite.api.trademark.model.dto.TrademarkStatsRequest;
 import cyou.yuanbaomao.sellersprite.api.trademark.model.vo.TrademarkDetailVo;
@@ -30,7 +29,7 @@ public interface TrademarkService {
      * @param request 全球商标库-详情的强类型请求参数
      * @return 全球商标库-详情的强类型响应数据
      */
-    TrademarkDetailVo getBrandDetail(TrademarkDetailRequest request);
+    TrademarkDetailVo getBrandDetail(String office, String brandId);
 
     /**
      * 全球商标库-列表。

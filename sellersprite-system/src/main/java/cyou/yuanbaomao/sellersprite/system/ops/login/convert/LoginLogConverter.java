@@ -23,7 +23,7 @@ public final class LoginLogConverter {
         vo.setUserAgent(SensitiveDataMasker.mask(entity.getUserAgent()));
         vo.setDeviceName(SensitiveDataMasker.mask(entity.getDeviceName()));
         vo.setClientType(entity.getClientType());
-        vo.setTrackId(entity.getTrackId());
+        vo.setTraceId(entity.getTraceId());
         vo.setCreatedAt(entity.getCreatedAt());
         return vo;
     }

@@ -57,22 +57,26 @@ public final class ResearchEvidenceCatalog {
                     ResearchPhase.PREPARE_SEGMENT_RETURN_EVIDENCE,
                     "evidence.segment-return",
                     "细分市场退货率",
-                    "细分市场", "类目路径", "SellerSprite退货率", "类目平均退货率", "退货原因", "退货量"),
+                    "细分市场", "类目路径", "SellerSprite退货率", "类目平均退货率",
+                    "退货率差值", "相对类目均值", "风险等级"),
             definition(
                     EvidenceStage.SCREENING,
                     ResearchPhase.PREPARE_BRAND_EVIDENCE,
                     "evidence.competitor-brands",
                     "竞品品牌",
-                    "排名", "品牌", "代表ASIN", "样本商品数", "月销量", "月销售额($)",
+                    "排名", "品牌", "代表ASIN", "ASIN数", "商品数", "新品数",
+                    "月销量", "月销售额($)",
                     "平均价格($)", "平均评分", "平均评分数", "平均变体数", "主要卖家所属地",
-                    "FBA商品占比", "样本销量份额", "产品线线索"),
+                    "FBA商品占比", "销量份额", "销售额份额", "新品销量占比", "新品销售额占比",
+                    "产品线线索"),
             definition(
                     EvidenceStage.SCREENING,
                     ResearchPhase.PREPARE_CONCENTRATION_EVIDENCE,
                     "evidence.product-concentration",
                     "商品集中度",
                     "排名", "集中维度", "对象/区间", "ASIN", "品牌/卖家", "商品数", "月销量",
-                    "月销售额($)", "占比", "平均评分", "平均价格($)"));
+                    "月销售额($)", "占比", "销售额占比", "累计销量占比", "累计销售额占比",
+                    "平均评分", "平均价格($)"));
 
     /** 阶段二固定五张评论、关键词与ASIN趋势深挖证据表。 */
     public static final List<Definition> DEEP_DIVE_DEFINITIONS = List.of(
@@ -88,8 +92,9 @@ public final class ResearchEvidenceCatalog {
                     ResearchPhase.PREPARE_VOC_EVIDENCE,
                     "evidence.voc",
                     "VOC",
-                    "ASIN", "评论样本数", "平均星级", "正向样本数", "负向样本数", "代表正向评价",
-                    "代表负向评价", "用户画像", "使用场景", "购买动机"),
+                    "ASIN", "评论样本数", "平均星级", "正向样本数", "正向占比",
+                    "中性样本数", "中性占比", "负向样本数", "负向占比", "VP评论占比",
+                    "带图或视频评论占比", "平均赞同数", "代表正向评价", "代表负向评价"),
             definition(
                     EvidenceStage.DEEP_DIVE,
                     ResearchPhase.PREPARE_KEYWORD_EVIDENCE,
@@ -104,13 +109,16 @@ public final class ResearchEvidenceCatalog {
                     "evidence.asin-sales-trend",
                     "ASIN销售趋势",
                     "ASIN", "品牌", "标题", "月份", "父体销量", "子体销量",
-                    "父体销售额($)", "子体销售额($)", "标价($)", "平均价格($)"),
+                    "父体销量环比", "子体销量环比", "子体销量贡献率", "近3月子体月均销量",
+                    "近3月子体销量波动率", "父体销售额($)", "子体销售额($)",
+                    "标价($)", "平均价格($)"),
             definition(
                     EvidenceStage.DEEP_DIVE,
                     ResearchPhase.PREPARE_ASIN_OPERATION_TREND_EVIDENCE,
                     "evidence.asin-operation-trend",
                     "ASIN运营趋势",
-                    "ASIN", "数据ASIN", "父体ASIN", "品牌", "标题", "类目", "指标", "时间", "数值"));
+                    "ASIN", "数据ASIN", "父体ASIN", "品牌", "标题", "类目", "指标", "时间",
+                    "数值", "前值", "变化量", "变化率", "区间最小值", "区间最大值"));
 
     /** 按稳定顺序组合的完整十二张证据表。 */
     public static final List<Definition> DEFINITIONS = Stream.concat(

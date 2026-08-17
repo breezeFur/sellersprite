@@ -19,6 +19,6 @@ public class LoginLogVo {
     private String userAgent;
     private String deviceName;
     private String clientType;
-    private String trackId;
+    private String traceId;
     private Long createdAt;
 }

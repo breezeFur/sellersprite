@@ -57,7 +57,7 @@ vi.mock('../components/ResearchConversationPanel.vue', () => ({
       workspace: Boolean,
       activeEventId: String,
     },
-    emits: ['resume', 'followUpRunsChange'],
+    emits: ['resume', 'followUpRunsChange', 'openProductSelection'],
     template: '<div data-testid="research-conversation-panel" :data-job-id="jobId" :data-job-status="jobStatus" :data-focus-mode="String(focusMode)" :data-section="section" :data-workspace="String(workspace)" :data-active-event-id="activeEventId" />',
   },
 }))
@@ -470,7 +470,7 @@ describe('MarketResearchPage', () => {
           enrichmentAsinLimit: 5,
         },
         collectMarketSalesTrend: { monthCount: 12 },
-        collectKeywordDemandTrend: { topN: 100, newProduct: 6 },
+        collectKeywordDemandTrend: { topN: 100 },
         collectSegmentOpportunity: {
           marketResearch: {},
           pagination: { startPage: 1, pageSize: 50, targetCount: 50 },
@@ -1069,6 +1069,44 @@ describe('MarketResearchPage', () => {
         source: 'history',
       },
     })
+
+    routeState.query.view = undefined
+    routeState.query.section = undefined
+    await nextTick()
+    expect(layoutStore.workspaceFocusMode).toBe(false)
+
+    wrapper.unmount()
+    expect(layoutStore.workspaceFocusMode).toBe(false)
+  })
+
+  it('opens product selection from the stage-one report decision action', async () => {
+    routeState.query.jobId = 'job-research-1'
+    routeState.query.view = 'conversation'
+    routeState.query.section = 'report'
+    const wrapper = mountPage()
+
+    pushSnapshot(connections[0], researchJob({
+      status: 'WAITING_INPUT',
+      currentStage: 'PRODUCT_SELECTION',
+      waitingInputType: 'PRODUCT_SELECTION',
+      currentNode: 'productSelectionGate',
+      currentNodeName: '等待商品选择',
+      cancellable: false,
+    }))
+    await nextTick()
+    push.mockClear()
+
+    wrapper.getComponent({ name: 'ResearchConversationPanel' })
+      .vm.$emit('openProductSelection')
+    await nextTick()
+
+    expect(push).toHaveBeenCalledWith({
+      query: {
+        jobId: 'job-research-1',
+        view: 'conversation',
+        section: 'selection',
+      },
+    })
   })
 
   it('keeps FOLLOW_UP SSE in the current workspace section without stealing navigation', async () => {
@@ -1149,7 +1187,7 @@ describe('MarketResearchPage', () => {
     expect(replace).not.toHaveBeenCalled()
   })
 
-  it('shows and downloads all five v5 artifacts by artifact id', async () => {
+  it('shows and downloads all seven artifacts by artifact id', async () => {
     routeState.query.jobId = 'job-research-1'
     vi.mocked(streamApi.downloadResearchArtifact).mockResolvedValue(
       new Blob(['xlsx'], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }),
@@ -1157,19 +1195,21 @@ describe('MarketResearchPage', () => {
     expect(researchArtifactTypes).toEqual([
       'STAGE1_RAW_WORKBOOK',
       'STAGE1_EVIDENCE_WORKBOOK',
+      'STAGE1_CONCLUSION_REPORT',
       'STAGE2_RAW_WORKBOOK',
       'STAGE2_EVIDENCE_WORKBOOK',
+      'STAGE2_CONCLUSION_REPORT',
       'AI_ANALYSIS_REPORT',
     ])
     const artifacts = researchArtifactTypes.map((artifactType, index) => ({
       artifactId: `artifact-${index + 1}`,
-      analysisRunId: artifactType === 'AI_ANALYSIS_REPORT' ? 'analysis-1' : null,
+      analysisRunId: artifactType.endsWith('REPORT') ? `analysis-${index + 1}` : null,
       artifactType,
-      fileName: artifactType === 'AI_ANALYSIS_REPORT'
-        ? 'market-research.md'
+      fileName: artifactType.endsWith('REPORT')
+        ? 'market-research.pdf'
         : `${artifactType.toLowerCase()}.xlsx`,
-      mediaType: artifactType === 'AI_ANALYSIS_REPORT'
-        ? 'text/markdown'
+      mediaType: artifactType.endsWith('REPORT')
+        ? 'application/pdf'
         : 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
       fileSize: 1024 + index,
       createdAt: 1_700_000_001_000 + index,
@@ -1202,10 +1242,10 @@ describe('MarketResearchPage', () => {
         artifact,
       )
     })
-    expect(createObjectUrl).toHaveBeenCalledTimes(5)
-    expect(linkClick).toHaveBeenCalledTimes(5)
+    expect(createObjectUrl).toHaveBeenCalledTimes(7)
+    expect(linkClick).toHaveBeenCalledTimes(7)
     await vi.advanceTimersByTimeAsync(1_000)
-    expect(revokeObjectUrl).toHaveBeenCalledTimes(5)
+    expect(revokeObjectUrl).toHaveBeenCalledTimes(7)
   })
 
   it('aborts the owned SSE connection when the page unmounts', async () => {

@@ -1,10 +1,10 @@
 // Generated from SellerSprite official documentation on 2026-07-10.
 package cyou.yuanbaomao.sellersprite.api.keyword.service;
 
+import cyou.yuanbaomao.sellersprite.api.common.enums.SellerSpriteMarketplace;
 import cyou.yuanbaomao.sellersprite.api.keyword.model.dto.AbaKeywordTrendRequest;
 import cyou.yuanbaomao.sellersprite.api.keyword.model.dto.AbaMonthlyResearchRequest;
 import cyou.yuanbaomao.sellersprite.api.keyword.model.dto.AbaWeeklyResearchRequest;
-import cyou.yuanbaomao.sellersprite.api.keyword.model.dto.GoogleTrendRequest;
 import cyou.yuanbaomao.sellersprite.api.keyword.model.dto.KeywordMinerRequest;
 import cyou.yuanbaomao.sellersprite.api.keyword.model.dto.KeywordOrderRequest;
 import cyou.yuanbaomao.sellersprite.api.keyword.model.dto.KeywordResearchRequest;
@@ -96,7 +96,8 @@ public interface KeywordService {
      * @param request 谷歌趋势的强类型请求参数
      * @return 谷歌趋势的强类型响应数据
      */
-    GoogleTrendVo getGoogleTrends(GoogleTrendRequest request);
+    GoogleTrendVo getGoogleTrends(SellerSpriteMarketplace marketplace, String keyword,
+            String googleProp, Boolean monthly);
 
     /**
      * 出单词反查。

@@ -1,11 +1,9 @@
 package cyou.yuanbaomao.sellersprite.system.dict.service;
 
-import cyou.yuanbaomao.base.result.PageResult;
+import cyou.yuanbaomao.mybatis.result.YPage;
 import cyou.yuanbaomao.sellersprite.system.dict.model.dto.DictItemCreateRequest;
-import cyou.yuanbaomao.sellersprite.system.dict.model.dto.DictItemPageRequest;
 import cyou.yuanbaomao.sellersprite.system.dict.model.dto.DictItemUpdateRequest;
 import cyou.yuanbaomao.sellersprite.system.dict.model.dto.DictTypeCreateRequest;
-import cyou.yuanbaomao.sellersprite.system.dict.model.dto.DictTypePageRequest;
 import cyou.yuanbaomao.sellersprite.system.dict.model.dto.DictTypeUpdateRequest;
 import cyou.yuanbaomao.sellersprite.system.dict.model.vo.DictItemVo;
 import cyou.yuanbaomao.sellersprite.system.dict.model.vo.DictTypeVo;
@@ -14,7 +12,7 @@ public interface DictService {
 
     DictTypeVo createType(DictTypeCreateRequest request);
 
-    PageResult<DictTypeVo> pageTypes(DictTypePageRequest request);
+    YPage<DictTypeVo> pageTypes(YPage<DictTypeVo> page, String dictType, String dictName, Integer status);
 
     DictTypeVo detailType(String dictTypeId);
 
@@ -26,7 +24,8 @@ public interface DictService {
 
     DictItemVo createItem(DictItemCreateRequest request);
 
-    PageResult<DictItemVo> pageItems(String dictTypeId, DictItemPageRequest request);
+    YPage<DictItemVo> pageItems(String dictType, YPage<DictItemVo> page,
+            String dictLabel, String dictName, String dictValue, Integer status);
 
     DictItemVo detailItem(String dictItemId);
 

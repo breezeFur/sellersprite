@@ -268,7 +268,7 @@ public class AiChatServiceImpl implements AiChatService {
                 ? bizException.getErrorCode() : ResultCode.INTERNAL_ERROR;
         String message = safeErrorMessage(throwable);
         return new AiStreamEvent(EVENT_ERROR, new AiStreamErrorVo(code.getCode(), message,
-                RequestContextHolder.currentTrackId(), !(throwable instanceof BizException)));
+                RequestContextHolder.currentTraceId(), !(throwable instanceof BizException)));
     }
 
     private AiConversation resolveConversation(AiChatRequest request, String userId) {

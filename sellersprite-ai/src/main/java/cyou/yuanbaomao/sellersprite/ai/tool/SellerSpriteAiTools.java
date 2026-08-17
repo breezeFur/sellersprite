@@ -60,7 +60,7 @@ public class SellerSpriteAiTools {
     public AsinDetailVo getAsinDetail(
             @Valid @ToolParam(description = "ASIN 详情查询条件，必须提供 marketplace 和 asin")
             AsinDetailRequest request) {
-        return asinService.getAsinDetail(request);
+        return asinService.getAsinDetail(request.getMarketplace(), request.getAsin());
     }
 
     /**

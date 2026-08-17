@@ -23,6 +23,6 @@ public class OperationLogVo {
     private String clientIp;
     private String userAgent;
     private Long costMs;
-    private String trackId;
+    private String traceId;
     private Long createdAt;
 }

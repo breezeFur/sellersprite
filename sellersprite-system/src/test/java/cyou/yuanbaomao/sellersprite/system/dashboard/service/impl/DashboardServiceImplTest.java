@@ -5,7 +5,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 
-import cyou.yuanbaomao.base.result.PageResult;
+import cyou.yuanbaomao.mybatis.result.YPage;
 import cyou.yuanbaomao.dict.core.DictTemplate;
 import cyou.yuanbaomao.log.mybatis.entity.OperationLogEntity;
 import cyou.yuanbaomao.sellersprite.db.dao.AiConversationDao;
@@ -45,7 +45,7 @@ class DashboardServiceImplTest {
     @BeforeEach
     void setUp() {
         Clock clock = Clock.fixed(Instant.parse("2026-07-10T04:00:00Z"), ZoneId.of("Asia/Shanghai"));
-        when(dictTemplate.pageTypes(any())).thenReturn(PageResult.empty(1, 1));
+        when(dictTemplate.pageTypes(any(), any(), any(), any(), any())).thenReturn(YPage.empty(1, 1));
         service = new DashboardServiceImpl(userDao, roleDao, deptDao, dictTemplate, aiConversationDao,
                 aiPromptRecordDao, loginLogDao, operationLogQueryDao, clock);
     }
@@ -71,7 +71,7 @@ class DashboardServiceImplTest {
         when(userDao.count()).thenReturn(8L);
         when(roleDao.countByStatus(1)).thenReturn(3L);
         when(deptDao.count()).thenReturn(4L);
-        when(dictTemplate.pageTypes(any())).thenReturn(PageResult.of(1, 1, 5, List.of()));
+        when(dictTemplate.pageTypes(any(), any(), any(), any(), any())).thenReturn(YPage.of(1, 1, 5, List.of()));
         when(aiConversationDao.countByCreatedAtRange(anyLong(), anyLong()))
                 .thenAnswer(invocation -> invocation.getArgument(0, Long.class) == todayStart ? 2L : 0L);
         when(aiPromptRecordDao.countByCreatedAtRange(anyLong(), anyLong()))
@@ -79,11 +79,11 @@ class DashboardServiceImplTest {
         when(loginLogDao.countByCreatedAtRange(anyLong(), anyLong()))
                 .thenAnswer(invocation -> invocation.getArgument(0, Long.class) == todayStart ? 6L : 0L);
         LoginLog login = new LoginLog();
-        login.setUsername("alice"); login.setSuccess(1); login.setCreatedAt(100L); login.setTrackId("login-track");
+        login.setUsername("alice"); login.setSuccess(1); login.setCreatedAt(100L); login.setTraceId("login-track");
         when(loginLogDao.listRecent(5)).thenReturn(List.of(login));
         OperationLogEntity operation = new OperationLogEntity();
         operation.setOperationName("更新角色权限"); operation.setSuccess(0); operation.setCreatedAt(200L);
-        operation.setTrackId("operation-track");
+        operation.setTraceId("operation-track");
         when(operationLogQueryDao.countFailedByCreatedAtRange(todayStart, tomorrowStart)).thenReturn(1L);
         when(operationLogQueryDao.listRecent(5)).thenReturn(List.of(operation));
 

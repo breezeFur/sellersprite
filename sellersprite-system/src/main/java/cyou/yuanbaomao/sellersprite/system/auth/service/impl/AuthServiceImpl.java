@@ -243,7 +243,7 @@ public class AuthServiceImpl implements AuthService {
         loginLog.setUserAgent(defaultString(userAgent));
         loginLog.setDeviceName(defaultString(request.getDeviceName()));
         loginLog.setClientType(defaultIfBlank(request.getClientType(), SystemBusinessConstants.DEFAULT_CLIENT_TYPE));
-        loginLog.setTrackId(RequestContextHolder.currentTrackId());
+        loginLog.setTraceId(RequestContextHolder.currentTraceId());
         loginLogRecorder.record(loginLog);
     }
 
@@ -263,7 +263,7 @@ public class AuthServiceImpl implements AuthService {
         loginLog.setClientType(token == null
                 ? SystemBusinessConstants.DEFAULT_CLIENT_TYPE
                 : defaultIfBlank(token.getClientType(), SystemBusinessConstants.DEFAULT_CLIENT_TYPE));
-        loginLog.setTrackId(RequestContextHolder.currentTrackId());
+        loginLog.setTraceId(RequestContextHolder.currentTraceId());
         loginLogRecorder.record(loginLog);
     }
 

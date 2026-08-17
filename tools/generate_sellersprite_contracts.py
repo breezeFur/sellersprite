@@ -95,6 +95,18 @@ RESPONSE_FIELD_OVERRIDES = {
     },
 }
 
+RESPONSE_TYPE_OVERRIDES = {
+    "MARKET_PERFORMANCE": {
+        "searchToPurchaseRatio": "BigDecimal",
+        "avgReturnRatio": "BigDecimal",
+    },
+}
+
+# 官方文档中的可选字段若会导致线上接口返回空数据，则从实际请求契约中排除。
+REQUEST_FIELD_EXCLUSIONS = {
+    "MARKET_PERFORMANCE": {"newProduct"},
+}
+
 
 @dataclass
 class FieldNode:
@@ -237,9 +249,17 @@ def fetch_contract(session: requests.Session, endpoint: Endpoint) -> Contract:
                     "name": cells[3], "description": cells[4],
                 })
 
+    excluded_request_fields = REQUEST_FIELD_EXCLUSIONS.get(endpoint.operation, set())
+    request_rows = [
+        row for row in request_rows
+        if row["field"] not in excluded_request_fields
+    ]
+
     overrides = RESPONSE_FIELD_OVERRIDES.get(endpoint.operation, {})
+    type_overrides = RESPONSE_TYPE_OVERRIDES.get(endpoint.operation, {})
     for row in response_rows:
         row["field"] = overrides.get(row["field"], row["field"])
+        row["type"] = type_overrides.get(row["field"], row["type"])
 
     # The URL is part of the authoritative request contract. A few official
     # pages omit a path placeholder from the request table (for example,

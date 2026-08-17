@@ -2,7 +2,7 @@ package cyou.yuanbaomao.sellersprite.system.role.service.impl;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import cyou.yuanbaomao.base.exception.BizException;
-import cyou.yuanbaomao.base.result.PageResult;
+import cyou.yuanbaomao.mybatis.result.YPage;
 import cyou.yuanbaomao.sellersprite.common.result.ResultCode;
 import cyou.yuanbaomao.sellersprite.db.dao.DeptDao;
 import cyou.yuanbaomao.sellersprite.db.dao.RoleDao;
@@ -16,10 +16,8 @@ import cyou.yuanbaomao.sellersprite.system.constants.SystemBusinessConstants;
 import cyou.yuanbaomao.sellersprite.system.convert.SystemConverter;
 import cyou.yuanbaomao.sellersprite.system.permission.service.RolePermissionService;
 import cyou.yuanbaomao.sellersprite.system.role.model.dto.RoleCreateRequest;
-import cyou.yuanbaomao.sellersprite.system.role.model.dto.RolePageRequest;
 import cyou.yuanbaomao.sellersprite.system.role.model.dto.RolePermissionReplaceRequest;
 import cyou.yuanbaomao.sellersprite.system.role.model.dto.RoleUpdateRequest;
-import cyou.yuanbaomao.sellersprite.system.role.model.dto.RoleUserPageRequest;
 import cyou.yuanbaomao.sellersprite.system.role.model.dto.UserRoleBindRequest;
 import cyou.yuanbaomao.sellersprite.system.role.model.vo.RolePermissionVo;
 import cyou.yuanbaomao.sellersprite.system.role.model.vo.RoleVo;
@@ -105,12 +103,14 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    public PageResult<RoleVo> page(RolePageRequest request) {
-        Page<Role> page = roleDao.pageRoles(request.getRoleName(), request.getStatus(), request.getCurrent(),
-                request.getSize());
-        return PageResult.of(page.getCurrent(), page.getSize(), page.getTotal(), page.getRecords().stream()
+    public YPage<RoleVo> page(YPage<RoleVo> page, String roleName, Integer status) {
+        Page<Role> entityPage = roleDao.pageRoles(roleName, status, page.getCurrent(),
+                page.getSize());
+        page.setTotal(entityPage.getTotal());
+        page.setRecords(entityPage.getRecords().stream()
                 .map(SystemConverter::toRoleVo)
                 .toList());
+        return page;
     }
 
     @Override
@@ -151,12 +151,14 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    public PageResult<UserDetailVo> listUsers(String roleId, RoleUserPageRequest request) {
+    public YPage<UserDetailVo> listUsers(String roleId, YPage<UserDetailVo> page, String username) {
         requireRole(roleId);
-        Page<User> page = userDao.pageByRoleId(roleId, request.getUsername(), request.getCurrent(), request.getSize());
-        return PageResult.of(page.getCurrent(), page.getSize(), page.getTotal(), page.getRecords().stream()
+        Page<User> entityPage = userDao.pageByRoleId(roleId, username, page.getCurrent(), page.getSize());
+        page.setTotal(entityPage.getTotal());
+        page.setRecords(entityPage.getRecords().stream()
                 .map(SystemConverter::toUserDetailVo)
                 .toList());
+        return page;
     }
 
     @Override

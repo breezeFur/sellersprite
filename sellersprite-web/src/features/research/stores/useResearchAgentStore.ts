@@ -10,6 +10,7 @@ import {
 import type { ResearchJobDetail, ResearchNodeExecution } from '../model/research'
 import type {
   ResearchEventScope,
+  ResearchReportChart,
   ResearchStreamFrame,
   ResearchStreamEvent,
   ResearchStreamRecord,
@@ -25,6 +26,7 @@ interface ResearchAgentState {
   job: ResearchJobDetail | null
   nodes: ResearchNodeExecution[]
   events: ResearchStreamRecord[]
+  reportCharts: Record<string, ResearchReportChart>
   seenSequences: Record<string, true>
   lastSequence: number
   replayComplete: boolean
@@ -58,6 +60,7 @@ export const useResearchAgentStore = defineStore('research-agent', {
       || state.connecting
       || state.streaming,
     analysisRunning: (state) => ['QUEUED', 'RUNNING'].includes(state.analysisState),
+    reportChartList: (state) => Object.values(state.reportCharts),
   },
   actions: {
     startJob(jobId: string) {
@@ -99,6 +102,7 @@ export const useResearchAgentStore = defineStore('research-agent', {
     },
     hydrate(events: ResearchStreamEvent[]) {
       this.events = []
+      this.reportCharts = {}
       this.seenSequences = {}
       this.lastSequence = 0
       this.workflowTerminal = null
@@ -123,6 +127,7 @@ export const useResearchAgentStore = defineStore('research-agent', {
       const record = recordFromEvent(event)
       this.seenSequences[`${event.sequenceNo}`] = true
       this.lastSequence = Math.max(this.lastSequence, event.sequenceNo)
+      if (record.eventType === 'report_chart') this.rememberReportChart(record)
 
       if (record.eventType === 'summary_delta') {
         this.appendSummaryDelta(record)
@@ -145,6 +150,11 @@ export const useResearchAgentStore = defineStore('research-agent', {
       this.analysisRetryable = false
       this.connectionError = ''
       if (analysisRunId) this.activeAnalysisRunId = analysisRunId
+    },
+    rememberReportChart(record: ResearchStreamRecord) {
+      if (!isResearchReportChart(record.data)) return
+      const key = `${record.analysisRunId || record.jobId}:${record.data.sectionCode}:${record.data.chartCode}`
+      this.reportCharts[key] = record.data
     },
     dismissWorkspace(jobId: string, analysisRunId = '') {
       this.workspaceDismissedJobId = jobId
@@ -296,6 +306,7 @@ function emptyState(): ResearchAgentState {
     job: null,
     nodes: [],
     events: [],
+    reportCharts: {},
     seenSequences: {},
     lastSequence: 0,
     replayComplete: false,
@@ -379,6 +390,17 @@ function sheetThinkMessage(sheetName?: string) {
 
 function eventRetryable(data: unknown) {
   return !isRecord(data) || data.retryable !== false
+}
+
+function isResearchReportChart(value: unknown): value is ResearchReportChart {
+  if (!isRecord(value)) return false
+  return typeof value.chartCode === 'string'
+    && typeof value.sectionCode === 'string'
+    && typeof value.sectionTitle === 'string'
+    && ['LINE', 'BAR'].includes(String(value.type))
+    && typeof value.title === 'string'
+    && Array.isArray(value.categories)
+    && Array.isArray(value.series)
 }
 
 function analysisStatus(data: unknown): AnalysisState {

@@ -13,7 +13,7 @@ import cyou.yuanbaomao.base.context.RequestContext;
 import cyou.yuanbaomao.base.context.RequestContextHolder;
 import cyou.yuanbaomao.base.exception.BizException;
 import cyou.yuanbaomao.base.id.IdGenerator;
-import cyou.yuanbaomao.base.result.PageResult;
+import cyou.yuanbaomao.mybatis.result.YPage;
 import cyou.yuanbaomao.sellersprite.api.common.enums.SellerSpriteMarketplace;
 import cyou.yuanbaomao.sellersprite.common.result.ResultCode;
 import cyou.yuanbaomao.sellersprite.db.dao.MarketResearchAnalysisRunDao;
@@ -30,7 +30,6 @@ import cyou.yuanbaomao.sellersprite.research.event.ResearchJobCreatedEvent;
 import cyou.yuanbaomao.sellersprite.research.model.CollectionGraphConfig;
 import cyou.yuanbaomao.sellersprite.research.model.ResearchDownload;
 import cyou.yuanbaomao.sellersprite.research.model.dto.ResearchJobCreateRequest;
-import cyou.yuanbaomao.sellersprite.research.model.dto.ResearchJobPageRequest;
 import cyou.yuanbaomao.sellersprite.research.model.vo.ResearchAnalysisRunVo;
 import cyou.yuanbaomao.sellersprite.research.model.vo.ResearchJobCreatedVo;
 import cyou.yuanbaomao.sellersprite.research.model.vo.ResearchJobDetailVo;
@@ -194,13 +193,6 @@ class ResearchJobServiceImplTest {
 
     @Test
     void shouldPageOwnedJobsAndAggregateLatestAnalysisAndPublishedArtifacts() {
-        ResearchJobPageRequest request = new ResearchJobPageRequest();
-        request.setCurrent(2L);
-        request.setSize(20L);
-        request.setKeyword("  facial device  ");
-        request.setStatus(ResearchJobStatus.SUCCEEDED);
-        request.setMarketplace(SellerSpriteMarketplace.US);
-        request.setMonth("2026-07");
         MarketResearchJob job = historyJob();
         Page<MarketResearchJob> sourcePage = Page.of(2L, 20L, 21L);
         sourcePage.setRecords(List.of(job));
@@ -220,8 +212,11 @@ class ResearchJobServiceImplTest {
         when(artifactDao.listAvailableByJobIds(List.of(JOB_ID)))
                 .thenReturn(List.of(historyArtifact()));
 
-        PageResult<ResearchJobHistoryVo> result = jobService.page(request);
+        YPage<ResearchJobHistoryVo> targetPage = YPage.of(2L, 20L);
+        YPage<ResearchJobHistoryVo> result = jobService.page(targetPage, "  facial device  ",
+                ResearchJobStatus.SUCCEEDED, SellerSpriteMarketplace.US, "2026-07");
 
+        assertThat(result).isSameAs(targetPage);
         assertThat(result.getCurrent()).isEqualTo(2L);
         assertThat(result.getSize()).isEqualTo(20L);
         assertThat(result.getTotal()).isEqualTo(21L);
@@ -250,12 +245,12 @@ class ResearchJobServiceImplTest {
 
     @Test
     void shouldSkipAssociationQueriesForEmptyHistoryPage() {
-        ResearchJobPageRequest request = new ResearchJobPageRequest();
         Page<MarketResearchJob> sourcePage = Page.of(1L, 20L, 0L);
         when(jobDao.pageByUserId(USER_ID, null, null, null, null, 1L, 20L))
                 .thenReturn(sourcePage);
 
-        PageResult<ResearchJobHistoryVo> result = jobService.page(request);
+        YPage<ResearchJobHistoryVo> result = jobService.page(YPage.of(1L, 20L),
+                null, null, null, null);
 
         assertThat(result.getRecords()).isEmpty();
         verify(analysisRunDao, never()).listByJobIdsAndUserId(any(), any());

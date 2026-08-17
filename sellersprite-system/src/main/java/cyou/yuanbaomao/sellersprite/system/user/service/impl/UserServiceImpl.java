@@ -1,7 +1,7 @@
 package cyou.yuanbaomao.sellersprite.system.user.service.impl;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import cyou.yuanbaomao.base.result.PageResult;
+import cyou.yuanbaomao.mybatis.result.YPage;
 import cyou.yuanbaomao.sellersprite.common.result.ResultCode;
 import cyou.yuanbaomao.sellersprite.db.dao.UserDao;
 import cyou.yuanbaomao.sellersprite.db.dao.UserRoleDao;
@@ -17,7 +17,6 @@ import cyou.yuanbaomao.base.context.RequestContextHolder;
 import cyou.yuanbaomao.sellersprite.system.constants.SystemBusinessConstants;
 import cyou.yuanbaomao.sellersprite.system.convert.SystemConverter;
 import cyou.yuanbaomao.sellersprite.system.user.model.dto.UserCreateRequest;
-import cyou.yuanbaomao.sellersprite.system.user.model.dto.UserPageRequest;
 import cyou.yuanbaomao.sellersprite.system.user.model.dto.UserUpdateRequest;
 import cyou.yuanbaomao.sellersprite.system.user.model.vo.UserDetailVo;
 import cyou.yuanbaomao.sellersprite.system.user.service.UserService;
@@ -76,13 +75,15 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public PageResult<UserDetailVo> page(UserPageRequest request) {
-        Page<User> page = userDao.pageUsers(request.getUsername(), request.getStatus(), request.getCurrent(),
-                request.getSize());
-        List<UserDetailVo> records = page.getRecords().stream()
+    public YPage<UserDetailVo> page(YPage<UserDetailVo> page, String username, Integer status) {
+        Page<User> entityPage = userDao.pageUsers(username, status, page.getCurrent(),
+                page.getSize());
+        List<UserDetailVo> records = entityPage.getRecords().stream()
                 .map(this::toDetailVo)
                 .toList();
-        return PageResult.of(page.getCurrent(), page.getSize(), page.getTotal(), records);
+        page.setTotal(entityPage.getTotal());
+        page.setRecords(records);
+        return page;
     }
 
     @Override

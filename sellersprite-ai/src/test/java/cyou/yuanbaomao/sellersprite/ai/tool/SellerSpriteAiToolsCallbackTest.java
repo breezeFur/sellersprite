@@ -1,12 +1,10 @@
 package cyou.yuanbaomao.sellersprite.ai.tool;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import cyou.yuanbaomao.sellersprite.api.account.service.AccountService;
-import cyou.yuanbaomao.sellersprite.api.asin.model.dto.AsinDetailRequest;
 import cyou.yuanbaomao.sellersprite.api.asin.model.vo.AsinDetailVo;
 import cyou.yuanbaomao.sellersprite.api.asin.service.AsinService;
 import cyou.yuanbaomao.sellersprite.api.common.enums.SellerSpriteMarketplace;
@@ -17,7 +15,6 @@ import java.util.Arrays;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.ai.tool.ToolCallback;
@@ -85,15 +82,12 @@ class SellerSpriteAiToolsCallbackTest {
     void shouldInvokeAnnotatedToolFromJsonAndSerializeDomainResult() {
         AsinDetailVo expected = new AsinDetailVo();
         expected.setAsin(ASIN);
-        when(asinService.getAsinDetail(any(AsinDetailRequest.class))).thenReturn(expected);
+        when(asinService.getAsinDetail(SellerSpriteMarketplace.US, ASIN)).thenReturn(expected);
 
         String result = callback(SellerSpriteAiTools.ASIN_DETAIL_TOOL_NAME)
                 .call("{\"request\":{\"marketplace\":\"US\",\"asin\":\"" + ASIN + "\"}}");
 
-        ArgumentCaptor<AsinDetailRequest> requestCaptor = ArgumentCaptor.forClass(AsinDetailRequest.class);
-        verify(asinService).getAsinDetail(requestCaptor.capture());
-        assertThat(requestCaptor.getValue().getMarketplace()).isEqualTo(SellerSpriteMarketplace.US);
-        assertThat(requestCaptor.getValue().getAsin()).isEqualTo(ASIN);
+        verify(asinService).getAsinDetail(SellerSpriteMarketplace.US, ASIN);
         assertThat(result).contains("\"asin\":\"" + ASIN + "\"");
     }
 

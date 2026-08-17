@@ -1,12 +1,6 @@
 // Generated from SellerSprite official documentation on 2026-07-10.
 package cyou.yuanbaomao.sellersprite.api.asin.service;
 
-import cyou.yuanbaomao.sellersprite.api.asin.model.dto.AsinCouponTrendRequest;
-import cyou.yuanbaomao.sellersprite.api.asin.model.dto.AsinDetailRequest;
-import cyou.yuanbaomao.sellersprite.api.asin.model.dto.AsinSalesPredictionRequest;
-import cyou.yuanbaomao.sellersprite.api.asin.model.dto.AsinSalesTrendRequest;
-import cyou.yuanbaomao.sellersprite.api.asin.model.dto.AsinWithCouponTrendRequest;
-import cyou.yuanbaomao.sellersprite.api.asin.model.dto.BsrSalesPredictionRequest;
 import cyou.yuanbaomao.sellersprite.api.asin.model.dto.KeepaTrendRequest;
 import cyou.yuanbaomao.sellersprite.api.asin.model.vo.AsinCouponTrendVo;
 import cyou.yuanbaomao.sellersprite.api.asin.model.vo.AsinDetailVo;
@@ -15,6 +9,7 @@ import cyou.yuanbaomao.sellersprite.api.asin.model.vo.AsinSalesTrendVo;
 import cyou.yuanbaomao.sellersprite.api.asin.model.vo.AsinWithCouponTrendVo;
 import cyou.yuanbaomao.sellersprite.api.asin.model.vo.BsrSalesPredictionVo;
 import cyou.yuanbaomao.sellersprite.api.asin.model.vo.KeepaTrendVo;
+import cyou.yuanbaomao.sellersprite.api.common.enums.SellerSpriteMarketplace;
 import java.util.List;
 
 /**
@@ -29,7 +24,7 @@ public interface AsinService {
      * @param request ASIN 详情的强类型请求参数
      * @return ASIN 详情的强类型响应数据
      */
-    AsinDetailVo getAsinDetail(AsinDetailRequest request);
+    AsinDetailVo getAsinDetail(SellerSpriteMarketplace marketplace, String asin);
 
     /**
      * ASIN优惠趋势。
@@ -38,7 +33,7 @@ public interface AsinService {
      * @param request ASIN优惠趋势的强类型请求参数
      * @return ASIN优惠趋势的强类型响应数据
      */
-    List<AsinCouponTrendVo> getCouponTrend(AsinCouponTrendRequest request);
+    List<AsinCouponTrendVo> getCouponTrend(SellerSpriteMarketplace marketplace, String asin);
 
     /**
      * ASIN详情及优惠趋势。
@@ -47,7 +42,7 @@ public interface AsinService {
      * @param request ASIN详情及优惠趋势的强类型请求参数
      * @return ASIN详情及优惠趋势的强类型响应数据
      */
-    AsinWithCouponTrendVo getAsinWithCouponTrend(AsinWithCouponTrendRequest request);
+    AsinWithCouponTrendVo getAsinWithCouponTrend(SellerSpriteMarketplace marketplace, String asin);
 
     /**
      * ASIN 销量趋势。
@@ -56,7 +51,7 @@ public interface AsinService {
      * @param request ASIN 销量趋势的强类型请求参数
      * @return ASIN 销量趋势的强类型响应数据
      */
-    AsinSalesTrendVo getSalesTrend(AsinSalesTrendRequest request);
+    AsinSalesTrendVo getSalesTrend(SellerSpriteMarketplace marketplace, String asin);
 
     /**
      * ASIN 销量预测。
@@ -65,7 +60,7 @@ public interface AsinService {
      * @param request ASIN 销量预测的强类型请求参数
      * @return ASIN 销量预测的强类型响应数据
      */
-    AsinSalesPredictionVo predictAsinSales(AsinSalesPredictionRequest request);
+    AsinSalesPredictionVo predictAsinSales(SellerSpriteMarketplace marketplace, String asin);
 
     /**
      * BSR销量预测。
@@ -74,7 +69,7 @@ public interface AsinService {
      * @param request BSR销量预测的强类型请求参数
      * @return BSR销量预测的强类型响应数据
      */
-    BsrSalesPredictionVo predictBsrSales(BsrSalesPredictionRequest request);
+    BsrSalesPredictionVo predictBsrSales(SellerSpriteMarketplace marketplace, Integer bsr, String categoryId);
 
     /**
      * 商品趋势详情(keepa)。

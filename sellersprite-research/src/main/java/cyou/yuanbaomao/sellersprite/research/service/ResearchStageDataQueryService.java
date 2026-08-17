@@ -32,8 +32,10 @@ public class ResearchStageDataQueryService {
     public List<ResearchEvidenceTableSummaryVo> listEvidence(
             String jobId, EvidenceStage stage) {
         requireOwnedJob(jobId);
-        Map<String, MarketResearchDataset> datasets = evidenceDatasets(jobId);
-        return ResearchEvidenceCatalog.definitions(stage).stream()
+        List<ResearchEvidenceCatalog.Definition> definitions =
+                ResearchEvidenceCatalog.definitions(stage);
+        Map<String, MarketResearchDataset> datasets = evidenceDatasetMetadata(jobId, definitions);
+        return definitions.stream()
                 .map(definition -> {
                     MarketResearchDataset dataset = datasets.get(definition.datasetCode());
                     return ResearchEvidenceTableSummaryVo.builder()
@@ -57,38 +59,44 @@ public class ResearchStageDataQueryService {
         } catch (IllegalArgumentException exception) {
             throw new BizException(ResultCode.RESOURCE_NOT_FOUND);
         }
-        MarketResearchDataset dataset = evidenceDatasets(jobId).get(datasetCode);
-        if (dataset == null) {
-            throw new BizException(ResultCode.RESOURCE_NOT_FOUND);
-        }
+        MarketResearchDataset dataset = datasetService
+                .findPayloadByJobIdAndDatasetCode(jobId, datasetCode)
+                .orElseThrow(() -> new BizException(ResultCode.RESOURCE_NOT_FOUND));
         JsonNode items = datasetService.readPayload(dataset).path("items");
-        List<JsonNode> allRecords = new ArrayList<>();
-        if (items.isArray()) {
-            items.forEach(allRecords::add);
-        }
+        int total = items.isArray() ? items.size() : 0;
         long safeCurrent = Math.max(1L, current);
         long safeSize = Math.max(1L, Math.min(size, MAX_PAGE_SIZE));
-        int fromIndex = (int) Math.min(allRecords.size(), (safeCurrent - 1L) * safeSize);
-        int toIndex = (int) Math.min(allRecords.size(), fromIndex + safeSize);
+        long pageIndex = safeCurrent - 1L;
+        long offset = pageIndex > Long.MAX_VALUE / safeSize
+                ? Long.MAX_VALUE
+                : pageIndex * safeSize;
+        int fromIndex = (int) Math.min(total, offset);
+        int toIndex = (int) Math.min(total, fromIndex + safeSize);
+        List<JsonNode> records = new ArrayList<>(toIndex - fromIndex);
+        for (int index = fromIndex; index < toIndex; index++) {
+            records.add(items.get(index));
+        }
         return ResearchEvidencePageVo.builder()
                 .datasetCode(datasetCode)
                 .sheetName(definition.sheetName())
                 .stageCode(definition.stage().name())
                 .columns(definition.columns())
-                .records(List.copyOf(allRecords.subList(fromIndex, toIndex)))
+                .records(List.copyOf(records))
                 .current(safeCurrent)
                 .size(safeSize)
-                .total((long) allRecords.size())
+                .total((long) total)
                 .build();
     }
 
-    private Map<String, MarketResearchDataset> evidenceDatasets(String jobId) {
+    private Map<String, MarketResearchDataset> evidenceDatasetMetadata(
+            String jobId, List<ResearchEvidenceCatalog.Definition> definitions) {
+        List<String> datasetCodes = definitions.stream()
+                .map(ResearchEvidenceCatalog.Definition::datasetCode)
+                .toList();
         Map<String, MarketResearchDataset> result = new LinkedHashMap<>();
-        for (MarketResearchDataset dataset : datasetService.listByJobId(jobId)) {
-            if (ResearchEvidenceCatalog.DEFINITIONS.stream()
-                    .anyMatch(definition -> definition.datasetCode().equals(dataset.getDatasetCode()))) {
-                result.putIfAbsent(dataset.getDatasetCode(), dataset);
-            }
+        for (MarketResearchDataset dataset :
+                datasetService.listMetadataByJobIdAndDatasetCodes(jobId, datasetCodes)) {
+            result.putIfAbsent(dataset.getDatasetCode(), dataset);
         }
         return result;
     }

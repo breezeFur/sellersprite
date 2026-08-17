@@ -8,7 +8,7 @@ import static org.mockito.Mockito.when;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import cyou.yuanbaomao.base.exception.BizException;
-import cyou.yuanbaomao.base.result.PageResult;
+import cyou.yuanbaomao.mybatis.result.YPage;
 import cyou.yuanbaomao.sellersprite.common.result.ResultCode;
 import cyou.yuanbaomao.sellersprite.db.dao.DeptDao;
 import cyou.yuanbaomao.sellersprite.db.dao.RoleDao;
@@ -19,7 +19,6 @@ import cyou.yuanbaomao.sellersprite.db.entity.User;
 import cyou.yuanbaomao.sellersprite.db.entity.Dept;
 import cyou.yuanbaomao.sellersprite.db.entity.UserRole;
 import cyou.yuanbaomao.sellersprite.system.constants.SystemBusinessConstants;
-import cyou.yuanbaomao.sellersprite.system.role.model.dto.RolePageRequest;
 import cyou.yuanbaomao.sellersprite.system.role.model.dto.RoleUpdateRequest;
 import cyou.yuanbaomao.sellersprite.system.role.model.dto.UserRoleBindRequest;
 import cyou.yuanbaomao.sellersprite.system.role.model.vo.RoleVo;
@@ -119,13 +118,7 @@ class RoleServiceImplTest {
         Page<Role> page = new Page<>(2, 10, 1);
         page.setRecords(List.of(role));
         when(roleDao.pageRoles("操作", 1, 2, 10)).thenReturn(page);
-        RolePageRequest pageRequest = new RolePageRequest();
-        pageRequest.setCurrent(2L);
-        pageRequest.setSize(10L);
-        pageRequest.setRoleName("操作");
-        pageRequest.setStatus(1);
-
-        PageResult<RoleVo> pageResult = roleService.page(pageRequest);
+        YPage<RoleVo> pageResult = roleService.page(YPage.of(2L, 10L), "操作", 1);
 
         assertThat(pageResult.getRecords()).extracting(RoleVo::getRoleCode).containsExactly("operator");
 

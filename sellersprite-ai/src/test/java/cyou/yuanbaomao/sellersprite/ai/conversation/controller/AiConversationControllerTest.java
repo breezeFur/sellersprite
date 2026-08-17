@@ -11,8 +11,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import cyou.yuanbaomao.base.result.PageResult;
-import cyou.yuanbaomao.sellersprite.ai.conversation.model.dto.AiConversationPageRequest;
+import cyou.yuanbaomao.mybatis.result.YPage;
 import cyou.yuanbaomao.sellersprite.ai.conversation.model.dto.AiConversationRenameRequest;
 import cyou.yuanbaomao.sellersprite.ai.conversation.model.dto.AiConversationSettingsRequest;
 import cyou.yuanbaomao.sellersprite.ai.conversation.model.vo.AiConversationDetailVo;
@@ -40,8 +39,8 @@ class AiConversationControllerTest {
         settings.setProvider("openai");
         settings.setModel("gpt-5.5");
         settings.setSystemPrompt("你是严谨助手");
-        when(service.page(any(AiConversationPageRequest.class)))
-                .thenReturn(PageResult.of(1, 20, 1, List.of(conversation)));
+        when(service.page(any(YPage.class), org.mockito.ArgumentMatchers.<String>isNull()))
+                .thenReturn(YPage.of(1, 20, 1, List.of(conversation)));
         when(service.detail("conversation-1")).thenReturn(detail);
         when(service.rename(eq("conversation-1"), any(AiConversationRenameRequest.class)))
                 .thenReturn(conversation);

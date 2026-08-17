@@ -98,6 +98,159 @@ class ResearchEvidenceServiceTest {
     }
 
     @Test
+    void shouldUseTotalUnitsRatioForGoodsConcentrationEvidence() {
+        ObjectMapper objectMapper = new ObjectMapper();
+        ResearchDatasetService datasetService = mock(ResearchDatasetService.class);
+        MarketResearchDataset products = new MarketResearchDataset();
+        products.setDatasetCode("products");
+        ObjectNode productsPayload = objectMapper.createObjectNode();
+        productsPayload.putArray("items");
+
+        MarketResearchDataset goodsConcentration = new MarketResearchDataset();
+        goodsConcentration.setDatasetCode("market.goods-concentration");
+        ObjectNode concentrationPayload = objectMapper.createObjectNode();
+        ArrayNode concentrationItems = concentrationPayload.putArray("items");
+        concentrationItems.addObject()
+                .put("asin", "B0TEST0001")
+                .put("totalUnits", 2515)
+                .put("totalRevenue", 18837.35)
+                .put("totalUnitsRatio", 0.4478)
+                .put("totalRevenueRatio", 0.3052);
+        concentrationItems.addObject()
+                .put("asin", "B0TEST0002")
+                .put("totalUnits", 1000)
+                .put("totalRevenue", 8000)
+                .put("totalUnitsRatio", 0.2000)
+                .put("totalRevenueRatio", 0.1500);
+
+        when(datasetService.listByJobId(JOB_ID))
+                .thenReturn(List.of(products, goodsConcentration));
+        when(datasetService.readPayload(products)).thenReturn(productsPayload);
+        when(datasetService.readPayload(goodsConcentration)).thenReturn(concentrationPayload);
+        ResearchEvidenceService service = new ResearchEvidenceService(datasetService, objectMapper);
+
+        ResearchDataset result = service.prepare(
+                job(),
+                cyou.yuanbaomao.sellersprite.research.enums.ResearchPhase
+                        .PREPARE_CONCENTRATION_EVIDENCE);
+
+        assertThat(result.getPayload().at("/items/0/集中维度").asText())
+                .isEqualTo("商品集中度");
+        assertThat(result.getPayload().at("/items/0/占比").decimalValue())
+                .isEqualByComparingTo("0.4478");
+        assertThat(result.getPayload().at("/items/0/销售额占比").decimalValue())
+                .isEqualByComparingTo("0.3052");
+        assertThat(result.getPayload().at("/items/1/累计销量占比").decimalValue())
+                .isEqualByComparingTo("0.6478");
+        assertThat(result.getPayload().at("/items/1/累计销售额占比").decimalValue())
+                .isEqualByComparingTo("0.4552");
+    }
+
+    @Test
+    void shouldBuildDecisionMetricsForReturnBrandAndVocEvidence() {
+        ObjectMapper objectMapper = new ObjectMapper();
+        ResearchDatasetService datasetService = mock(ResearchDatasetService.class);
+        ResearchEvidenceService service = new ResearchEvidenceService(datasetService, objectMapper);
+
+        MarketResearchDataset products = dataset("products");
+        ObjectNode productsPayload = objectMapper.createObjectNode();
+        productsPayload.putArray("items").addObject()
+                .put("asin", "B0TEST0001")
+                .put("brand", "Example")
+                .put("title", "Example product")
+                .put("variations", 4)
+                .put("fulfillment", "FBA")
+                .put("sellerNation", "CN");
+
+        MarketResearchDataset markets = dataset("market.research");
+        ObjectNode marketPayload = objectMapper.createObjectNode();
+        marketPayload.putArray("items").addObject()
+                .put("nodeLabelName", "Example Segment")
+                .put("nodeLabelPath", "Home:Example")
+                .put("returnRatio", 0.12)
+                .put("avgReturnRatio", 0.08);
+
+        MarketResearchDataset demand = dataset("market.demand-trend");
+        ObjectNode demandPayload = objectMapper.createObjectNode();
+        demandPayload.putArray("items");
+
+        MarketResearchDataset brands = dataset("market.brand-concentration");
+        ObjectNode brandPayload = objectMapper.createObjectNode();
+        brandPayload.putArray("items").addObject()
+                .put("ranking", 1)
+                .put("brand", "Example")
+                .putArray("asins").add("B0TEST0001").add("B0TEST0002");
+        ObjectNode brandItem = (ObjectNode) brandPayload.path("items").get(0);
+        brandItem.put("products", 2)
+                .put("newProducts", 1)
+                .put("totalUnits", 5000)
+                .put("totalRevenue", 75000)
+                .put("avgPrice", 15)
+                .put("rating", 4.5)
+                .put("ratings", 800)
+                .put("totalUnitsRatio", 0.40)
+                .put("totalRevenueRatio", 0.35)
+                .put("newUnitsRatio", 0.25)
+                .put("newRevenueRatio", 0.20);
+
+        MarketResearchDataset reviews = dataset("reviews.B0TEST0001");
+        ObjectNode reviewsPayload = objectMapper.createObjectNode();
+        ArrayNode reviewItems = reviewsPayload.putArray("items");
+        reviewItems
+                .addObject().put("star", 5).put("verified", true).put("likes", 4)
+                .putArray("images").add("image.jpg");
+        reviewItems.addObject()
+                .put("star", 3).put("verified", false).put("likes", 2);
+        reviewItems.addObject()
+                .put("star", 1).put("verified", true).put("likes", 0)
+                .put("title", "Bad").put("content", "Broken");
+
+        List<MarketResearchDataset> datasets = List.of(products, markets, demand, brands, reviews);
+        Map<MarketResearchDataset, JsonNode> payloads = Map.of(
+                products, productsPayload,
+                markets, marketPayload,
+                demand, demandPayload,
+                brands, brandPayload,
+                reviews, reviewsPayload);
+        when(datasetService.listByJobId(JOB_ID)).thenReturn(datasets);
+        when(datasetService.readPayload(any(MarketResearchDataset.class)))
+                .thenAnswer(invocation -> payloads.get(invocation.getArgument(0)));
+
+        ResearchDataset returnEvidence = service.prepare(
+                job(), cyou.yuanbaomao.sellersprite.research.enums.ResearchPhase
+                        .PREPARE_SEGMENT_RETURN_EVIDENCE);
+        ResearchDataset brandEvidence = service.prepare(
+                job(), cyou.yuanbaomao.sellersprite.research.enums.ResearchPhase
+                        .PREPARE_BRAND_EVIDENCE);
+        ResearchDataset vocEvidence = service.prepare(
+                job(), cyou.yuanbaomao.sellersprite.research.enums.ResearchPhase
+                        .PREPARE_VOC_EVIDENCE);
+
+        assertThat(returnEvidence.getPayload().at("/items/0/退货率差值").decimalValue())
+                .isEqualByComparingTo("0.0400");
+        assertThat(returnEvidence.getPayload().at("/items/0/相对类目均值").decimalValue())
+                .isEqualByComparingTo("0.5000");
+        assertThat(returnEvidence.getPayload().at("/items/0/风险等级").asText()).isEqualTo("高");
+        assertThat(brandEvidence.getPayload().at("/items/0/ASIN数").asInt()).isEqualTo(2);
+        assertThat(brandEvidence.getPayload().at("/items/0/销量份额").decimalValue())
+                .isEqualByComparingTo("0.40");
+        assertThat(brandEvidence.getPayload().at("/items/0/FBA商品占比").decimalValue())
+                .isEqualByComparingTo("1.0000");
+        assertThat(vocEvidence.getPayload().at("/items/0/正向占比").decimalValue())
+                .isEqualByComparingTo("0.3333");
+        assertThat(vocEvidence.getPayload().at("/items/0/中性占比").decimalValue())
+                .isEqualByComparingTo("0.3333");
+        assertThat(vocEvidence.getPayload().at("/items/0/负向占比").decimalValue())
+                .isEqualByComparingTo("0.3333");
+        assertThat(vocEvidence.getPayload().at("/items/0/VP评论占比").decimalValue())
+                .isEqualByComparingTo("0.6667");
+        assertThat(vocEvidence.getPayload().at("/items/0/带图或视频评论占比").decimalValue())
+                .isEqualByComparingTo("0.3333");
+        assertThat(vocEvidence.getPayload().at("/items/0/平均赞同数").decimalValue())
+                .isEqualByComparingTo("2.0000");
+    }
+
+    @Test
     void shouldBuildAndValidateTwelveBusinessEvidenceDatasetsWithoutAgentOutput() {
         ObjectMapper objectMapper = new ObjectMapper();
         ResearchDatasetService datasetService = mock(ResearchDatasetService.class);
@@ -163,14 +316,13 @@ class ResearchEvidenceServiceTest {
         assertThat(salesEvidence.path("items").size()).isLessThanOrEqualTo(12);
 
         JsonNode returnEvidence = find(evidence, "evidence.segment-return").getPayload();
-        assertThat(returnEvidence.at("/items/0/退货原因").isNull()).isTrue();
-        assertThat(returnEvidence.at("/items/0/退货量").isNull()).isTrue();
+        assertThat(returnEvidence.path("columns"))
+                .extracting(JsonNode::asText)
+                .doesNotContain("退货原因", "退货量");
         JsonNode vocEvidence = find(evidence, "evidence.voc").getPayload();
-        for (JsonNode item : vocEvidence.path("items")) {
-            assertThat(item.path("用户画像").isNull()).isTrue();
-            assertThat(item.path("使用场景").isNull()).isTrue();
-            assertThat(item.path("购买动机").isNull()).isTrue();
-        }
+        assertThat(vocEvidence.path("columns"))
+                .extracting(JsonNode::asText)
+                .doesNotContain("用户画像", "使用场景", "购买动机");
 
         append(stored, payloads, evidence);
         assertThatCode(() -> service.validate(JOB_ID)).doesNotThrowAnyException();
@@ -188,11 +340,14 @@ class ResearchEvidenceServiceTest {
                 .put("asin", "B0TEST0001")
                 .put("brand", "Example")
                 .put("title", "Example product");
-        salesPayload.putArray("salesTrendPoints").addObject()
-                .put("month", "2026-07")
-                .put("parentUnitSales", 1200)
-                .put("childUnitSales", 300)
-                .put("averagePrice", 19.99);
+        ArrayNode salesTrendPoints = salesPayload.putArray("salesTrendPoints");
+        salesTrendPoints
+                .addObject().put("month", "2026-07").put("parentUnitSales", 1200)
+                .put("childUnitSales", 300).put("averagePrice", 19.99);
+        salesTrendPoints.addObject()
+                .put("month", "2026-05").put("parentUnitSales", 1000).put("childUnitSales", 200);
+        salesTrendPoints.addObject()
+                .put("month", "2026-06").put("parentUnitSales", 1100).put("childUnitSales", 250);
 
         MarketResearchDataset keepa = new MarketResearchDataset();
         keepa.setDatasetCode("asin-keepa-trend.B0TEST0001");
@@ -201,7 +356,11 @@ class ResearchEvidenceServiceTest {
         keepaPayload.put("dataAsin", "B0TEST0001");
         keepaPayload.put("parentAsin", "B0PARENT01");
         keepaPayload.put("nodeLabelPath", "Home & Kitchen:Example");
-        keepaPayload.putArray("price").addObject()
+        ArrayNode pricePoints = keepaPayload.putArray("price");
+        pricePoints.addObject()
+                .put("timePoint", 1_754_522_400_000L)
+                .put("value", 18.99);
+        pricePoints.addObject()
                 .put("timePoint", 1_754_608_800_000L)
                 .put("value", 19.99);
         keepaPayload.putArray("bsr").addObject()
@@ -220,11 +379,29 @@ class ResearchEvidenceServiceTest {
 
         assertThat(salesEvidence.getPayload().at("/items/0/ASIN").asText())
                 .isEqualTo("B0TEST0001");
-        assertThat(salesEvidence.getPayload().at("/items/0/父体销量").asInt()).isEqualTo(1200);
-        assertThat(keepaEvidence.getPayload().path("items")).hasSize(2);
+        assertThat(salesEvidence.getPayload().at("/items/0/月份").asText()).isEqualTo("2026-05");
+        assertThat(salesEvidence.getPayload().at("/items/2/父体销量环比").decimalValue())
+                .isEqualByComparingTo("0.0909");
+        assertThat(salesEvidence.getPayload().at("/items/2/子体销量贡献率").decimalValue())
+                .isEqualByComparingTo("0.2500");
+        assertThat(salesEvidence.getPayload().at("/items/2/近3月子体月均销量").decimalValue())
+                .isEqualByComparingTo("250.0000");
+        assertThat(salesEvidence.getPayload().at("/items/2/近3月子体销量波动率").decimalValue())
+                .isEqualByComparingTo("0.1633");
+        assertThat(keepaEvidence.getPayload().path("items")).hasSize(3);
+        assertThat(keepaEvidence.getPayload().at("/items/1/前值").decimalValue())
+                .isEqualByComparingTo("18.99");
+        assertThat(keepaEvidence.getPayload().at("/items/1/变化量").decimalValue())
+                .isEqualByComparingTo("1.0000");
+        assertThat(keepaEvidence.getPayload().at("/items/1/变化率").decimalValue())
+                .isEqualByComparingTo("0.0527");
+        assertThat(keepaEvidence.getPayload().at("/items/1/区间最小值").decimalValue())
+                .isEqualByComparingTo("18.9900");
+        assertThat(keepaEvidence.getPayload().at("/items/1/区间最大值").decimalValue())
+                .isEqualByComparingTo("19.9900");
         assertThat(keepaEvidence.getPayload().path("items"))
                 .extracting(item -> item.path("指标").asText())
-                .containsExactly("价格", "大类BSR");
+                .containsExactly("价格", "价格", "大类BSR");
     }
 
     private void append(
@@ -240,6 +417,12 @@ class ResearchEvidenceServiceTest {
             stored.add(dataset);
             payloads.put(dataset, value.getPayload());
         }
+    }
+
+    private MarketResearchDataset dataset(String code) {
+        MarketResearchDataset dataset = new MarketResearchDataset();
+        dataset.setDatasetCode(code);
+        return dataset;
     }
 
     private ResearchDataset find(List<ResearchDataset> datasets, String code) {

@@ -1,16 +1,16 @@
 // Generated from SellerSprite official documentation on 2026-07-10.
 package cyou.yuanbaomao.sellersprite.api.traffic.service;
 
+import cyou.yuanbaomao.sellersprite.api.common.enums.SellerSpriteMarketplace;
 import cyou.yuanbaomao.sellersprite.api.traffic.model.dto.RelatedTrafficRequest;
 import cyou.yuanbaomao.sellersprite.api.traffic.model.dto.TrafficKeywordRequest;
-import cyou.yuanbaomao.sellersprite.api.traffic.model.dto.TrafficKeywordStatRequest;
-import cyou.yuanbaomao.sellersprite.api.traffic.model.dto.TrafficListingStatRequest;
 import cyou.yuanbaomao.sellersprite.api.traffic.model.dto.TrafficSourceRequest;
 import cyou.yuanbaomao.sellersprite.api.traffic.model.vo.RelatedTrafficVo;
 import cyou.yuanbaomao.sellersprite.api.traffic.model.vo.TrafficKeywordStatVo;
 import cyou.yuanbaomao.sellersprite.api.traffic.model.vo.TrafficKeywordVo;
 import cyou.yuanbaomao.sellersprite.api.traffic.model.vo.TrafficListingStatVo;
 import cyou.yuanbaomao.sellersprite.api.traffic.model.vo.TrafficSourceVo;
+import java.util.List;
 
 /**
  * SellerSprite 流量分析接口封装。
@@ -42,7 +42,7 @@ public interface TrafficService {
      * @param request 流量词统计的强类型请求参数
      * @return 流量词统计的强类型响应数据
      */
-    TrafficKeywordStatVo getKeywordStats(TrafficKeywordStatRequest request);
+    TrafficKeywordStatVo getKeywordStats(SellerSpriteMarketplace marketplace, String asin, String month);
 
     /**
      * 关联流量统计。
@@ -51,7 +51,7 @@ public interface TrafficService {
      * @param request 关联流量统计的强类型请求参数
      * @return 关联流量统计的强类型响应数据
      */
-    TrafficListingStatVo getListingStats(TrafficListingStatRequest request);
+    TrafficListingStatVo getListingStats(String asin, SellerSpriteMarketplace marketplace, List<String> asinList);
 
     /**
      * 查流量来源(关键词流向)。

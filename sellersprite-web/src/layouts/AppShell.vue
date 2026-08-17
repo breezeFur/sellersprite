@@ -17,7 +17,7 @@ withDefaults(
 )
 
 const layoutStore = useLayoutStore()
-const { mobileSidebarOpen, sidebarCollapsed } = storeToRefs(layoutStore)
+const { mobileSidebarOpen, sidebarCollapsed, workspaceFocusMode } = storeToRefs(layoutStore)
 
 const DESKTOP_MIN_WIDTH_PX = 769
 
@@ -39,7 +39,11 @@ onBeforeUnmount(() => {
 <template>
   <div
     class="app-shell"
-    :class="{ 'is-collapsed': sidebarCollapsed, 'is-mobile-open': mobileSidebarOpen }"
+    :class="{
+      'is-collapsed': sidebarCollapsed,
+      'is-mobile-open': mobileSidebarOpen,
+      'is-workspace-focus': workspaceFocusMode,
+    }"
   >
     <button
       v-if="mobileSidebarOpen"
@@ -239,6 +243,10 @@ onBeforeUnmount(() => {
   box-shadow: var(--shadow-header);
 }
 
+.app-shell.is-workspace-focus .app-shell__header {
+  display: none;
+}
+
 .app-shell__icon-button {
   display: grid;
   flex: 0 0 32px;
@@ -350,6 +358,10 @@ onBeforeUnmount(() => {
   padding: var(--content-gutter);
 }
 
+.app-shell.is-workspace-focus .app-shell__content {
+  padding: 0;
+}
+
 .app-shell__overlay {
   display: none;
 }
@@ -377,6 +389,10 @@ onBeforeUnmount(() => {
     width: min(82vw, 280px);
     box-shadow: var(--shadow-overlay);
     transform: translateX(-102%);
+  }
+
+  .app-shell.is-workspace-focus .app-shell__content {
+    padding: 0;
   }
 
   .app-shell__workspace,

@@ -32,12 +32,12 @@ class OperationLogAspectContractTest {
     }
 
     @Test
-    void shouldRecordSuccessfulManagementWriteWithCostAndTrackId() throws Throwable {
+    void shouldRecordSuccessfulManagementWriteWithCostAndTraceId() throws Throwable {
         OperationLogSink sink = mock(OperationLogSink.class);
         OperationLogAspect aspect = aspect(sink);
         ProceedingJoinPoint joinPoint = joinPoint("saved");
         Operation operation = operation("系统管理", "新增用户");
-        bindRequest("POST", "/api/users", "track-1");
+        bindRequest("POST", "/api/users", "trace-1");
 
         Object result = aspect.aroundOperation(joinPoint, operation);
 
@@ -50,7 +50,7 @@ class OperationLogAspectContractTest {
         assertThat(record.getOperationType()).isEqualTo("CREATE");
         assertThat(record.isSuccess()).isTrue();
         assertThat(record.getDurationMillis()).isGreaterThanOrEqualTo(0L);
-        assertThat(record.getTrackId()).isEqualTo("track-1");
+        assertThat(record.getTraceId()).isEqualTo("trace-1");
         assertThat(record.getRequestPayload()).contains("******").doesNotContain("secret");
     }
 
@@ -60,7 +60,7 @@ class OperationLogAspectContractTest {
         OperationLogAspect aspect = aspect(sink);
         ProceedingJoinPoint joinPoint = joinPoint(null);
         when(joinPoint.proceed()).thenThrow(new IllegalStateException("保存失败"));
-        bindRequest("DELETE", "/api/users/user-1", "track-2");
+        bindRequest("DELETE", "/api/users/user-1", "trace-2");
 
         assertThatThrownBy(() -> aspect.aroundOperation(
                 joinPoint, operation("系统管理", "删除用户")))
@@ -74,7 +74,7 @@ class OperationLogAspectContractTest {
         assertThat(record.isSuccess()).isFalse();
         assertThat(record.getResponseStatus()).isEqualTo(500);
         assertThat(record.getExceptionMessage()).isEqualTo("保存失败");
-        assertThat(record.getTrackId()).isEqualTo("track-2");
+        assertThat(record.getTraceId()).isEqualTo("trace-2");
     }
 
     private OperationLogAspect aspect(OperationLogSink sink) {
@@ -100,7 +100,7 @@ class OperationLogAspectContractTest {
         return operation;
     }
 
-    private void bindRequest(String method, String uri, String trackId) {
+    private void bindRequest(String method, String uri, String traceId) {
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.setMethod(method);
         request.setRequestURI(uri);
@@ -111,7 +111,7 @@ class OperationLogAspectContractTest {
         cyou.yuanbaomao.base.context.RequestContextHolder.set(RequestContext.builder()
                 .userId("user-1")
                 .username("yuanbao")
-                .trackId(trackId)
+                .traceId(traceId)
                 .build());
     }
 

@@ -53,6 +53,14 @@ const historyRow: ResearchJobHistory = {
     createdAt: Date.UTC(2026, 6, 29, 2, 44),
   }, {
     artifactId: 'artifact-3',
+    analysisRunId: 'analysis-stage1',
+    artifactType: 'STAGE1_CONCLUSION_REPORT',
+    fileName: '美国站美容仪阶段一结论表.pdf',
+    mediaType: 'application/pdf',
+    fileSize: 896,
+    createdAt: Date.UTC(2026, 6, 29, 2, 44),
+  }, {
+    artifactId: 'artifact-4',
     analysisRunId: null,
     artifactType: 'STAGE2_RAW_WORKBOOK',
     fileName: '美国站美容仪阶段二原始数据.xlsx',
@@ -60,7 +68,7 @@ const historyRow: ResearchJobHistory = {
     fileSize: 1024,
     createdAt: Date.UTC(2026, 6, 29, 2, 45),
   }, {
-    artifactId: 'artifact-4',
+    artifactId: 'artifact-5',
     analysisRunId: null,
     artifactType: 'STAGE2_EVIDENCE_WORKBOOK',
     fileName: '美国站美容仪阶段二证据数据.xlsx',
@@ -68,11 +76,19 @@ const historyRow: ResearchJobHistory = {
     fileSize: 768,
     createdAt: Date.UTC(2026, 6, 29, 2, 45),
   }, {
-    artifactId: 'artifact-5',
+    artifactId: 'artifact-6',
+    analysisRunId: 'analysis-stage2',
+    artifactType: 'STAGE2_CONCLUSION_REPORT',
+    fileName: '美国站美容仪阶段二结论表.pdf',
+    mediaType: 'application/pdf',
+    fileSize: 864,
+    createdAt: Date.UTC(2026, 6, 29, 2, 45),
+  }, {
+    artifactId: 'artifact-7',
     analysisRunId: 'analysis-1',
     artifactType: 'AI_ANALYSIS_REPORT',
-    fileName: '美国站美容仪分析报告.md',
-    mediaType: 'text/markdown',
+    fileName: '美国站美容仪分析报告.pdf',
+    mediaType: 'application/pdf',
     fileSize: 1024,
     createdAt: Date.UTC(2026, 6, 29, 2, 45),
   }],
@@ -134,10 +150,14 @@ describe('ResearchHistoryPage', () => {
       .toContain('阶段一原始数据 Excel')
     expect(wrapper.get('[data-testid="history-artifact-group-job-1-STAGE1_EVIDENCE_WORKBOOK"]').text())
       .toContain('阶段一证据数据 Excel')
+    expect(wrapper.get('[data-testid="history-artifact-group-job-1-STAGE1_CONCLUSION_REPORT"]').text())
+      .toContain('阶段一结论表 PDF')
     expect(wrapper.get('[data-testid="history-artifact-group-job-1-STAGE2_RAW_WORKBOOK"]').text())
       .toContain('阶段二原始数据 Excel')
     expect(wrapper.get('[data-testid="history-artifact-group-job-1-STAGE2_EVIDENCE_WORKBOOK"]').text())
       .toContain('阶段二证据数据 Excel')
+    expect(wrapper.get('[data-testid="history-artifact-group-job-1-STAGE2_CONCLUSION_REPORT"]').text())
+      .toContain('阶段二结论表 PDF')
     expect(wrapper.get('[data-testid="history-artifact-group-job-1-AI_ANALYSIS_REPORT"]').text())
       .toContain('AI 分析报告')
 

@@ -47,6 +47,18 @@ public class ResearchDatasetService {
     }
 
     @Transactional(readOnly = true)
+    public Optional<MarketResearchDataset> findPayloadByJobIdAndDatasetCode(
+            String jobId, String datasetCode) {
+        return datasetDao.findPayloadByJobIdAndDatasetCode(jobId, datasetCode);
+    }
+
+    @Transactional(readOnly = true)
+    public List<MarketResearchDataset> listMetadataByJobIdAndDatasetCodes(
+            String jobId, List<String> datasetCodes) {
+        return datasetDao.listMetadataByJobIdAndDatasetCodes(jobId, datasetCodes);
+    }
+
+    @Transactional(readOnly = true)
     public List<ResearchDataset> readEvidenceDatasets(String jobId) {
         return readEvidenceDatasets(jobId, ResearchEvidenceCatalog.DEFINITIONS);
     }

@@ -7,6 +7,7 @@ import cyou.yuanbaomao.sellersprite.research.model.dto.ResearchJobCreateRequest;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import org.junit.jupiter.api.Test;
+import tools.jackson.databind.ObjectMapper;
 
 class CollectionGraphConfigTest {
 
@@ -64,6 +65,28 @@ class CollectionGraphConfigTest {
         assertThat(validator.validate(request))
                 .extracting(violation -> violation.getPropertyPath().toString())
                 .contains("collectionConfig");
+    }
+
+    @Test
+    void shouldIgnoreLegacyDemandTrendNewProductConfig() throws Exception {
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        CollectionGraphConfig config = objectMapper.readValue(
+                """
+                {
+                  "collectKeywordDemandTrend": {
+                    "topN": 77,
+                    "newProduct": 6
+                  }
+                }
+                """,
+                CollectionGraphConfig.class);
+
+        assertThat(config.getCollectKeywordDemandTrend().getTopN()).isEqualTo(77);
+        assertThat(objectMapper.valueToTree(config)
+                        .path("collectKeywordDemandTrend")
+                        .has("newProduct"))
+                .isFalse();
     }
 
     private ResearchJobCreateRequest validRequest() {

@@ -1,6 +1,7 @@
 package cyou.yuanbaomao.sellersprite.research.persistence;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 
 import cyou.yuanbaomao.sellersprite.db.dao.MarketResearchArtifactDao;
 import cyou.yuanbaomao.sellersprite.db.dao.MarketResearchDatasetDao;
@@ -119,6 +120,26 @@ class ResearchPersistenceIntegrationTest {
         assertThat(datasetDao.listByJobId(JOB_ID))
                 .extracting(MarketResearchDataset::getDatasetId)
                 .containsExactly("dataset-1", "dataset-2");
+        assertThat(datasetDao.findPayloadByJobIdAndDatasetCode(JOB_ID, "products"))
+                .get()
+                .satisfies(result -> {
+                    assertThat(result.getDatasetId()).isEqualTo("dataset-1");
+                    assertThat(result.getSourcePayload()).isEqualTo("{}");
+                    assertThat(result.getRequestPayload()).isNull();
+                    assertThat(result.getNormalizedPayload()).isNull();
+                });
+        assertThat(datasetDao.listMetadataByJobIdAndDatasetCodes(
+                        JOB_ID, List.of("products", "keywords")))
+                .extracting(
+                        MarketResearchDataset::getDatasetId,
+                        MarketResearchDataset::getDatasetCode,
+                        MarketResearchDataset::getRecordCount,
+                        MarketResearchDataset::getSourcePayload)
+                .containsExactly(
+                        tuple("dataset-1", "products", 1, null),
+                        tuple("dataset-2", "keywords", 1, null));
+        assertThat(datasetDao.listMetadataByJobIdAndDatasetCodes(JOB_ID, List.of()))
+                .isEmpty();
 
         MarketResearchArtifact artifact = artifact();
         assertThat(artifactDao.save(artifact)).isTrue();

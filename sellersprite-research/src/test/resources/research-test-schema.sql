@@ -115,6 +115,9 @@ CREATE TABLE IF NOT EXISTS market_research_dataset (
     UNIQUE (job_id, node_code, operation, dataset_code, request_hash, deleted)
 );
 
+CREATE INDEX idx_market_research_dataset_job_code_created
+  ON market_research_dataset (job_id, dataset_code, deleted, created_at, dataset_id);
+
 CREATE TABLE IF NOT EXISTS market_research_analysis_run (
   analysis_run_id VARCHAR(36) PRIMARY KEY,
   job_id VARCHAR(36) NOT NULL,
