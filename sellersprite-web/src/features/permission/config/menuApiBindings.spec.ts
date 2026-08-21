@@ -51,6 +51,7 @@ describe('menuApiBindings', () => {
     expect(research?.apis).toEqual([
       { httpMethod: 'GET', pathPattern: '/api/auth/session' },
       { httpMethod: 'GET', pathPattern: '/api/market-research/categories' },
+      { httpMethod: 'POST', pathPattern: '/api/market-research/categories/resolve-by-asins' },
       { httpMethod: 'POST', pathPattern: '/api/market-research/jobs' },
       { httpMethod: 'GET', pathPattern: '/api/market-research/jobs/{jobId}' },
       { httpMethod: 'GET', pathPattern: '/api/market-research/jobs/{jobId}/nodes' },

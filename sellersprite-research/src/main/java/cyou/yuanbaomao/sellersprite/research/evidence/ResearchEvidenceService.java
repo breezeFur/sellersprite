@@ -717,6 +717,31 @@ public class ResearchEvidenceService {
         return evidence(rows);
     }
 
+    /**
+     * 【临时降采样方案 - 不是最终方案】
+     * Keepa 时序数据在老 Listing 或活跃商品上可能包含数千甚至上万个原始变动点。
+     * 若全量展开，会导致单张证据表行数激增（数万行），引发单表 Payload 爆炸（数十 MB）及前端渲染卡顿。
+     * 当前采用简单的等步长抽样（每个指标保留首尾点 + 中间等间距抽样，最多保留 50 个点）做临时兜底。
+     * 注意：不是最终方案！后续可升级为按时间窗口（如近180天/365天）与关键变价拐点（Change Points）的高级聚合。
+     */
+    private static final int MAX_KEEPA_POINTS_PER_METRIC = 50;
+
+    private List<JsonNode> sampleKeepaOrderedPoints(List<JsonNode> orderedPoints) {
+        if (orderedPoints == null || orderedPoints.size() <= MAX_KEEPA_POINTS_PER_METRIC) {
+            return orderedPoints;
+        }
+        int size = orderedPoints.size();
+        List<JsonNode> sampled = new ArrayList<>(MAX_KEEPA_POINTS_PER_METRIC);
+        sampled.add(orderedPoints.get(0));
+        double step = (double) (size - 1) / (MAX_KEEPA_POINTS_PER_METRIC - 1);
+        for (int i = 1; i < MAX_KEEPA_POINTS_PER_METRIC - 1; i++) {
+            int index = (int) Math.round(i * step);
+            sampled.add(orderedPoints.get(index));
+        }
+        sampled.add(orderedPoints.get(size - 1));
+        return sampled;
+    }
+
     private EvidenceRows asinOperationTrendEvidence(List<MarketResearchDataset> datasets) {
         List<MetricDefinition> metrics = List.of(
                 new MetricDefinition("price", "价格", true),
@@ -744,8 +769,10 @@ public class ResearchEvidenceService {
                         .sorted(Comparator.comparingLong(point -> longValue(point, "timePoint")))
                         .toList();
                 NumericRange range = metric.numeric() ? numericRange(orderedPoints) : null;
-                for (int index = 0; index < orderedPoints.size(); index++) {
-                    JsonNode point = orderedPoints.get(index);
+                // 【注意：不是最终方案】对高频 Keepa 时序点进行等步长抽样，防止数据大爆炸
+                List<JsonNode> sampledPoints = sampleKeepaOrderedPoints(orderedPoints);
+                for (int index = 0; index < sampledPoints.size(); index++) {
+                    JsonNode point = sampledPoints.get(index);
                     ObjectNode row = objectMapper.createObjectNode();
                     row.put("ASIN", StringUtils.hasText(text(payload, "asin"))
                             ? text(payload, "asin") : sourceAsin);
@@ -758,7 +785,7 @@ public class ResearchEvidenceService {
                     putDate(row, "时间", first(point, "timePoint"));
                     copy(row, "数值", point, "value");
                     JsonNode previousValue = index == 0
-                            ? null : first(orderedPoints.get(index - 1), "value");
+                            ? null : first(sampledPoints.get(index - 1), "value");
                     putNode(row, "前值", previousValue);
                     BigDecimal currentNumeric = metric.numeric() ? decimalOrNull(point, "value") : null;
                     BigDecimal previousNumeric = metric.numeric() ? decimalOrNull(previousValue) : null;

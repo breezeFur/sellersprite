@@ -19,6 +19,7 @@
         <module>sellersprite-research</module>
         <module>sellersprite-research-graph</module>
         <module>sellersprite-graph-learning</module>
+        <module>sellersprite-mcp-server</module>
         <module>sellersprite-server</module>
     </modules>
 

@@ -185,6 +185,43 @@ class ResearchStageInputServiceTest {
     }
 
     @Test
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    void shouldDeduplicateChildVariantsByParentAsin() {
+        MarketResearchJob job = waitingJob();
+        MarketResearchDataset evidenceProducts = new MarketResearchDataset();
+        evidenceProducts.setDatasetCode("evidence.products");
+        ObjectNode evidencePayload = objectMapper.createObjectNode();
+        var sourceItems = evidencePayload.putArray("items");
+
+        sourceItems.addObject().put("ASIN", "B0CHILD01A").put("父体ASIN", "B0PARENT01").put("变体数", 3);
+        sourceItems.addObject().put("ASIN", "B0CHILD01B").put("父体ASIN", "B0PARENT01").put("变体数", 3);
+        sourceItems.addObject().put("ASIN", "B0CHILD01C").put("父体ASIN", "B0PARENT01").put("变体数", 3);
+        sourceItems.addObject().put("ASIN", "B0SINGLE02").put("父体ASIN", "").put("变体数", 1);
+        sourceItems.addObject().put("ASIN", "B0CHILD03A").put("父体ASIN", "B0PARENT03").put("变体数", 2);
+        sourceItems.addObject().put("ASIN", "B0CHILD03B").put("父体ASIN", "B0PARENT03").put("变体数", 2);
+
+        when(datasetDao.listByJobId(JOB_ID)).thenReturn(List.of(evidenceProducts));
+        when(jobDao.getById(JOB_ID)).thenReturn(job);
+        when(datasetService.readPayload(evidenceProducts)).thenReturn(evidencePayload);
+        when(inputService.from(job)).thenReturn(ResearchInput.builder().jobId(JOB_ID).build());
+
+        service.prepareProductCandidates(JOB_ID);
+
+        ArgumentCaptor<List<ResearchDataset>> datasetsCaptor =
+                ArgumentCaptor.forClass((Class) List.class);
+        verify(datasetService).saveDatasets(
+                any(), any(), any(), datasetsCaptor.capture());
+
+        List<ResearchDataset> saved = datasetsCaptor.getValue();
+        assertThat(saved).singleElement().satisfies(dataset -> {
+            assertThat(dataset.getRecordCount()).isEqualTo(3);
+            List<String> asins = new ArrayList<>();
+            dataset.getPayload().path("items").forEach(row -> asins.add(row.path("asin").asText()));
+            assertThat(asins).containsExactly("B0CHILD01A", "B0SINGLE02", "B0CHILD03A");
+        });
+    }
+
+    @Test
     void shouldRejectSelectionWhenJobIsNotWaitingForProductInput() {
         MarketResearchJob job = waitingJob();
         job.setJobStatus(ResearchJobStatus.RUNNING.name());

@@ -31,6 +31,7 @@ import {
   createResearchJob,
   getResearchCategoryNodes,
   getResearchWorkflowTopology,
+  resolveResearchCategoriesByAsins,
   retryResearchJob,
 } from '../api/researchApi'
 import { downloadResearchArtifact, streamResearchEvents } from '../api/researchStreamApi'
@@ -49,6 +50,7 @@ import {
   resolveResearchWorkflowStepCode,
   type CollectionGraphConfig,
   type ResearchArtifactSummary,
+  type ResearchCategoryCandidate,
   type ResearchCategoryNode,
   type ResearchJobCreateRequest,
   type ResearchJobStatus,
@@ -71,7 +73,6 @@ interface ResearchFormModel {
   month: string
   nodeIdPath: string
   keyword: string
-  seedAsinsText: string
   analysisGoal: string
   collectionConfig: CollectionGraphConfig
 }
@@ -93,7 +94,6 @@ type ResearchWorkspaceSection = ResearchWorkspaceLiveSection | 'selection' | 'ar
 type ResearchAgentWorkspaceSection = 'report' | 'process'
 
 const WORKFLOW_VERSION = 'market-research-v6-cache-insights'
-const MAX_SEED_ASINS = 20
 const HORIZONTAL_STEP_WIDTH_PX = 154
 const VERTICAL_STEP_HEIGHT_PX = 48
 const PRODUCT_SELECTION_EVENT_TYPES = new Set([
@@ -191,7 +191,6 @@ const form = reactive<ResearchFormModel>({
   month: previousBusinessMonth(),
   nodeIdPath: '',
   keyword: '',
-  seedAsinsText: '',
   analysisGoal: '',
   collectionConfig: createDefaultCollectionGraphConfig(),
 })
@@ -216,22 +215,6 @@ const formRules: FormRules<ResearchFormModel> = {
   analysisGoal: [
     { max: 1000, message: '分析目标不能超过 1000 个字符', trigger: 'blur' },
   ],
-  seedAsinsText: [{
-    trigger: ['blur', 'change'],
-    validator: (_rule, value, callback) => {
-      const asins = parseSeedAsins(String(value ?? ''))
-      if (asins.length > MAX_SEED_ASINS) {
-        callback(new Error(`种子 ASIN 最多填写 ${MAX_SEED_ASINS} 个`))
-        return
-      }
-      const invalidAsin = asins.find((asin) => !/^[A-Za-z0-9]{10}$/.test(asin))
-      if (invalidAsin) {
-        callback(new Error(`ASIN ${invalidAsin} 必须是 10 位字母或数字`))
-        return
-      }
-      callback()
-    },
-  }],
 }
 
 const creating = ref(false)
@@ -547,23 +530,71 @@ function invalidateCategorySearch() {
   categoryTreeVersion.value += 1
 }
 
+const categoryAsin = ref('')
+const resolvingCategory = ref(false)
+
+async function handleResolveCategoryByAsin() {
+  const asin = categoryAsin.value.trim().toUpperCase()
+  if (!asin) {
+    ElMessage.warning('请输入要反查的单个 ASIN')
+    return
+  }
+  if (!/^[A-Z0-9]{10}$/.test(asin)) {
+    ElMessage.warning('ASIN 必须是 10 位字母或数字')
+    return
+  }
+
+  resolvingCategory.value = true
+  try {
+    const candidates = await resolveResearchCategoriesByAsins({
+      marketplace: form.marketplace,
+      asins: [asin],
+      month: form.month,
+    })
+    if (!candidates || candidates.length === 0) {
+      ElMessage.info(`未识别到 ASIN [${asin}] 的所属类目，请检查 ASIN 或手动选择类目`)
+      return
+    }
+    const candidate = candidates[0]
+    applyCategoryCandidate(candidate)
+    ElMessage.success(`已自动填入类目：${candidate.displayName}`)
+  } catch (error) {
+    ElMessage.error(errorMessage(error, '反查类目失败'))
+  } finally {
+    resolvingCategory.value = false
+  }
+}
+
+function applyCategoryCandidate(candidate: ResearchCategoryCandidate) {
+  form.nodeIdPath = candidate.nodeIdPath
+  const node: ResearchCategoryNode = {
+    nodeIdPath: candidate.nodeIdPath,
+    nodeLabelPath: candidate.nodeLabelPath ?? null,
+    products: null,
+    nodeLabelLocale: candidate.nodeLabelLocale ?? null,
+    nodeLabelPathLocale: null,
+    displayName: candidate.displayName,
+    nodeId: candidate.nodeId,
+    nodeLabel: candidate.nodeLabel,
+  }
+  categorySearchActive.value = true
+  categorySearchOptions.value = toCategorySearchOptions([node])
+}
+
 async function submitResearchJob() {
   if (submissionLocked.value) return
 
   const valid = await formRef.value?.validate().catch(() => false)
   if (!valid) return
 
-  const seedAsins = parseSeedAsins(form.seedAsinsText).map((asin) => asin.toUpperCase())
   const analysisGoal = form.analysisGoal.trim()
   const collectionConfig = structuredClone(toRaw(form.collectionConfig))
-  collectionConfig.collectSegmentOpportunity.distribution.asins = seedAsins
   const request: ResearchJobCreateRequest = {
     reportName: form.reportName.trim(),
     marketplace: form.marketplace,
     nodeIdPath: form.nodeIdPath,
     month: form.month,
     ...(form.keyword.trim() ? { keyword: form.keyword.trim() } : {}),
-    ...(seedAsins.length > 0 ? { seedAsins } : {}),
     ...(analysisGoal ? { analysisGoal } : {}),
     collectionConfig,
   }
@@ -922,25 +953,30 @@ function clearReconnectTimer() {
   reconnectTimer = null
 }
 
-function parseSeedAsins(source: string) {
-  return source.split(/[\s,，;；]+/).map((item) => item.trim()).filter(Boolean)
-}
-
 function previousBusinessMonth() {
   const now = new Date()
   const previousMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1)
   return `${previousMonth.getFullYear()}-${String(previousMonth.getMonth() + 1).padStart(2, '0')}`
 }
 
+function composeCategoryNodeName(node: ResearchCategoryNode) {
+  if (node.displayName?.trim()) {
+    return node.displayName.trim()
+  }
+  const en = node.nodeLabel?.trim() || lastCategoryPathSegment(node.nodeLabelPath)
+  const zh = node.nodeLabelLocale?.trim() || lastCategoryPathSegment(node.nodeLabelPathLocale)
+  if (en && zh) {
+    return `${en} (${zh})`
+  }
+  return en || zh || node.nodeIdPath
+}
+
 function categoryLabel(node: ResearchCategoryNode) {
-  const name = node.nodeLabelLocale
-    || lastCategoryPathSegment(node.nodeLabelPathLocale)
-    || lastCategoryPathSegment(node.nodeLabelPath)
-    || node.nodeIdPath
+  const name = composeCategoryNodeName(node)
   return node.products === null ? name : `${name}（${node.products}）`
 }
 
-function lastCategoryPathSegment(path: string | null) {
+function lastCategoryPathSegment(path: string | null | undefined) {
   return path?.split(':').at(-1)?.trim() || ''
 }
 
@@ -986,19 +1022,18 @@ function toCategorySearchOptions(nodes: ResearchCategoryNode[]): CascaderOption[
 }
 
 function categoryPathLabels(node: ResearchCategoryNode, nodeIdSegments: string[]) {
-  const localizedLabels = splitCategoryPath(node.nodeLabelPathLocale)
-  if (localizedLabels.length === nodeIdSegments.length) return localizedLabels
+  const enLabels = splitCategoryPath(node.nodeLabelPath)
+  const zhLabels = splitCategoryPath(node.nodeLabelPathLocale)
 
-  const labels = splitCategoryPath(node.nodeLabelPath)
-  if (labels.length === nodeIdSegments.length) return labels
-
-  const fallbackLabels = [...nodeIdSegments]
-  fallbackLabels[fallbackLabels.length - 1] = node.nodeLabelLocale?.trim()
-    || localizedLabels.at(-1)
-    || labels.at(-1)
-    || fallbackLabels.at(-1)
-    || ''
-  return fallbackLabels
+  return nodeIdSegments.map((nodeId, index) => {
+    const en = enLabels[index]?.trim()
+    const zh = zhLabels[index]?.trim()
+      || (index === nodeIdSegments.length - 1 ? node.nodeLabelLocale?.trim() : undefined)
+    if (en && zh) return `${en} (${zh})`
+    if (en) return en
+    if (zh) return zh
+    return nodeId
+  })
 }
 
 function splitCategoryPath(path: string | null) {
@@ -1405,11 +1440,15 @@ onBeforeUnmount(() => {
 
     <div
       class="research-layout"
-      :class="{ 'research-layout--workspace': workspaceMode }"
+      :class="{
+        'research-layout--workspace': workspaceMode,
+        'research-layout--create': !currentJobId,
+      }"
     >
       <section
         v-if="!workspaceMode"
         class="form-panel"
+        :class="{ 'form-panel--create': !currentJobId }"
         :aria-label="currentJob ? '本次市场调研任务参数' : '创建市场调研任务'"
       >
         <ResearchTaskInputSummary
@@ -1480,27 +1519,50 @@ onBeforeUnmount(() => {
               required
             >
               <div class="category-picker">
-                <ElInput
-                  v-model="categoryKeyword"
-                  aria-label="类目搜索关键词"
-                  clearable
-                  data-testid="research-category-search-input"
-                  maxlength="128"
-                  placeholder="输入类目名称或节点 ID"
-                  @clear="resetCategorySearch"
-                  @keyup.enter="searchCategoryOptions"
-                >
-                  <template #append>
-                    <ElButton
-                      aria-label="搜索类目"
-                      data-testid="search-research-categories"
-                      :disabled="!categoryKeyword.trim()"
-                      :icon="Search"
-                      :loading="categorySearchLoading"
-                      @click="searchCategoryOptions"
-                    />
-                  </template>
-                </ElInput>
+                <div class="category-picker__tools">
+                  <ElInput
+                    v-model="categoryKeyword"
+                    aria-label="类目搜索关键词"
+                    clearable
+                    data-testid="research-category-search-input"
+                    maxlength="128"
+                    placeholder="输入类目名称或节点 ID"
+                    @clear="resetCategorySearch"
+                    @keyup.enter="searchCategoryOptions"
+                  >
+                    <template #append>
+                      <ElButton
+                        aria-label="搜索类目"
+                        data-testid="search-research-categories"
+                        :disabled="!categoryKeyword.trim()"
+                        :icon="Search"
+                        :loading="categorySearchLoading"
+                        @click="searchCategoryOptions"
+                      />
+                    </template>
+                  </ElInput>
+                  <ElInput
+                    v-model="categoryAsin"
+                    aria-label="ASIN 反查类目"
+                    clearable
+                    data-testid="research-category-asin-input"
+                    maxlength="10"
+                    placeholder="输入单个 ASIN 反查类目（如 B08GHW4TBS）"
+                    @keyup.enter="handleResolveCategoryByAsin"
+                  >
+                    <template #append>
+                      <ElButton
+                        aria-label="从 ASIN 反查类目"
+                        data-testid="resolve-category-by-asin"
+                        :disabled="!categoryAsin.trim()"
+                        :loading="resolvingCategory"
+                        @click="handleResolveCategoryByAsin"
+                      >
+                        反查类目
+                      </ElButton>
+                    </template>
+                  </ElInput>
+                </div>
                 <ElFormItem
                   class="category-picker__selection"
                   prop="nodeIdPath"
@@ -1538,20 +1600,6 @@ onBeforeUnmount(() => {
                 placeholder="例如：facial cleansing device（可不填）"
                 show-word-limit
               />
-            </ElFormItem>
-            <ElFormItem
-              label="种子 ASIN（可选）"
-              prop="seedAsinsText"
-            >
-              <ElInput
-                v-model="form.seedAsinsText"
-                aria-label="种子 ASIN"
-                type="textarea"
-                :rows="5"
-                resize="vertical"
-                placeholder="每行一个，或使用逗号分隔"
-              />
-              <span class="form-help">最多 20 个，每个 ASIN 为 10 位字母或数字。</span>
             </ElFormItem>
             <ElFormItem label="采集节点参数">
               <ElCollapse
@@ -1826,18 +1874,13 @@ onBeforeUnmount(() => {
       </section>
 
       <section
+        v-if="currentJobId"
         class="workflow-panel"
         :class="{ 'workflow-panel--workspace': workspaceMode }"
         aria-label="市场调研任务进度"
       >
         <StatePanel
-          v-if="!currentJobId"
-          status="empty"
-          title="尚未创建调研任务"
-          description="填写任务参数后，可在此查看阶段执行、人工关卡和最终产物。"
-        />
-        <StatePanel
-          v-else-if="jobLoading && !currentJob"
+          v-if="jobLoading && !currentJob"
           status="loading"
           title="正在读取任务状态"
         />
@@ -2689,7 +2732,71 @@ onBeforeUnmount(() => {
   border-bottom: 1px solid var(--color-border);
 }
 
+.category-picker__tools {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.research-layout--create {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 32px 20px 48px;
+  overflow-y: auto;
+  background: var(--color-surface-muted, #f8fafc);
+}
+
+.form-panel--create {
+  width: 100%;
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 32px 36px;
+  background: var(--color-surface, #ffffff);
+  border: 1px solid var(--color-border, #e2e8f0);
+  border-radius: var(--radius-lg, 12px);
+  box-shadow: 0 4px 16px -2px rgba(0, 0, 0, 0.05), 0 2px 6px -1px rgba(0, 0, 0, 0.03);
+}
+
+.form-panel--create .panel-heading {
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.form-panel--create .panel-heading h2 {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--color-text-primary, #1e293b);
+}
+
+.form-panel--create .panel-heading span {
+  font-size: 13px;
+  color: var(--color-text-secondary, #64748b);
+}
+
+.form-panel--create .create-button {
+  margin-top: 16px;
+  height: 44px;
+  font-size: 15px;
+  font-weight: 600;
+  border-radius: 8px;
+}
+
 @media (max-width: 640px) {
+  .category-picker__tools {
+    grid-template-columns: 1fr;
+  }
+
+  .research-layout--create {
+    padding: 16px 12px 24px;
+  }
+
+  .form-panel--create {
+    padding: 20px 16px;
+    border-radius: var(--radius-md, 8px);
+  }
+
   .collection-config__grid,
   .artifact-list__row {
     grid-template-columns: 1fr;

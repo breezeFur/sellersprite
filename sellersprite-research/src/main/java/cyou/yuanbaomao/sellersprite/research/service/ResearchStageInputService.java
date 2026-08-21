@@ -24,6 +24,7 @@ import cyou.yuanbaomao.sellersprite.research.enums.ResearchPhase;
 import cyou.yuanbaomao.sellersprite.research.model.dto.ResearchProductSelectionRequest;
 import cyou.yuanbaomao.sellersprite.research.model.vo.ResearchProductCandidateVo;
 import cyou.yuanbaomao.sellersprite.research.model.vo.ResearchProductSelectionVo;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
@@ -91,6 +92,7 @@ public class ResearchStageInputService {
         ObjectNode payload = objectMapper.createObjectNode();
         ArrayNode items = payload.putArray("items");
         if (sourceItems.isArray()) {
+            Set<String> seenParentAsins = new HashSet<>();
             for (JsonNode row : sourceItems) {
                 if (items.size() >= PRODUCT_CANDIDATE_LIMIT) {
                     break;
@@ -99,9 +101,16 @@ public class ResearchStageInputService {
                 if (asin.isBlank()) {
                     continue;
                 }
+                String parentAsin = text(row, "父体ASIN");
+                String groupKey = parentAsin.isBlank() ? asin.toUpperCase(Locale.ROOT) : parentAsin.toUpperCase(Locale.ROOT);
+                if (!seenParentAsins.add(groupKey)) {
+                    continue;
+                }
                 ObjectNode candidate = items.addObject();
                 candidate.put("rank", items.size());
                 candidate.put("asin", asin.toUpperCase(Locale.ROOT));
+                candidate.put("parentAsin", groupKey);
+                candidate.put("variations", text(row, "变体数"));
                 candidate.put("imageUrl", text(row, "图片链接"));
                 candidate.put("title", text(row, "标题"));
                 candidate.put("brand", text(row, "品牌"));
@@ -250,6 +259,8 @@ public class ResearchStageInputService {
             candidates.add(ResearchProductCandidateVo.builder()
                     .rank(candidates.size() + 1)
                     .asin(asin.toUpperCase(Locale.ROOT))
+                    .parentAsin(text(row, "parentAsin"))
+                    .variations(text(row, "variations"))
                     .imageUrl(text(row, "imageUrl"))
                     .title(text(row, "title"))
                     .brand(text(row, "brand"))

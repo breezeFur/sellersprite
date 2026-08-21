@@ -170,7 +170,7 @@ function errorMessage(error: unknown, fallback: string) {
     <header class="product-selection__header">
       <div>
         <h3>Top20 商品选择</h3>
-        <span>保留采集接口默认顺序，已选 {{ selectedCount }} 个</span>
+        <span>已按父体去重保留独立爆款，已选 {{ selectedCount }} 个</span>
       </div>
       <ElTag
         v-if="selection"
@@ -240,7 +240,23 @@ function errorMessage(error: unknown, fallback: string) {
               />
               <div>
                 <strong>{{ scope.row.title || scope.row.asin }}</strong>
-                <code>{{ scope.row.asin }}</code>
+                <div class="product-selection__meta">
+                  <code>{{ scope.row.asin }}</code>
+                  <ElTag
+                    v-if="scope.row.variations && Number(scope.row.variations) > 1"
+                    size="small"
+                    type="info"
+                  >
+                    {{ scope.row.variations }} 变体
+                  </ElTag>
+                  <ElTag
+                    v-if="scope.row.parentAsin && scope.row.parentAsin !== scope.row.asin"
+                    size="small"
+                    type="warning"
+                  >
+                    父体: {{ scope.row.parentAsin }}
+                  </ElTag>
+                </div>
                 <span>{{ [scope.row.brand, scope.row.category].filter(Boolean).join(' · ') || '--' }}</span>
               </div>
             </div>
@@ -314,5 +330,5 @@ function errorMessage(error: unknown, fallback: string) {
 </template>
 
 <style scoped>
-.product-selection{display:grid;min-width:0;gap:14px}.product-selection__header{display:flex;align-items:center;justify-content:space-between;gap:16px}.product-selection__header>div{display:grid;gap:4px}.product-selection__header h3{margin:0;color:var(--color-text);font-size:14px;letter-spacing:0}.product-selection__header span,.product-selection__actions>span{color:var(--color-text-secondary);font-size:12px}.product-selection__product{display:grid;min-width:0;grid-template-columns:56px minmax(0,1fr);align-items:center;gap:10px}.product-selection__product :deep(.el-image){width:56px;height:56px;border:1px solid var(--color-border);border-radius:var(--radius-sm);background:var(--color-surface-muted)}.product-selection__product>div{display:grid;min-width:0;gap:3px}.product-selection__product strong{overflow:hidden;color:var(--color-text);font-size:12px;text-overflow:ellipsis;white-space:nowrap}.product-selection__product code{color:var(--color-brand-700);font:11px var(--font-mono)}.product-selection__product span{overflow:hidden;color:var(--color-text-secondary);font-size:11px;text-overflow:ellipsis;white-space:nowrap}.product-selection__actions{display:flex;align-items:center;justify-content:space-between;gap:16px}.product-selection__actions>div{display:flex;flex:0 0 auto;gap:10px}@media(max-width:760px){.product-selection__header,.product-selection__actions{align-items:stretch;flex-direction:column}.product-selection__actions>div{display:grid;grid-template-columns:1fr 1fr}.product-selection__actions .el-button{width:100%;margin:0}}@media(max-width:520px){.product-selection__actions>div{grid-template-columns:1fr}}
+.product-selection{display:grid;min-width:0;gap:14px}.product-selection__header{display:flex;align-items:center;justify-content:space-between;gap:16px}.product-selection__header>div{display:grid;gap:4px}.product-selection__header h3{margin:0;color:var(--color-text);font-size:14px;letter-spacing:0}.product-selection__header span,.product-selection__actions>span{color:var(--color-text-secondary);font-size:12px}.product-selection__product{display:grid;min-width:0;grid-template-columns:56px minmax(0,1fr);align-items:center;gap:10px}.product-selection__product :deep(.el-image){width:56px;height:56px;border:1px solid var(--color-border);border-radius:var(--radius-sm);background:var(--color-surface-muted)}.product-selection__product>div{display:grid;min-width:0;gap:3px}.product-selection__product strong{overflow:hidden;color:var(--color-text);font-size:12px;text-overflow:ellipsis;white-space:nowrap}.product-selection__meta{display:flex;align-items:center;gap:6px;flex-wrap:wrap}.product-selection__product code{color:var(--color-brand-700);font:11px var(--font-mono)}.product-selection__product span{overflow:hidden;color:var(--color-text-secondary);font-size:11px;text-overflow:ellipsis;white-space:nowrap}.product-selection__actions{display:flex;align-items:center;justify-content:space-between;gap:16px}.product-selection__actions>div{display:flex;flex:0 0 auto;gap:10px}@media(max-width:760px){.product-selection__header,.product-selection__actions{align-items:stretch;flex-direction:column}.product-selection__actions>div{display:grid;grid-template-columns:1fr 1fr}.product-selection__actions .el-button{width:100%;margin:0}}@media(max-width:520px){.product-selection__actions>div{grid-template-columns:1fr}}
 </style>

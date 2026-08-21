@@ -29,6 +29,7 @@ vi.mock('vue-router', () => ({
 vi.mock('../api/researchApi', () => ({
   createResearchJob: vi.fn(),
   getResearchCategoryNodes: vi.fn(),
+  resolveResearchCategoriesByAsins: vi.fn(),
   cancelResearchJob: vi.fn(),
   retryResearchJob: vi.fn(),
   getResearchWorkflowTopology: vi.fn(),
@@ -294,7 +295,7 @@ describe('MarketResearchPage', () => {
       nodeIdPath: '172282',
     })
     expect(resolveChildren).toHaveBeenCalledWith([{
-      label: '配件（320）',
+      label: 'Accessories & Supplies (配件)（320）',
       value: '172282:281407',
     }])
     expect(rejectChildren).not.toHaveBeenCalled()
@@ -328,14 +329,14 @@ describe('MarketResearchPage', () => {
 
     const cascader = wrapper.getComponent({ name: 'ElCascader' })
     expect(cascader.props('options')).toEqual([{
-      label: '电子产品',
+      label: 'Electronics (电子产品)',
       value: '172282',
       children: [{
-        label: '配件（320）',
+        label: 'Accessories & Supplies (配件)（320）',
         value: '172282:281407',
         leaf: true,
       }, {
-        label: '耳机（188）',
+        label: 'Headphones (耳机)（188）',
         value: '172282:24046923011',
         leaf: true,
       }],
@@ -438,6 +439,38 @@ describe('MarketResearchPage', () => {
     expect((cascader.props('props') as CascaderProps).lazy).toBe(true)
   })
 
+  it('resolves category from single ASIN and directly applies it to cascader', async () => {
+    const wrapper = mountPage()
+    await flushPromises()
+
+    vi.mocked(researchApi.resolveResearchCategoriesByAsins).mockResolvedValueOnce([
+      {
+        nodeIdPath: '1055398:1063252:1063280',
+        nodeId: '1063280',
+        displayName: 'Blankets & Throws (毯子、盖毯)',
+        nodeLabelPath: 'Home & Kitchen:Bedding:Blankets & Throws',
+        nodeLabel: 'Blankets & Throws',
+        nodeLabelLocale: '毯子、盖毯',
+        matchedCount: 1,
+        matchedAsins: ['B08GHW4TBS'],
+        matchedRatio: 100.0,
+      },
+    ])
+
+    await wrapper.get('input[aria-label="ASIN 反查类目"]').setValue('B08GHW4TBS')
+    await wrapper.get('[data-testid="resolve-category-by-asin"]').trigger('click')
+    await flushPromises()
+
+    expect(researchApi.resolveResearchCategoriesByAsins).toHaveBeenCalledWith({
+      marketplace: 'US',
+      asins: ['B08GHW4TBS'],
+      month: '2026-06',
+    })
+
+    const cascader = wrapper.getComponent({ name: 'ElCascader' })
+    expect(cascader.props('modelValue')).toBe('1055398:1063252:1063280')
+  })
+
   it('creates a job and lets snapshot plus aggregate events drive it to success', async () => {
     vi.mocked(researchApi.createResearchJob).mockResolvedValue({
       jobId: 'job-research-1',
@@ -450,7 +483,6 @@ describe('MarketResearchPage', () => {
     await selectCategory(wrapper)
     await wrapper.get('input[aria-label="报告名称"]').setValue('美容仪美国站市场调研')
     await wrapper.get('input[aria-label="核心关键词"]').setValue('facial cleansing device')
-    await wrapper.get('textarea[aria-label="种子 ASIN"]').setValue('b0mock0001\nB0MOCK0002')
     await wrapper.get('textarea[aria-label="Agent 分析目标"]').setValue('重点判断进入机会和退货风险')
     await wrapper.get('[data-testid="create-research-job"]').trigger('click')
     await flushPromises()
@@ -461,7 +493,6 @@ describe('MarketResearchPage', () => {
       nodeIdPath: '172282:281407',
       month: '2026-06',
       keyword: 'facial cleansing device',
-      seedAsins: ['B0MOCK0001', 'B0MOCK0002'],
       analysisGoal: '重点判断进入机会和退货风险',
       collectionConfig: {
         collectProducts: {
@@ -477,7 +508,7 @@ describe('MarketResearchPage', () => {
           distribution: {
             topN: 100,
             newProduct: 6,
-            asins: ['B0MOCK0001', 'B0MOCK0002'],
+            asins: [],
           },
         },
         collectReviews: {
@@ -543,19 +574,6 @@ describe('MarketResearchPage', () => {
       workflowVersion: 'market-research-v6-cache-insights',
     })
     await flushPromises()
-  })
-
-  it('rejects malformed ASIN text without creating a task', async () => {
-    vi.useRealTimers()
-    const wrapper = mountPage()
-    await selectCategory(wrapper)
-    await wrapper.get('input[aria-label="报告名称"]').setValue('测试报告')
-    await wrapper.get('textarea[aria-label="种子 ASIN"]').setValue('BAD-ASIN')
-    await wrapper.get('[data-testid="create-research-job"]').trigger('click')
-    await flushPromises()
-
-    expect(wrapper.get('.el-form-item.is-error').classes()).toContain('is-error')
-    expect(researchApi.createResearchJob).not.toHaveBeenCalled()
   })
 
   it('restores a failed route job from the first SSE snapshot without polling APIs', async () => {
@@ -1288,7 +1306,7 @@ describe('MarketResearchPage', () => {
 
     routeState.query.jobId = undefined
     await nextTick()
-    expect(wrapper.text()).toContain('尚未创建调研任务')
+    expect(wrapper.text()).toContain('任务参数')
   })
 
   it('manually refreshes by reconnecting from the last acknowledged sequence', async () => {
@@ -1333,7 +1351,7 @@ describe('MarketResearchPage', () => {
     const wrapper = mountPage()
 
     expect(wrapper.text()).toContain('分阶段采集与分析市场数据')
-    expect(wrapper.text()).toContain('阶段执行、人工关卡和最终产物')
+    expect(wrapper.text()).toContain('任务参数')
     expect(wrapper.text()).not.toContain('22 个执行阶段')
   })
 

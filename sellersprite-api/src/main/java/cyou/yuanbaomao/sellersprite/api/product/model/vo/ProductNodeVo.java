@@ -40,9 +40,58 @@ public class ProductNodeVo {
     @Schema(description = "查产品类目响应参数：类目所属所有节点名称中文；大家电:洗碗机")
     private String nodeLabelPathLocale;
 
+    /** 当前类目节点 ID（取 nodeIdPath 末节）；3741271 */
+    @Schema(description = "当前类目节点 ID（取 nodeIdPath 末节）；3741271")
+    private String nodeId;
+
+    /** 当前类目节点英文名称（取 nodeLabelPath 末节）；Dishwashers */
+    @Schema(description = "当前类目节点英文名称（取 nodeLabelPath 末节）；Dishwashers")
+    private String nodeLabel;
+
+    /** 选品习惯展示名称：英文名称 (中文名称)；Dishwashers (洗碗机) */
+    @Schema(description = "选品习惯展示名称：英文名称 (中文名称)；Dishwashers (洗碗机)")
+    private String displayName;
+
     /** 官方响应中未建模字段的原始值。 */
     @Schema(description = "官方响应未建模字段", hidden = true)
     private final Map<String, JsonNode> additionalProperties = new LinkedHashMap<>();
+
+    public String getNodeId() {
+        if (nodeId != null && !nodeId.isBlank()) {
+            return nodeId;
+        }
+        if (nodeIdPath == null || nodeIdPath.isBlank()) {
+            return null;
+        }
+        int lastIndex = nodeIdPath.lastIndexOf(':');
+        return lastIndex >= 0 ? nodeIdPath.substring(lastIndex + 1) : nodeIdPath;
+    }
+
+    public String getNodeLabel() {
+        if (nodeLabel != null && !nodeLabel.isBlank()) {
+            return nodeLabel;
+        }
+        if (nodeLabelPath == null || nodeLabelPath.isBlank()) {
+            return null;
+        }
+        int lastIndex = nodeLabelPath.lastIndexOf(':');
+        return lastIndex >= 0 ? nodeLabelPath.substring(lastIndex + 1) : nodeLabelPath;
+    }
+
+    public String getDisplayName() {
+        if (displayName != null && !displayName.isBlank()) {
+            return displayName;
+        }
+        String en = getNodeLabel();
+        String zh = nodeLabelLocale != null && !nodeLabelLocale.isBlank() ? nodeLabelLocale.trim() : null;
+        if (en != null && !en.isBlank() && zh != null) {
+            return en + " (" + zh + ")";
+        }
+        if (en != null && !en.isBlank()) {
+            return en;
+        }
+        return zh;
+    }
 
     @JsonAnySetter
     public void putAdditionalProperty(String name, JsonNode value) {

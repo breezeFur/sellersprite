@@ -16,6 +16,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.validation.annotation.Validated;
 
+import cyou.yuanbaomao.sellersprite.research.model.dto.CategoryResolveByAsinsRequest;
+import cyou.yuanbaomao.sellersprite.research.model.vo.ResearchCategoryCandidateVo;
+import jakarta.validation.Valid;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+
 @Tag(name = "市场调研类目")
 @RestController
 @RequiredArgsConstructor
@@ -37,5 +43,12 @@ public class ResearchCategoryController {
             @Parameter(description = "历史月份，格式 yyyyMM")
             @RequestParam(value = "month", required = false) String month) {
         return Result.success(researchCategoryService.listProductNodes(marketplace, nodeIdPath, keyword, month));
+    }
+
+    @Operation(summary = "通过 ASIN 反查所属类目候选", description = "批量反查 ASIN 所属类目并聚合推荐候选列表")
+    @PostMapping("/resolve-by-asins")
+    public Result<List<ResearchCategoryCandidateVo>> resolveByAsins(
+            @Valid @RequestBody CategoryResolveByAsinsRequest request) {
+        return Result.success(researchCategoryService.resolveCategoriesByAsins(request));
     }
 }

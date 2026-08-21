@@ -42,15 +42,17 @@ public class MyLoggerAdvisor implements BaseAdvisor {
     @Override
     public ChatClientResponse after(ChatClientResponse response, AdvisorChain chain) {
         ChatResponse chatResponse = response == null ? null : response.chatResponse();
+        Map<String, Object> context = response == null ? Map.of() : response.context();
+        long costMs = elapsed(context);
         if (response != null) {
-            String promptRecordId = contextString(response.context(), AiAdvisorContextKeys.PROMPT_RECORD_ID);
+            String promptRecordId = contextString(context, AiAdvisorContextKeys.PROMPT_RECORD_ID);
             if (!promptRecordId.isBlank()) {
-                promptRecordService.recordSuccess(promptRecordId, chatResponse, elapsed(response.context()));
+                promptRecordService.recordSuccess(promptRecordId, chatResponse, costMs);
             }
         }
         String text = extractText(response);
         if (text != null) {
-            log.info("<<<<<< [模型回复结束] responseChars={}", text.length());
+            log.info("<<<<<< [模型回复结束] 耗时: {}ms, responseChars={}, 回复内容:\n{}", costMs, text.length(), text);
         }
         logToolCalls(response);
         logReasoning(response);
@@ -69,21 +71,25 @@ public class MyLoggerAdvisor implements BaseAdvisor {
                     String delta = extractText(response);
                     if (delta != null) {
                         fullText.append(delta);
-                        log.debug("[TOKEN] chars={}", delta.length());
                     }
                     logToolCalls(response);
                     logReasoning(response);
                 })
                 .doOnComplete(() -> {
-                    log.info("[FINAL] responseChars={}", fullText.length());
+                    long costMs = elapsed(processed.context());
+                    String content = fullText.toString();
+                    log.info("<<<<<< [模型流式回复结束] 耗时: {}ms, responseChars={}, 回复内容:\n{}",
+                            costMs, content.length(), content);
                     if (!promptRecordId.isBlank()) {
-                        ChatResponse mergedResponse = mergeStreamResponse(fullText.toString(), lastResponse.get());
-                        promptRecordService.recordSuccess(promptRecordId, mergedResponse, elapsed(processed.context()));
+                        ChatResponse mergedResponse = mergeStreamResponse(content, lastResponse.get());
+                        promptRecordService.recordSuccess(promptRecordId, mergedResponse, costMs);
                     }
                 })
                 .doOnError(throwable -> {
+                    long costMs = elapsed(processed.context());
+                    log.error("<<<<<< [模型流式回复异常] 耗时: {}ms, error={}", costMs, throwable.getMessage(), throwable);
                     if (!promptRecordId.isBlank()) {
-                        promptRecordService.recordFailure(promptRecordId, throwable, elapsed(processed.context()));
+                        promptRecordService.recordFailure(promptRecordId, throwable, costMs);
                     }
                 });
     }

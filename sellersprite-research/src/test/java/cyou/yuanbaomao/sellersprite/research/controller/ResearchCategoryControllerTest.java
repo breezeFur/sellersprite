@@ -16,6 +16,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import org.springframework.http.MediaType;
+import cyou.yuanbaomao.sellersprite.research.model.vo.ResearchCategoryCandidateVo;
+
 class ResearchCategoryControllerTest {
 
     @Test
@@ -38,5 +43,39 @@ class ResearchCategoryControllerTest {
                 .andExpect(jsonPath("$.data[0].nodeIdPath").value("3760911:11062741"))
                 .andExpect(jsonPath("$.data[0].nodeLabelPath")
                         .value("Beauty & Personal Care:Tools & Accessories"));
+    }
+
+    @Test
+    void shouldExposeResolveByAsinsEndpoint() throws Exception {
+        ResearchCategoryService service = mock(ResearchCategoryService.class);
+        ResearchCategoryCandidateVo candidate = ResearchCategoryCandidateVo.builder()
+                .nodeIdPath("1055398:1063252:1063280")
+                .nodeId("1063280")
+                .nodeLabelPath("Home & Kitchen:Bedding:Blankets & Throws")
+                .nodeLabel("Blankets & Throws")
+                .displayName("Blankets & Throws")
+                .matchedCount(2)
+                .matchedAsins(List.of("B08GHW4TBS", "B08GHW4TBC"))
+                .matchedRatio(100.0)
+                .build();
+
+        when(service.resolveCategoriesByAsins(any())).thenReturn(List.of(candidate));
+        MockMvc mockMvc = MockMvcBuilders
+                .standaloneSetup(new ResearchCategoryController(service))
+                .build();
+
+        mockMvc.perform(post("/api/market-research/categories/resolve-by-asins")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "marketplace": "US",
+                                  "month": "2026-07",
+                                  "asins": ["B08GHW4TBS", "B08GHW4TBC"]
+                                }
+                                """))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data[0].nodeIdPath").value("1055398:1063252:1063280"))
+                .andExpect(jsonPath("$.data[0].nodeLabel").value("Blankets & Throws"))
+                .andExpect(jsonPath("$.data[0].matchedCount").value(2));
     }
 }

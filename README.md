@@ -24,6 +24,7 @@ SellerSprite Open API 全栈集成服务。项目已同步 `D:\develop\yuanbaoma
 | `sellersprite-ai` | AI 聊天、会话、记忆、Prompt 审计、SellerSprite `@Tool` 和市场调研 Curation Agent。 |
 | `sellersprite-research` | 市场调研业务域、Mock/Remote 数据源、不可变证据、Excel、分析运行和持久化事件流。 |
 | `sellersprite-research-graph` | Spring AI Alibaba Graph 固定工作流、数据库 Dispatcher、执行租约和 checkpoint 恢复。 |
+| `sellersprite-mcp-server` | 独立 SellerSprite API MCP 服务，以 Streamable HTTP 或 stdio 暴露当前 45 个 API 工具。 |
 | `sellersprite-server` | Spring Boot 启动入口和模块装配。 |
 | `sellersprite-web` | Vue 管理台、动态菜单、权限控制、AI 聊天、SellerSprite 调试台和市场调研对话工作区。 |
 
@@ -39,6 +40,28 @@ SellerSprite Open API 全栈集成服务。项目已同步 `D:\develop\yuanbaoma
 - 实际调用卖家精灵上游时提供 `SELLERSPRITE_API_SECRET_KEY`
 
 默认使用本地缓存；切换 Redis 时按 `ybm.cache` 与 Spring Data Redis 标准配置补充连接信息。
+
+## SellerSprite API MCP 服务
+
+`sellersprite-mcp-server` 将 `sellersprite-api` 当前登记的 45 个 SellerSprite 操作逐一映射为 MCP 工具，工具名统一使用 `sellersprite_` 前缀。它只复用现有 API Service、鉴权、字典转换和错误处理，不改变原有 REST 代理与市场调研工作流。
+
+Streamable HTTP 默认监听 8128 端口：
+
+```powershell
+$env:SPRING_PROFILES_ACTIVE = "streamable,local"
+$env:SELLERSPRITE_API_SECRET_KEY = "<your-secret-key>"
+.\mvnw.cmd -pl sellersprite-mcp-server spring-boot:run
+```
+
+stdio 模式：
+
+```powershell
+$env:SPRING_PROFILES_ACTIVE = "stdio,local"
+$env:SELLERSPRITE_API_SECRET_KEY = "<your-secret-key>"
+.\mvnw.cmd -pl sellersprite-mcp-server spring-boot:run
+```
+
+运行 MCP 服务仍需要当前项目的数据库字典配置，因为 API Client 会把稳定字典标签转换为 SellerSprite 官方参数值；密钥和数据库连接应通过本地 profile 或环境变量注入，不要写入 Git 跟踪文件。
 
 ## 数据库初始化与升级
 

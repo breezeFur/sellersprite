@@ -2,6 +2,7 @@ import { apiClient, type ApiClient } from '@/shared/api/http'
 import type { PageResult } from '@/shared/api/types'
 
 import type {
+  ResearchCategoryCandidate,
   ResearchCategoryNode,
   ResearchCategoryNodeQuery,
   ResearchEvidencePage,
@@ -36,6 +37,25 @@ export function getResearchCategoryNodes(
       month: toSellerSpriteMonth(query.month),
       ...(nodeIdPath ? { nodeIdPath } : {}),
       ...(keyword ? { keyword } : {}),
+    },
+  })
+}
+
+export function resolveResearchCategoriesByAsins(
+  data: {
+    marketplace: string
+    asins: string[]
+    month?: string
+  },
+  client: ApiClient = apiClient,
+) {
+  return client.request<ResearchCategoryCandidate[]>({
+    method: 'POST',
+    url: `${RESEARCH_CATEGORIES_PATH}/resolve-by-asins`,
+    data: {
+      marketplace: data.marketplace,
+      asins: data.asins,
+      ...(data.month ? { month: toSellerSpriteMonth(data.month) } : {}),
     },
   })
 }

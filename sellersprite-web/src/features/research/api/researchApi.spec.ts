@@ -18,6 +18,7 @@ import {
   getResearchWorkflowTopology,
   listResearchEvidenceTables,
   pageResearchJobs,
+  resolveResearchCategoriesByAsins,
   retryResearchJob,
   submitResearchProductSelection,
 } from './researchApi'
@@ -92,6 +93,27 @@ describe('researchApi', () => {
       url: '/market-research/categories',
       params: {
         marketplace: 'US',
+        month: '202607',
+      },
+    })
+  })
+
+  it('resolves categories by asins with normalized payload and month', async () => {
+    const { client, request } = createClient()
+    request.mockResolvedValue([])
+
+    await resolveResearchCategoriesByAsins({
+      marketplace: 'US',
+      asins: ['B08GHW4TBS', 'B08GHW4TBC'],
+      month: '2026-07',
+    }, client)
+
+    expect(request).toHaveBeenCalledWith({
+      method: 'POST',
+      url: '/market-research/categories/resolve-by-asins',
+      data: {
+        marketplace: 'US',
+        asins: ['B08GHW4TBS', 'B08GHW4TBC'],
         month: '202607',
       },
     })

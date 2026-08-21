@@ -404,6 +404,43 @@ class ResearchEvidenceServiceTest {
                 .containsExactly("价格", "价格", "大类BSR");
     }
 
+    @Test
+    void shouldSampleHighFrequencyKeepaTrendPointsWhenExceedingLimit() {
+        ObjectMapper objectMapper = new ObjectMapper();
+        ResearchDatasetService datasetService = mock(ResearchDatasetService.class);
+        MarketResearchDataset keepa = dataset("asin-keepa-trend.B0HEAVY001");
+        ObjectNode keepaPayload = objectMapper.createObjectNode();
+        keepaPayload.put("asin", "B0HEAVY001");
+        keepaPayload.put("brand", "HeavyBrand");
+        keepaPayload.put("title", "HeavyTitle");
+
+        var pricePoints = keepaPayload.putArray("price");
+        for (int i = 0; i < 200; i++) {
+            var point = pricePoints.addObject();
+            point.put("timePoint", 1700000000000L + i * 86400000L);
+            point.put("value", 10 + i);
+        }
+
+        List<MarketResearchDataset> datasets = List.of(keepa);
+        when(datasetService.listByJobId(JOB_ID)).thenReturn(datasets);
+        when(datasetService.readPayload(keepa)).thenReturn(keepaPayload);
+        ResearchEvidenceService service = new ResearchEvidenceService(datasetService, objectMapper);
+
+        ResearchDataset keepaEvidence = service.prepare(
+                job(), cyou.yuanbaomao.sellersprite.research.enums.ResearchPhase
+                        .PREPARE_ASIN_OPERATION_TREND_EVIDENCE);
+
+        assertThat(keepaEvidence.getPayload().path("items")).hasSize(50);
+        assertThat(keepaEvidence.getPayload().at("/items/0/数值").decimalValue())
+                .isEqualByComparingTo("10");
+        assertThat(keepaEvidence.getPayload().at("/items/49/数值").decimalValue())
+                .isEqualByComparingTo("209");
+        assertThat(keepaEvidence.getPayload().at("/items/0/区间最小值").decimalValue())
+                .isEqualByComparingTo("10");
+        assertThat(keepaEvidence.getPayload().at("/items/0/区间最大值").decimalValue())
+                .isEqualByComparingTo("209");
+    }
+
     private void append(
             List<MarketResearchDataset> stored,
             Map<MarketResearchDataset, JsonNode> payloads,

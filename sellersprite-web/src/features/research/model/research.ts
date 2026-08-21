@@ -323,6 +323,21 @@ export interface ResearchCategoryNode {
   products: number | null
   nodeLabelLocale: string | null
   nodeLabelPathLocale: string | null
+  nodeId?: string | null
+  nodeLabel?: string | null
+  displayName?: string | null
+}
+
+export interface ResearchCategoryCandidate {
+  nodeIdPath: string
+  nodeId?: string | null
+  nodeLabelPath?: string | null
+  nodeLabel?: string | null
+  nodeLabelLocale?: string | null
+  displayName: string
+  matchedCount: number
+  matchedAsins: string[]
+  matchedRatio: number
 }
 
 export interface ResearchJobCreated {
@@ -510,6 +525,8 @@ export interface ResearchEvidencePage {
 export interface ResearchProductCandidate {
   rank: number
   asin: string
+  parentAsin?: string | null
+  variations?: number | string | null
   imageUrl: string | null
   title: string | null
   brand: string | null
