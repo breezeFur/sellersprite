@@ -1,0 +1,15 @@
+server:
+  port: ${SERVER_PORT:8128}
+
+spring:
+  ai:
+    mcp:
+      server:
+        name: sellersprite-api-mcp-server
+        version: 1.0.0
+        type: SYNC
+        protocol: STREAMABLE
+        stdio: false
+  main:
+    web-application-type: servlet
+    banner-mode: off

@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: sellersprite-mcp-server
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:streamable}
+
+sellersprite:
+  api:
+    enabled: ${SELLERSPRITE_API_ENABLED:true}
+    base-url: ${SELLERSPRITE_API_BASE_URL:https://api.sellersprite.com}
+    secret-key: ${SELLERSPRITE_API_SECRET_KEY:}
+    connect-timeout: ${SELLERSPRITE_API_CONNECT_TIMEOUT:5s}
+    read-timeout: ${SELLERSPRITE_API_READ_TIMEOUT:30s}
